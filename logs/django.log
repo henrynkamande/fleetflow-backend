@@ -1,0 +1,172 @@
+[INFO] 2026-04-29 12:49:53,412 autoreload 1396563 140178824339968 Watching for file changes with StatReloader
+[INFO] 2026-04-29 12:49:53,412 autoreload 1396563 140178824339968 Watching for file changes with StatReloader
+[INFO] 2026-04-29 12:51:01,414 autoreload 1397618 140624450249216 Watching for file changes with StatReloader
+[INFO] 2026-04-29 12:51:01,414 autoreload 1397618 140624450249216 Watching for file changes with StatReloader
+[INFO] 2026-04-29 12:51:43,422 autoreload 1398263 140276269478400 Watching for file changes with StatReloader
+[INFO] 2026-04-29 12:51:43,422 autoreload 1398263 140276269478400 Watching for file changes with StatReloader
+[INFO] 2026-04-29 13:00:58,972 autoreload 1406387 139807011316224 Watching for file changes with StatReloader
+[INFO] 2026-04-29 13:00:58,972 autoreload 1406387 139807011316224 Watching for file changes with StatReloader
+[INFO] 2026-04-29 13:01:20,510 autoreload 1406699 140278627709440 Watching for file changes with StatReloader
+[INFO] 2026-04-29 13:01:20,510 autoreload 1406699 140278627709440 Watching for file changes with StatReloader
+[INFO] 2026-04-29 14:41:37,142 autoreload 1500887 140620604674560 Watching for file changes with StatReloader
+[INFO] 2026-04-29 14:41:37,142 autoreload 1500887 140620604674560 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:35:16,785 autoreload 70142 140536051855872 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:35:16,785 autoreload 70142 140536051855872 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:36:07,720 autoreload 70953 140176170545664 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:36:07,720 autoreload 70953 140176170545664 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:38:11,513 autoreload 70953 140176170545664 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-03 13:38:11,513 autoreload 70953 140176170545664 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-03 13:38:12,356 autoreload 72816 140307814593024 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:38:12,356 autoreload 72816 140307814593024 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:38:13,708 autoreload 72816 140307814593024 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-03 13:38:13,708 autoreload 72816 140307814593024 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-03 13:38:14,179 autoreload 72849 139815573701120 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:38:14,179 autoreload 72849 139815573701120 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:38:16,431 autoreload 72849 139815573701120 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-03 13:38:16,431 autoreload 72849 139815573701120 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-03 13:38:17,123 autoreload 72899 140599465865728 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:38:17,123 autoreload 72899 140599465865728 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:38:18,383 autoreload 72899 140599465865728 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-03 13:38:18,383 autoreload 72899 140599465865728 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-03 13:38:18,935 autoreload 72944 140418281861632 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:38:18,935 autoreload 72944 140418281861632 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:38:57,068 autoreload 72944 140418281861632 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-03 13:38:57,068 autoreload 72944 140418281861632 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-03 13:38:57,591 autoreload 73503 139775303557632 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:38:57,591 autoreload 73503 139775303557632 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:38:58,903 autoreload 73503 139775303557632 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-03 13:38:58,903 autoreload 73503 139775303557632 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-03 13:38:59,473 autoreload 73537 139993358635520 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:38:59,473 autoreload 73537 139993358635520 Watching for file changes with StatReloader
+[INFO] 2026-05-03 13:41:22,942 views 73537 139993294042816 Welcome email sent to john.kamau@example.com
+[INFO] 2026-05-03 13:41:22,942 views 73537 139993294042816 Welcome email sent to john.kamau@example.com
+[INFO] 2026-05-03 13:41:22,942 views 73537 139993294042816 New fleet owner registered: john.kamau@example.com
+[INFO] 2026-05-03 13:41:22,942 views 73537 139993294042816 New fleet owner registered: john.kamau@example.com
+[INFO] 2026-05-03 13:41:22,944 basehttp 73537 139993294042816 "POST /users/api/auth/register/ HTTP/1.1" 201 1430
+[INFO] 2026-05-03 13:41:22,944 basehttp 73537 139993294042816 "POST /users/api/auth/register/ HTTP/1.1" 201 1430
+[INFO] 2026-05-03 13:43:49,481 views 73537 139993294042816 User logged in: john.kamau@example.com
+[INFO] 2026-05-03 13:43:49,481 views 73537 139993294042816 User logged in: john.kamau@example.com
+[INFO] 2026-05-03 13:43:49,484 basehttp 73537 139993294042816 "POST /users/api/auth/login/ HTTP/1.1" 200 1423
+[INFO] 2026-05-03 13:43:49,484 basehttp 73537 139993294042816 "POST /users/api/auth/login/ HTTP/1.1" 200 1423
+[WARNING] 2026-05-03 13:46:53,311 basehttp 73537 139993294042816 "POST /users/api/auth/logout/ HTTP/1.1" 401 58
+[WARNING] 2026-05-03 13:46:53,311 basehttp 73537 139993294042816 "POST /users/api/auth/logout/ HTTP/1.1" 401 58
+[WARNING] 2026-05-03 13:47:22,434 basehttp 73537 139993294042816 "POST /users/api/auth/logout/ HTTP/1.1" 401 176
+[WARNING] 2026-05-03 13:47:22,434 basehttp 73537 139993294042816 "POST /users/api/auth/logout/ HTTP/1.1" 401 176
+[WARNING] 2026-05-03 13:47:50,862 basehttp 73537 139993294042816 "POST /users/api/auth/logout/ HTTP/1.1" 400 39
+[WARNING] 2026-05-03 13:47:50,862 basehttp 73537 139993294042816 "POST /users/api/auth/logout/ HTTP/1.1" 400 39
+[WARNING] 2026-05-03 13:47:52,103 basehttp 73537 139993294042816 "POST /users/api/auth/logout/ HTTP/1.1" 400 39
+[WARNING] 2026-05-03 13:47:52,103 basehttp 73537 139993294042816 "POST /users/api/auth/logout/ HTTP/1.1" 400 39
+[WARNING] 2026-05-03 13:48:25,235 basehttp 73537 139993294042816 "POST /users/api/auth/logout/ HTTP/1.1" 400 39
+[WARNING] 2026-05-03 13:48:25,235 basehttp 73537 139993294042816 "POST /users/api/auth/logout/ HTTP/1.1" 400 39
+[INFO] 2026-05-03 13:48:53,422 views 73537 139993294042816 User logged out: john.kamau@example.com
+[INFO] 2026-05-03 13:48:53,422 views 73537 139993294042816 User logged out: john.kamau@example.com
+[INFO] 2026-05-03 13:48:53,422 basehttp 73537 139993294042816 "POST /users/api/auth/logout/ HTTP/1.1" 200 37
+[INFO] 2026-05-03 13:48:53,422 basehttp 73537 139993294042816 "POST /users/api/auth/logout/ HTTP/1.1" 200 37
+[INFO] 2026-05-03 13:50:54,619 views 73537 139993294042816 User logged in: john.kamau@example.com
+[INFO] 2026-05-03 13:50:54,619 views 73537 139993294042816 User logged in: john.kamau@example.com
+[INFO] 2026-05-03 13:50:54,621 basehttp 73537 139993294042816 "POST /users/api/auth/login/ HTTP/1.1" 200 1423
+[INFO] 2026-05-03 13:50:54,621 basehttp 73537 139993294042816 "POST /users/api/auth/login/ HTTP/1.1" 200 1423
+[INFO] 2026-05-03 13:51:20,998 views 73537 139993294042816 Company registration email sent to john.kamau@example.com
+[INFO] 2026-05-03 13:51:20,998 views 73537 139993294042816 Company registration email sent to john.kamau@example.com
+[INFO] 2026-05-03 13:51:21,006 views 73537 139993294042816 Company registered by john.kamau@example.com: Speedy Logistics Ltd
+[INFO] 2026-05-03 13:51:21,006 views 73537 139993294042816 Company registered by john.kamau@example.com: Speedy Logistics Ltd
+[INFO] 2026-05-03 13:51:21,013 basehttp 73537 139993294042816 "POST /users/api/company/register/ HTTP/1.1" 201 2141
+[INFO] 2026-05-03 13:51:21,013 basehttp 73537 139993294042816 "POST /users/api/company/register/ HTTP/1.1" 201 2141
+[INFO] 2026-05-03 13:53:18,222 basehttp 73537 139993294042816 "GET /users/api/company/ HTTP/1.1" 200 881
+[INFO] 2026-05-03 13:53:18,222 basehttp 73537 139993294042816 "GET /users/api/company/ HTTP/1.1" 200 881
+[INFO] 2026-05-03 13:56:05,463 views 73537 139993294042816 Company updated by john.kamau@example.com: Speedy Logistics Ltd
+[INFO] 2026-05-03 13:56:05,463 views 73537 139993294042816 Company updated by john.kamau@example.com: Speedy Logistics Ltd
+[INFO] 2026-05-03 13:56:05,468 basehttp 73537 139993294042816 "PATCH /users/api/company/update/ HTTP/1.1" 200 938
+[INFO] 2026-05-03 13:56:05,468 basehttp 73537 139993294042816 "PATCH /users/api/company/update/ HTTP/1.1" 200 938
+[WARNING] 2026-05-03 13:58:38,379 basehttp 73537 139993294042816 "POST /users/api/company/status/ HTTP/1.1" 405 41
+[WARNING] 2026-05-03 13:58:38,379 basehttp 73537 139993294042816 "POST /users/api/company/status/ HTTP/1.1" 405 41
+[INFO] 2026-05-03 13:59:05,647 views 73537 139993294042816 Onboarding email sent to driver1@example.com
+[INFO] 2026-05-03 13:59:05,647 views 73537 139993294042816 Onboarding email sent to driver1@example.com
+[INFO] 2026-05-03 13:59:05,651 views 73537 139993294042816 Driver onboarded by john.kamau@example.com: driver1@example.com for company Speedy Logistics Ltd
+[INFO] 2026-05-03 13:59:05,651 views 73537 139993294042816 Driver onboarded by john.kamau@example.com: driver1@example.com for company Speedy Logistics Ltd
+[INFO] 2026-05-03 13:59:05,658 basehttp 73537 139993294042816 "POST /users/api/drivers/onboard/ HTTP/1.1" 201 1469
+[INFO] 2026-05-03 13:59:05,658 basehttp 73537 139993294042816 "POST /users/api/drivers/onboard/ HTTP/1.1" 201 1469
+[INFO] 2026-05-03 14:02:06,423 autoreload 93586 140679320654336 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:02:06,423 autoreload 93586 140679320654336 Watching for file changes with StatReloader
+[WARNING] 2026-05-03 14:02:36,266 basehttp 93586 140679256733376 "GET /users/api/auth/verify-otp/ HTTP/1.1" 405 40
+[WARNING] 2026-05-03 14:02:36,266 basehttp 93586 140679256733376 "GET /users/api/auth/verify-otp/ HTTP/1.1" 405 40
+[WARNING] 2026-05-03 14:02:42,820 basehttp 93586 140679256733376 "POST /users/api/auth/verify-otp/ HTTP/1.1" 400 68
+[WARNING] 2026-05-03 14:02:42,820 basehttp 93586 140679256733376 "POST /users/api/auth/verify-otp/ HTTP/1.1" 400 68
+[INFO] 2026-05-03 14:12:25,324 autoreload 93586 140679320654336 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-03 14:12:25,324 autoreload 93586 140679320654336 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-03 14:12:26,942 autoreload 102682 140621163082240 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:12:26,942 autoreload 102682 140621163082240 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:17:39,562 autoreload 102682 140621163082240 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-03 14:17:39,562 autoreload 102682 140621163082240 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-03 14:17:40,049 autoreload 107349 140109477061120 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:17:40,049 autoreload 107349 140109477061120 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:17:52,712 autoreload 107349 140109477061120 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-03 14:17:52,712 autoreload 107349 140109477061120 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-03 14:17:53,297 autoreload 107538 140284251091456 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:17:53,297 autoreload 107538 140284251091456 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:22:13,448 autoreload 107538 140284251091456 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/models.py changed, reloading.
+[INFO] 2026-05-03 14:22:13,448 autoreload 107538 140284251091456 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/models.py changed, reloading.
+[INFO] 2026-05-03 14:22:13,972 autoreload 111329 140026207998464 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:22:13,972 autoreload 111329 140026207998464 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:22:15,377 autoreload 111329 140026207998464 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/models.py changed, reloading.
+[INFO] 2026-05-03 14:22:15,377 autoreload 111329 140026207998464 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/models.py changed, reloading.
+[INFO] 2026-05-03 14:22:16,081 autoreload 111356 140056836678144 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:22:16,081 autoreload 111356 140056836678144 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:22:20,402 autoreload 111356 140056836678144 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/models.py changed, reloading.
+[INFO] 2026-05-03 14:22:20,402 autoreload 111356 140056836678144 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/models.py changed, reloading.
+[INFO] 2026-05-03 14:22:20,980 autoreload 111431 140501941088768 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:22:20,980 autoreload 111431 140501941088768 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:29:23,127 autoreload 111431 140501941088768 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-05-03 14:29:23,127 autoreload 111431 140501941088768 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-05-03 14:29:23,714 autoreload 117966 140201193652736 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:29:23,714 autoreload 117966 140201193652736 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:29:33,396 autoreload 117966 140201193652736 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/urls.py changed, reloading.
+[INFO] 2026-05-03 14:29:33,396 autoreload 117966 140201193652736 /home/genius/Projects/fleet_flow/fleetflow-backend/oauth/urls.py changed, reloading.
+[INFO] 2026-05-03 14:29:33,979 autoreload 118118 140419969864192 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:29:33,979 autoreload 118118 140419969864192 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:30:47,130 autoreload 119212 140124202492416 Watching for file changes with StatReloader
+[INFO] 2026-05-03 14:30:47,130 autoreload 119212 140124202492416 Watching for file changes with StatReloader
+[WARNING] 2026-05-03 14:34:21,263 basehttp 119212 140124138501824 "POST /users/api/auth/register/ HTTP/1.1" 400 113
+[WARNING] 2026-05-03 14:34:21,263 basehttp 119212 140124138501824 "POST /users/api/auth/register/ HTTP/1.1" 400 113
+[INFO] 2026-05-03 14:37:57,372 views 119212 140124138501824 User logged in: john.kamau@example.com
+[INFO] 2026-05-03 14:37:57,372 views 119212 140124138501824 User logged in: john.kamau@example.com
+[INFO] 2026-05-03 14:37:57,380 basehttp 119212 140124138501824 "POST /users/api/auth/login/ HTTP/1.1" 200 2547
+[INFO] 2026-05-03 14:37:57,380 basehttp 119212 140124138501824 "POST /users/api/auth/login/ HTTP/1.1" 200 2547
+[WARNING] 2026-05-03 14:38:32,496 basehttp 119212 140124138501824 "POST /users/api/drivers/onboard/ HTTP/1.1" 400 113
+[WARNING] 2026-05-03 14:38:32,496 basehttp 119212 140124138501824 "POST /users/api/drivers/onboard/ HTTP/1.1" 400 113
+[ERROR] 2026-05-03 14:39:00,150 basehttp 119212 140124138501824 "POST /users/api/drivers/onboard/ HTTP/1.1" 500 232609
+[ERROR] 2026-05-03 14:39:00,150 basehttp 119212 140124138501824 "POST /users/api/drivers/onboard/ HTTP/1.1" 500 232609
+[WARNING] 2026-05-03 14:39:19,242 basehttp 119212 140124138501824 "POST /users/api/drivers/onboard/ HTTP/1.1" 400 113
+[WARNING] 2026-05-03 14:39:19,242 basehttp 119212 140124138501824 "POST /users/api/drivers/onboard/ HTTP/1.1" 400 113
+[WARNING] 2026-05-03 14:39:31,683 basehttp 119212 140124138501824 "POST /users/api/drivers/onboard/ HTTP/1.1" 400 64
+[WARNING] 2026-05-03 14:39:31,683 basehttp 119212 140124138501824 "POST /users/api/drivers/onboard/ HTTP/1.1" 400 64
+[ERROR] 2026-05-03 14:39:40,025 basehttp 119212 140124138501824 "POST /users/api/drivers/onboard/ HTTP/1.1" 500 232753
+[ERROR] 2026-05-03 14:39:40,025 basehttp 119212 140124138501824 "POST /users/api/drivers/onboard/ HTTP/1.1" 500 232753
+[WARNING] 2026-05-03 14:40:09,003 basehttp 119212 140124138501824 "POST /users/api/drivers/onboard/ HTTP/1.1" 400 113
+[WARNING] 2026-05-03 14:40:09,003 basehttp 119212 140124138501824 "POST /users/api/drivers/onboard/ HTTP/1.1" 400 113
+[INFO] 2026-05-04 14:33:50,564 autoreload 689987 140199514206720 Watching for file changes with StatReloader
+[INFO] 2026-05-04 14:33:50,564 autoreload 689987 140199514206720 Watching for file changes with StatReloader
+[INFO] 2026-05-04 14:34:43,148 autoreload 690820 140113813303808 Watching for file changes with StatReloader
+[INFO] 2026-05-04 14:34:43,148 autoreload 690820 140113813303808 Watching for file changes with StatReloader
+[INFO] 2026-05-04 16:40:24,134 autoreload 690820 140113813303808 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-04 16:40:24,134 autoreload 690820 140113813303808 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-04 16:40:24,977 autoreload 729430 140229614936576 Watching for file changes with StatReloader
+[INFO] 2026-05-04 16:40:24,977 autoreload 729430 140229614936576 Watching for file changes with StatReloader
+[INFO] 2026-05-04 16:40:27,354 autoreload 729430 140229614936576 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-04 16:40:27,354 autoreload 729430 140229614936576 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-04 16:40:28,169 autoreload 729471 139910553141760 Watching for file changes with StatReloader
+[INFO] 2026-05-04 16:40:28,169 autoreload 729471 139910553141760 Watching for file changes with StatReloader
+[INFO] 2026-05-04 16:41:05,930 autoreload 729471 139910553141760 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-04 16:41:05,930 autoreload 729471 139910553141760 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-04 16:41:06,693 autoreload 730044 139887910261248 Watching for file changes with StatReloader
+[INFO] 2026-05-04 16:41:06,693 autoreload 730044 139887910261248 Watching for file changes with StatReloader
+[INFO] 2026-05-04 16:41:08,133 autoreload 730044 139887910261248 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-04 16:41:08,133 autoreload 730044 139887910261248 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-04 16:41:08,899 autoreload 730071 140618069504512 Watching for file changes with StatReloader
+[INFO] 2026-05-04 16:41:08,899 autoreload 730071 140618069504512 Watching for file changes with StatReloader
+[INFO] 2026-05-04 16:41:10,450 autoreload 730071 140618069504512 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-04 16:41:10,450 autoreload 730071 140618069504512 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-04 16:41:11,292 autoreload 730119 140300892721664 Watching for file changes with StatReloader
+[INFO] 2026-05-04 16:41:11,292 autoreload 730119 140300892721664 Watching for file changes with StatReloader
+[INFO] 2026-05-04 16:42:15,558 autoreload 731081 139996176769536 Watching for file changes with StatReloader
+[INFO] 2026-05-04 16:42:15,558 autoreload 731081 139996176769536 Watching for file changes with StatReloader
