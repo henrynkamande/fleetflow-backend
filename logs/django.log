@@ -170,3 +170,199 @@
 [INFO] 2026-05-04 16:41:11,292 autoreload 730119 140300892721664 Watching for file changes with StatReloader
 [INFO] 2026-05-04 16:42:15,558 autoreload 731081 139996176769536 Watching for file changes with StatReloader
 [INFO] 2026-05-04 16:42:15,558 autoreload 731081 139996176769536 Watching for file changes with StatReloader
+[INFO] 2026-05-08 06:58:54,765 autoreload 24913 140237519593984 Watching for file changes with StatReloader
+[INFO] 2026-05-08 06:58:54,765 autoreload 24913 140237519593984 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:35:05,802 autoreload 73435 140140005634560 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:35:05,802 autoreload 73435 140140005634560 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:41:58,532 autoreload 73435 140140005634560 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-08 08:41:58,532 autoreload 73435 140140005634560 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-08 08:41:59,134 autoreload 79536 140318277526016 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:41:59,134 autoreload 79536 140318277526016 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:42:01,360 autoreload 79536 140318277526016 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-08 08:42:01,360 autoreload 79536 140318277526016 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-08 08:42:02,034 autoreload 79580 140398645563904 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:42:02,034 autoreload 79580 140398645563904 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:42:03,238 autoreload 79580 140398645563904 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-08 08:42:03,238 autoreload 79580 140398645563904 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-08 08:42:03,834 autoreload 79607 140387392557568 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:42:03,834 autoreload 79607 140387392557568 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:42:07,026 autoreload 79607 140387392557568 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-08 08:42:07,026 autoreload 79607 140387392557568 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-08 08:42:07,756 autoreload 79677 140211410784768 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:42:07,756 autoreload 79677 140211410784768 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:42:09,197 autoreload 79677 140211410784768 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-08 08:42:09,197 autoreload 79677 140211410784768 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-08 08:42:09,751 autoreload 79714 140408036389376 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:42:09,751 autoreload 79714 140408036389376 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:42:21,518 autoreload 79714 140408036389376 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-08 08:42:21,518 autoreload 79714 140408036389376 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-08 08:42:22,401 autoreload 79902 140242136928768 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:42:22,401 autoreload 79902 140242136928768 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:42:23,825 autoreload 79902 140242136928768 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-08 08:42:23,825 autoreload 79902 140242136928768 /home/genius/Projects/fleet_flow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-08 08:42:24,709 autoreload 79935 140648580153856 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:42:24,709 autoreload 79935 140648580153856 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:43:57,085 autoreload 79935 140648580153856 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:43:57,085 autoreload 79935 140648580153856 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:43:57,871 autoreload 81321 140231959020032 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:43:57,871 autoreload 81321 140231959020032 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:44:07,469 autoreload 81321 140231959020032 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:44:07,469 autoreload 81321 140231959020032 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:44:08,281 autoreload 81485 140432254194176 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:44:08,281 autoreload 81485 140432254194176 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:44:31,087 autoreload 81485 140432254194176 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:44:31,087 autoreload 81485 140432254194176 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:44:31,773 autoreload 81824 140376043868672 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:44:31,773 autoreload 81824 140376043868672 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:00,773 autoreload 81824 140376043868672 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:00,773 autoreload 81824 140376043868672 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:01,729 autoreload 82266 140404978639360 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:01,729 autoreload 82266 140404978639360 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:07,116 autoreload 82266 140404978639360 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:07,116 autoreload 82266 140404978639360 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:07,665 autoreload 82351 140644612633088 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:07,665 autoreload 82351 140644612633088 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:09,969 autoreload 82351 140644612633088 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:09,969 autoreload 82351 140644612633088 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:10,571 autoreload 82411 139919479005696 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:10,571 autoreload 82411 139919479005696 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:15,937 autoreload 82411 139919479005696 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:15,937 autoreload 82411 139919479005696 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:16,633 autoreload 82492 140623572783616 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:16,633 autoreload 82492 140623572783616 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:19,997 autoreload 82492 140623572783616 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:19,997 autoreload 82492 140623572783616 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:20,601 autoreload 82569 139920367276544 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:20,601 autoreload 82569 139920367276544 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:23,968 autoreload 82569 139920367276544 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:23,968 autoreload 82569 139920367276544 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:24,544 autoreload 82622 140330508190208 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:24,544 autoreload 82622 140330508190208 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:28,863 autoreload 82622 140330508190208 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:28,863 autoreload 82622 140330508190208 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:29,689 autoreload 82717 140110427030016 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:29,689 autoreload 82717 140110427030016 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:38,138 autoreload 82717 140110427030016 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:38,138 autoreload 82717 140110427030016 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:38,729 autoreload 82837 140390877934080 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:38,729 autoreload 82837 140390877934080 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:45,072 autoreload 82837 140390877934080 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:45,072 autoreload 82837 140390877934080 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:45,669 autoreload 82957 139939914367488 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:45,669 autoreload 82957 139939914367488 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:47,949 autoreload 82957 139939914367488 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:47,949 autoreload 82957 139939914367488 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:48,617 autoreload 82998 140131200094720 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:48,617 autoreload 82998 140131200094720 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:50,928 autoreload 82998 140131200094720 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:50,928 autoreload 82998 140131200094720 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:45:51,480 autoreload 83053 140373347193344 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:45:51,480 autoreload 83053 140373347193344 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:46:03,025 autoreload 83053 140373347193344 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:46:03,025 autoreload 83053 140373347193344 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:46:03,595 autoreload 83235 140216339612160 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:46:03,595 autoreload 83235 140216339612160 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:46:04,890 autoreload 83235 140216339612160 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:46:04,890 autoreload 83235 140216339612160 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:46:05,649 autoreload 83269 139803183923712 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:46:05,649 autoreload 83269 139803183923712 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:46:07,948 autoreload 83269 139803183923712 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:46:07,948 autoreload 83269 139803183923712 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:46:08,570 autoreload 83314 139929753223680 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:46:08,570 autoreload 83314 139929753223680 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:46:10,837 autoreload 83314 139929753223680 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:46:10,837 autoreload 83314 139929753223680 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:46:11,410 autoreload 83377 140625162318336 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:46:11,410 autoreload 83377 140625162318336 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:46:23,975 autoreload 83377 140625162318336 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:46:23,975 autoreload 83377 140625162318336 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:46:24,584 autoreload 83589 140635172921856 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:46:24,584 autoreload 83589 140635172921856 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:46:26,902 autoreload 83589 140635172921856 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:46:26,902 autoreload 83589 140635172921856 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:46:27,571 autoreload 83644 139814088020480 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:46:27,571 autoreload 83644 139814088020480 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:47:09,187 autoreload 83644 139814088020480 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:47:09,187 autoreload 83644 139814088020480 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:47:09,897 autoreload 84245 139821744742912 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:47:09,897 autoreload 84245 139821744742912 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:47:19,374 autoreload 84245 139821744742912 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:47:19,374 autoreload 84245 139821744742912 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:47:19,957 autoreload 84399 140454729196032 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:47:19,957 autoreload 84399 140454729196032 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:47:22,305 autoreload 84399 140454729196032 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:47:22,305 autoreload 84399 140454729196032 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:47:22,932 autoreload 84469 140570507518464 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:47:22,932 autoreload 84469 140570507518464 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:47:25,181 autoreload 84469 140570507518464 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:47:25,181 autoreload 84469 140570507518464 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:47:25,831 autoreload 84505 139879473304064 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:47:25,831 autoreload 84505 139879473304064 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:47:27,146 autoreload 84505 139879473304064 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:47:27,146 autoreload 84505 139879473304064 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:47:27,716 autoreload 84537 140375314854400 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:47:27,716 autoreload 84537 140375314854400 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:47:58,933 autoreload 84537 140375314854400 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:47:58,933 autoreload 84537 140375314854400 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:47:59,590 autoreload 85002 140066446443008 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:47:59,590 autoreload 85002 140066446443008 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:48:03,953 autoreload 85002 140066446443008 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:48:03,953 autoreload 85002 140066446443008 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:48:04,528 autoreload 85094 139836025258496 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:48:04,528 autoreload 85094 139836025258496 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:48:05,803 autoreload 85094 139836025258496 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:48:05,803 autoreload 85094 139836025258496 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:48:06,510 autoreload 85125 140311099949568 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:48:06,510 autoreload 85125 140311099949568 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:48:09,796 autoreload 85125 140311099949568 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:48:09,796 autoreload 85125 140311099949568 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:48:10,501 autoreload 85178 140587136971264 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:48:10,501 autoreload 85178 140587136971264 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:48:49,062 autoreload 85178 140587136971264 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:48:49,062 autoreload 85178 140587136971264 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:48:49,590 autoreload 85747 140669177283072 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:48:49,590 autoreload 85747 140669177283072 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:50:38,217 autoreload 85747 140669177283072 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:50:38,217 autoreload 85747 140669177283072 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:50:38,760 autoreload 87313 140610983801344 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:50:38,760 autoreload 87313 140610983801344 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:50:55,471 autoreload 87313 140610983801344 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:50:55,471 autoreload 87313 140610983801344 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:50:56,133 autoreload 87580 139806844469760 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:50:56,133 autoreload 87580 139806844469760 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:50:58,455 autoreload 87580 139806844469760 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:50:58,455 autoreload 87580 139806844469760 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-05-08 08:50:59,138 autoreload 87620 139959709041152 Watching for file changes with StatReloader
+[INFO] 2026-05-08 08:50:59,138 autoreload 87620 139959709041152 Watching for file changes with StatReloader
+[INFO] 2026-05-08 09:04:36,545 autoreload 87620 139959709041152 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/urls.py changed, reloading.
+[INFO] 2026-05-08 09:04:36,545 autoreload 87620 139959709041152 /home/genius/Projects/fleet_flow/fleetflow-backend/trips/urls.py changed, reloading.
+[INFO] 2026-05-08 09:04:37,160 autoreload 99565 140711971201536 Watching for file changes with StatReloader
+[INFO] 2026-05-08 09:04:37,160 autoreload 99565 140711971201536 Watching for file changes with StatReloader
+[INFO] 2026-05-08 09:06:28,177 autoreload 101339 139706979017216 Watching for file changes with StatReloader
+[INFO] 2026-05-08 09:06:28,177 autoreload 101339 139706979017216 Watching for file changes with StatReloader
+[WARNING] 2026-05-08 09:06:38,152 basehttp 101339 139706914305728 "POST /users/api/auth/register/ HTTP/1.1" 400 64
+[WARNING] 2026-05-08 09:06:38,152 basehttp 101339 139706914305728 "POST /users/api/auth/register/ HTTP/1.1" 400 64
+[INFO] 2026-05-08 09:06:51,972 views 101339 139706914305728 Welcome email sent to john.mutisya@example.com
+[INFO] 2026-05-08 09:06:51,972 views 101339 139706914305728 Welcome email sent to john.mutisya@example.com
+[INFO] 2026-05-08 09:06:51,972 views 101339 139706914305728 New fleet owner registered: john.mutisya@example.com
+[INFO] 2026-05-08 09:06:51,972 views 101339 139706914305728 New fleet owner registered: john.mutisya@example.com
+[INFO] 2026-05-08 09:06:51,975 basehttp 101339 139706914305728 "POST /users/api/auth/register/ HTTP/1.1" 201 1437
+[INFO] 2026-05-08 09:06:51,975 basehttp 101339 139706914305728 "POST /users/api/auth/register/ HTTP/1.1" 201 1437
+[WARNING] 2026-05-08 09:07:34,009 basehttp 101339 139706914305728 "POST /users/api/company/register/ HTTP/1.1" 400 81
+[WARNING] 2026-05-08 09:07:34,009 basehttp 101339 139706914305728 "POST /users/api/company/register/ HTTP/1.1" 400 81
+[WARNING] 2026-05-08 09:07:44,778 basehttp 101339 139706914305728 "POST /users/api/company/register/ HTTP/1.1" 400 81
+[WARNING] 2026-05-08 09:07:44,778 basehttp 101339 139706914305728 "POST /users/api/company/register/ HTTP/1.1" 400 81
+[INFO] 2026-05-08 09:07:54,613 views 101339 139706914305728 Company registration email sent to john.mutisya@example.com
+[INFO] 2026-05-08 09:07:54,613 views 101339 139706914305728 Company registration email sent to john.mutisya@example.com
+[INFO] 2026-05-08 09:07:54,618 views 101339 139706914305728 Company registered by john.mutisya@example.com: Speedie Logistics Ltd
+[INFO] 2026-05-08 09:07:54,618 views 101339 139706914305728 Company registered by john.mutisya@example.com: Speedie Logistics Ltd
+[INFO] 2026-05-08 09:07:54,626 basehttp 101339 139706914305728 "POST /users/api/company/register/ HTTP/1.1" 201 2128
+[INFO] 2026-05-08 09:07:54,626 basehttp 101339 139706914305728 "POST /users/api/company/register/ HTTP/1.1" 201 2128
+[INFO] 2026-05-08 09:08:22,503 basehttp 101339 139706914305728 "GET /users/api/company/ HTTP/1.1" 200 860
+[INFO] 2026-05-08 09:08:22,503 basehttp 101339 139706914305728 "GET /users/api/company/ HTTP/1.1" 200 860
+[WARNING] 2026-05-08 09:08:49,475 basehttp 101339 139706914305728 "POST /users/api/drivers/onboard/ HTTP/1.1" 400 113
+[WARNING] 2026-05-08 09:08:49,475 basehttp 101339 139706914305728 "POST /users/api/drivers/onboard/ HTTP/1.1" 400 113
+[ERROR] 2026-05-08 09:09:07,331 basehttp 101339 139706914305728 "POST /users/api/drivers/onboard/ HTTP/1.1" 500 232441
+[ERROR] 2026-05-08 09:09:07,331 basehttp 101339 139706914305728 "POST /users/api/drivers/onboard/ HTTP/1.1" 500 232441
+[WARNING] 2026-05-08 09:09:11,569 basehttp 101339 139706914305728 "POST /users/api/drivers/onboard/ HTTP/1.1" 400 113
+[WARNING] 2026-05-08 09:09:11,569 basehttp 101339 139706914305728 "POST /users/api/drivers/onboard/ HTTP/1.1" 400 113
