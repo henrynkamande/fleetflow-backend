@@ -1,4 +1,4 @@
-#!/home/genius/Projects/fleet_flow/fleetflow-backend/venv/bin/python
+#!/home/jowamupro/software/fleetflow/fleetflow-backend/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
