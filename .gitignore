@@ -1,1 +1,35 @@
+# Environment
 .env
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Logs
+*.log
+logs/
+
+# Database
+db.sqlite3
+*.sqlite3
+*.db
+
+# Static/media generated files
+media/
+staticfiles/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Migrations cache only (NOT migration files)
+*/migrations/__pycache__/
