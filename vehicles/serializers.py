@@ -33,7 +33,8 @@ class VehicleSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at', 'created_by', 'created_by_name',
         ]
         read_only_fields = [
-            'id', 'company_name', 'assigned_driver_name', 'created_by_name',
+            'id', 'company', 'company_name', 'assigned_driver_name', 'created_by_name',
+            'created_by',
             'is_insurance_expired', 'is_registration_expired',
             'is_service_due', 'age_years', 'created_at', 'updated_at',
         ]
