@@ -223,7 +223,8 @@ if DEBUG:
 else:
     CORS_ALLOWED_ORIGINS = os.environ.get(
         'CORS_ALLOWED_ORIGINS',
-        'http://localhost:3000,http://localhost:5173'
+        'http://localhost:3000,http://localhost:5173',
+        'https://fleetflow-frontend-72w2.vercel.app/'
     ).split(',')
 
 CORS_ALLOW_CREDENTIALS = True
