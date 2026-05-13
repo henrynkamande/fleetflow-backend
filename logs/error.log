@@ -285,3 +285,113 @@ Traceback (most recent call last):
     return super().execute(query, params)
            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
 django.db.utils.IntegrityError: UNIQUE constraint failed: driver_profiles.drivers_license_number
+[ERROR] 2026-05-13 06:40:28,274 log 13035 135459814504128 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/http/request.py", line 203, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+[ERROR] 2026-05-13 06:41:19,576 log 13035 135459814504128 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/http/request.py", line 203, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+[ERROR] 2026-05-13 06:41:20,582 log 13035 135459814504128 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/http/request.py", line 203, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+[ERROR] 2026-05-13 06:42:30,646 log 14892 130787549640384 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/http/request.py", line 203, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+[ERROR] 2026-05-13 06:42:39,047 log 14892 130787549640384 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/http/request.py", line 203, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+[ERROR] 2026-05-13 06:42:48,840 log 14892 130787549640384 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/http/request.py", line 203, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+[ERROR] 2026-05-13 06:43:13,573 log 14892 130787549640384 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/http/request.py", line 203, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+[ERROR] 2026-05-13 07:04:11,907 log 14892 130787549640384 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/http/request.py", line 203, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+[ERROR] 2026-05-13 07:10:08,968 log 14892 130787549640384 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/http/request.py", line 203, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+[ERROR] 2026-05-13 07:13:56,633 log 25310 132310225647296 Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/jowamupro/software/fleetflow/fleetflow-backend/.venv/lib/python3.14/site-packages/django/http/request.py", line 203, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'localhost:8000'. You may need to add 'localhost' to ALLOWED_HOSTS.

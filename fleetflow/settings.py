@@ -169,7 +169,7 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSION': '1.0',
     'ALLOWED_VERSIONS': ['1.0'],
     'VERSION_PARAM': 'version',
-    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
+    'EXCEPTION_HANDLER': 'fleetflow.api_exception_handler.api_exception_handler',
 }
 
 # For development, enable browsable API
