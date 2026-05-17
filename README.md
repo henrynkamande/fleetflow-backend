@@ -8,10 +8,10 @@ REST API for **Fleet Flow**, a fleet management platform: fleet-owner and driver
 
 | Layer | Technology |
 |--------|------------|
-| Framework | [Django](https://www.djangoproject.com/) 5.2 |
+| Framework | [Django](https://www.djangoproject.com/) 6.0 |
 | API | [Django REST Framework](https://www.django-rest-framework.org/) 3.17 |
-| Auth | [Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/) (access + refresh, rotation, blacklist) |
-| DB (local) | SQLite (`db.sqlite3`) |
+| Auth | [Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/) (access + refresh, rotation) |
+| DB | [MongoDB](https://www.mongodb.com/) via [django-mongodb-backend](https://www.mongodb.com/docs/languages/python/django-mongodb/) |
 | Other | `django-cors-headers`, Pillow (uploads), `pyotp`, WhiteNoise, Gunicorn |
 
 API versioning uses **Accept header** versioning (`DEFAULT_VERSION` `1.0`). Send requests with the version your client expects per DRF’s `AcceptHeaderVersioning` rules.
@@ -57,26 +57,28 @@ The API defaults to `http://127.0.0.1:8000/`. With `DEBUG=True`, the browsable A
 
 ## Configuration (environment variables)
 
-Create a `.env` file or export variables in your shell (values below are illustrative; production must override secrets).
+Copy `.env.template` to `.env` and fill in values (loaded automatically at startup), or export variables in your shell.
 
 | Variable | Purpose |
 |----------|---------|
 | `SECRET_KEY` | Django secret; **required in production** |
 | `DEBUG` | `True` / `False` |
-| `ALLOWED_HOSTS` | Comma-separated hosts (default includes a Render hostname in code—override for your domain) |
+| `ALLOWED_HOSTS` | Comma-separated hosts (default: Render hostname; with `DEBUG=True`, `localhost` and `127.0.0.1` are added automatically) |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated origins when `DEBUG=False` |
 | `CSRF_TRUSTED_ORIGINS` | Trusted origins for CSRF (e.g. your frontend HTTPS URL) |
 | `FRONTEND_URL` | Base URL for email links (verify email, reset password, login) |
 | `EMAIL_*` | SMTP and sender settings when not using console email (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, etc.) |
 | `ADMIN_EMAIL` | Used in `ADMINS` for error notifications |
+| `MONGO_URI` | **Required.** MongoDB connection string (Atlas SRV or `mongodb://…`). |
+| `MONGO_DB_NAME` | Database name (default: `fleetflow`). Should match the database in `MONGO_URI` if the URI includes one. |
 
-PostgreSQL is prepared as commented configuration in `fleetflow/settings.py`; set `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` when you switch the `DATABASES` block to Postgres.
+Run `python manage.py migrate` against your cluster before serving traffic. JWT refresh rotation does not use the token blacklist app (Simple JWT’s blacklist models are SQL-oriented); access and refresh tokens still work.
 
 ## Production notes
 
 - Run with **Gunicorn** (already in `requirements.txt`), e.g. `gunicorn fleetflow.wsgi:application`, behind a reverse proxy with TLS.
 - Set `DEBUG=False`, strong `SECRET_KEY`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, and `CSRF_TRUSTED_ORIGINS`.
-- Use PostgreSQL for production instead of SQLite.
+- Set `MONGO_URI` (and optionally `MONGO_DB_NAME`) for production data storage.
 - Collect static files: `python manage.py collectstatic`.
 - Media uploads go under `media/` (avatars, KYC, logos); ensure persistent storage or object storage in production.
 

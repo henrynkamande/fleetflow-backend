@@ -4,8 +4,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 from django.utils import timezone
 import logging
+import uuid as uuid_lib
+
+from oauth.fleet_workspace import ensure_fleet_owner_company
 
 from .models import Trip, TripStop, TripExpense
 from .serializers import (
@@ -14,6 +18,25 @@ from .serializers import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _company_for_user(user):
+    if user.is_fleet_owner:
+        return ensure_fleet_owner_company(user)
+    return user.company
+
+
+def _resolve_trip(user, trip_ref: str) -> Trip:
+    """Look up a trip by UUID primary key or human-readable trip_number."""
+    company = _company_for_user(user)
+    if not company:
+        raise Http404
+    qs = Trip.objects.filter(company=company)
+    try:
+        uid = uuid_lib.UUID(str(trip_ref))
+        return get_object_or_404(qs, id=uid)
+    except ValueError:
+        return get_object_or_404(qs, trip_number=trip_ref)
 
 
 # ============================================================================
@@ -25,11 +48,16 @@ logger = logging.getLogger(__name__)
 def list_trips(request):
     """List all trips for the company."""
     user = request.user
-    
-    if not user.company:
-        return Response({'error': 'No company found.'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    trips = Trip.objects.filter(company=user.company)
+
+    if user.is_fleet_owner:
+        company = ensure_fleet_owner_company(user)
+    else:
+        company = user.company
+
+    if not company:
+        return Response({'count': 0, 'trips': []}, status=status.HTTP_200_OK)
+
+    trips = Trip.objects.filter(company=company)
     
     # Filters
     status_filter = request.query_params.get('status', None)
@@ -73,18 +101,23 @@ def create_trip(request):
     if not user.is_fleet_owner:
         return Response({'error': 'Only fleet owners can create trips.'}, status=status.HTTP_403_FORBIDDEN)
     
-    if not user.company:
-        return Response({'error': 'Please register your company first.'}, status=status.HTTP_400_BAD_REQUEST)
-    
+    company = ensure_fleet_owner_company(user)
+    if not company:
+        return Response({'error': 'Unable to create fleet workspace.'}, status=status.HTTP_400_BAD_REQUEST)
+
     serializer = TripSerializer(data=request.data, context={'request': request})
     
     if serializer.is_valid():
         # Validate vehicle belongs to company
         vehicle = serializer.validated_data.get('vehicle')
-        if vehicle.company != user.company:
+        if vehicle.company_id != company.id:
             return Response({'error': 'Vehicle does not belong to your company.'}, status=status.HTTP_403_FORBIDDEN)
-        
-        trip = serializer.save(company=user.company, created_by=user)
+
+        driver = serializer.validated_data.get('driver')
+        if driver is not None and driver.user.company_id != company.id:
+            return Response({'error': 'Driver does not belong to your company.'}, status=status.HTTP_403_FORBIDDEN)
+
+        trip = serializer.save(company=company, created_by=user)
         
         logger.info(f"Trip created by {user.email}: {trip.trip_number}")
         
@@ -98,44 +131,58 @@ def create_trip(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_trip(request, trip_id):
-    """Get trip details."""
+def get_trip(request, trip_ref):
+    """Get trip details by UUID or trip_number (e.g. TRIP-20260517-0001)."""
     user = request.user
-    trip = get_object_or_404(Trip, id=trip_id, company=user.company)
-    
-    # Drivers can only see their own trips
+    trip = _resolve_trip(user, trip_ref)
+
     if user.is_driver and trip.driver != user.driver_profile:
         return Response({'error': 'Unauthorized.'}, status=status.HTTP_403_FORBIDDEN)
-    
+
     serializer = TripSerializer(trip, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
-def update_trip(request, trip_id):
-    """Update trip details."""
+def update_trip(request, trip_ref):
+    """Update trip details (fleet owner, or driver on assigned trip)."""
     user = request.user
-    
-    trip = get_object_or_404(Trip, id=trip_id, company=user.company)
-    
-    # Only fleet owners or assigned driver can update
+    trip = _resolve_trip(user, trip_ref)
+
     if not user.is_fleet_owner and trip.driver != user.driver_profile:
         return Response({'error': 'Unauthorized.'}, status=status.HTTP_403_FORBIDDEN)
-    
+
+    if user.is_fleet_owner and trip.status not in (
+        Trip.TripStatus.PLANNED,
+        Trip.TripStatus.DELAYED,
+    ):
+        return Response(
+            {'error': 'Only planned or delayed trips can be edited. Cancel the trip or contact support.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    company = _company_for_user(user)
     serializer = TripSerializer(
         trip, data=request.data, partial=request.method == 'PATCH',
-        context={'request': request}
+        context={'request': request, 'company': company},
     )
-    
+
     if serializer.is_valid():
+        vehicle = serializer.validated_data.get('vehicle')
+        if vehicle and company and vehicle.company_id != company.id:
+            return Response({'error': 'Vehicle does not belong to your company.'}, status=status.HTTP_403_FORBIDDEN)
+        driver = serializer.validated_data.get('driver')
+        if driver is not None and company and driver.user.company_id != company.id:
+            return Response({'error': 'Driver does not belong to your company.'}, status=status.HTTP_403_FORBIDDEN)
+
         serializer.save()
         logger.info(f"Trip updated by {user.email}: {trip.trip_number}")
         return Response({
             'message': 'Trip updated successfully.',
-            'trip': serializer.data
+            'trip': TripSerializer(trip, context={'request': request}).data
         }, status=status.HTTP_200_OK)
-    
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -198,12 +245,22 @@ def complete_trip(request, trip_id):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def cancel_trip(request, trip_id):
-    """Cancel a trip."""
+def cancel_trip(request, trip_ref):
+    """Cancel a trip (fleet owner)."""
     user = request.user
-    trip = get_object_or_404(Trip, id=trip_id, company=user.company)
-    
-    reason = request.data.get('reason', 'Cancelled by user')
+
+    if not user.is_fleet_owner:
+        return Response({'error': 'Only fleet owners can cancel trips.'}, status=status.HTTP_403_FORBIDDEN)
+
+    trip = _resolve_trip(user, trip_ref)
+
+    if trip.status in (Trip.TripStatus.COMPLETED, Trip.TripStatus.CANCELLED):
+        return Response(
+            {'error': 'This trip cannot be cancelled.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    reason = request.data.get('reason', 'Cancelled by fleet owner')
     trip.cancel_trip(reason)
     
     logger.info(f"Trip cancelled by {user.email}: {trip.trip_number}")

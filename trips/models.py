@@ -95,6 +95,12 @@ class Trip(models.Model):
         blank=True,
         help_text="Estimated arrival time"
     )
+
+    planned_distance_km = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Estimated route distance in km (from fleet planning)"
+    )
     
     # Actual Trip Data (GPS-Free - entered by driver)
     actual_departure_time = models.DateTimeField(
@@ -202,6 +208,7 @@ class Trip(models.Model):
     other_expenses = models.DecimalField(
         max_digits=10,
         decimal_places=2,
+        default=Decimal('0.00'),
         help_text="Other miscellaneous expenses"
     )
     
@@ -353,10 +360,18 @@ class Trip(models.Model):
     
     @property
     def distance_km(self):
-        """Calculate trip distance in kilometers"""
-        if self.start_odometer and self.end_odometer:
+        """Trip distance in km: odometer delta when available, else planned estimate."""
+        if self.start_odometer is not None and self.end_odometer is not None:
             return self.end_odometer - self.start_odometer
+        if self.planned_distance_km is not None:
+            return self.planned_distance_km
         return None
+
+    @property
+    def distance_is_estimated(self) -> bool:
+        if self.start_odometer is not None and self.end_odometer is not None:
+            return False
+        return self.planned_distance_km is not None
     
     @property
     def duration_hours(self):

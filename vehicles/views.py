@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 import logging
 
+from oauth.fleet_workspace import ensure_fleet_owner_company
+
 from .models import Vehicle, VehicleDocument, VehicleServiceRecord, VehicleExpense, FuelLog
 from .serializers import (
     VehicleSerializer, VehicleDocumentSerializer,
@@ -26,14 +28,17 @@ logger = logging.getLogger(__name__)
 def list_vehicles(request):
     """List all vehicles in the fleet owner's company."""
     user = request.user
-    
-    if not user.company:
-        return Response({
-            'error': 'No company found.'
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
+
+    if user.is_fleet_owner:
+        company = ensure_fleet_owner_company(user)
+    else:
+        company = user.company
+
+    if not company:
+        return Response({'count': 0, 'vehicles': []}, status=status.HTTP_200_OK)
+
     # Filter by query params
-    vehicles = Vehicle.objects.filter(company=user.company)
+    vehicles = Vehicle.objects.filter(company=company)
     
     status_filter = request.query_params.get('status', None)
     type_filter = request.query_params.get('vehicle_type', None)
@@ -65,23 +70,22 @@ def create_vehicle(request):
             'error': 'Only fleet owners can add vehicles.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    if not user.company:
-        return Response({
-            'error': 'Please register your company first.'
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
+    company = ensure_fleet_owner_company(user)
+    if not company:
+        return Response({'error': 'Unable to create fleet workspace.'}, status=status.HTTP_400_BAD_REQUEST)
+
     serializer = VehicleSerializer(data=request.data, context={'request': request})
     
     if serializer.is_valid():
         vehicle = serializer.save(
-            company=user.company,
+            company=company,
             created_by=user
         )
-        
+
         # Update fleet owner's total vehicles count
         fleet_owner_profile = user.fleet_owner_profile
         fleet_owner_profile.total_vehicles = Vehicle.objects.filter(
-            company=user.company
+            company=company
         ).count()
         fleet_owner_profile.save(update_fields=['total_vehicles'])
         
