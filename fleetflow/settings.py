@@ -2,7 +2,18 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
+
+
+def env_list(key: str, *, default: str = '') -> list[str]:
+    """Comma-separated environment variable → stripped non-empty list."""
+    return [part.strip() for part in os.environ.get(key, default).split(',') if part.strip()]
+
 
 # Logs directory
 LOGS_DIR = BASE_DIR / 'logs'
@@ -15,27 +26,36 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'fleetflow-backend-zr0z.onrender.com').split(',')
+# Host validation: explicit ALLOWED_HOSTS in production; local names when DEBUG.
+_DEFAULT_ALLOWED_HOSTS = 'fleetflow-backend-zr0z.onrender.com'
+_LOCAL_DEV_HOSTS = ('localhost', '127.0.0.1', '[::1]')
+
+if os.environ.get('ALLOWED_HOSTS'):
+    ALLOWED_HOSTS = env_list('ALLOWED_HOSTS')
+else:
+    ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', default=_DEFAULT_ALLOWED_HOSTS)
+
+if DEBUG:
+    for host in _LOCAL_DEV_HOSTS:
+        if host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(host)
 
 # Application definition
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
+    'fleetflow.mongo_apps.MongoAdminConfig',
+    'fleetflow.mongo_apps.MongoAuthConfig',
+    'fleetflow.mongo_apps.MongoContentTypesConfig',
+    'django_mongodb_backend',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # Third-party apps
     'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
-
-    # Local apps
     'oauth',
     'vehicles',
-    'trips'
+    'trips',
+    'reports',
 ]
 
 MIDDLEWARE = [
@@ -70,24 +90,27 @@ TEMPLATES = [
 WSGI_APPLICATION = 'fleetflow.wsgi.application'
 
 
+MONGO_URI = os.environ.get('MONGO_URI', '').strip()
+if not MONGO_URI:
+    raise ImproperlyConfigured(
+        'MONGO_URI is required. Set it in the environment or in '
+        f'{BASE_DIR / ".env"} (see .env.template).'
+    )
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'ENGINE': 'django_mongodb_backend',
+        'HOST': MONGO_URI,
+        'NAME': os.environ.get('MONGO_DB_NAME', 'fleetflow'),
+    },
 }
 
-# For production, use PostgreSQL:
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.environ.get('DB_NAME', 'fleetflow'),
-#         'USER': os.environ.get('DB_USER', 'fleetflow_user'),
-#         'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-#         'HOST': os.environ.get('DB_HOST', 'localhost'),
-#         'PORT': os.environ.get('DB_PORT', '5432'),
-#     }
-# }
+DATABASE_ROUTERS = ['django_mongodb_backend.routers.MongoRouter']
+MIGRATION_MODULES = {
+    'admin': 'mongo_migrations.admin',
+    'auth': 'mongo_migrations.auth',
+    'contenttypes': 'mongo_migrations.contenttypes',
+}
 
 
 # ============================================================================
@@ -169,7 +192,7 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSION': '1.0',
     'ALLOWED_VERSIONS': ['1.0'],
     'VERSION_PARAM': 'version',
-    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
+    'EXCEPTION_HANDLER': 'fleetflow.api_exception_handler.api_exception_handler',
 }
 
 # For development, enable browsable API
@@ -188,7 +211,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
+    'BLACKLIST_AFTER_ROTATION': False,
     'UPDATE_LAST_LOGIN': True,
 
     'ALGORITHM': 'HS256',
@@ -221,11 +244,13 @@ SIMPLE_JWT = {
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
-    CORS_ALLOWED_ORIGINS = os.environ.get(
+    CORS_ALLOWED_ORIGINS = env_list(
         'CORS_ALLOWED_ORIGINS',
-        'http://localhost:3000,http://localhost:5173',
-        'https://fleetflow-frontend-72w2.vercel.app/'
-    ).split(',')
+        default=(
+            'http://localhost:3000,http://localhost:5173,'
+            'https://fleetflow-frontend-72w2.vercel.app'
+        ),
+    )
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -358,10 +383,10 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # CSRF settings
 CSRF_COOKIE_HTTPONLY = True
-CSRF_TRUSTED_ORIGINS = os.environ.get(
+CSRF_TRUSTED_ORIGINS = env_list(
     'CSRF_TRUSTED_ORIGINS',
-    'http://localhost:3000,http://localhost:5173'
-).split(',')
+    default='http://localhost:3000,http://localhost:5173',
+)
 
 
 # ============================================================================
@@ -456,7 +481,7 @@ LOGGING = {
 # DEFAULT PRIMARY KEY FIELD TYPE
 # ============================================================================
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = 'django_mongodb_backend.fields.ObjectIdAutoField'
 
 
 # ============================================================================

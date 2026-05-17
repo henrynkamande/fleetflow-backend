@@ -13,6 +13,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 import logging
 
 from .models import User, DriverProfile, FleetOwnerProfile, KYCDocument, Company
+from .fleet_workspace import ensure_fleet_owner_company, resolve_user_company
 from .serializers import (
     FleetOwnerRegistrationSerializer,
     CompanyRegistrationSerializer,
@@ -235,7 +236,7 @@ def get_tokens_for_user(user):
 def register_fleet_owner(request):
     """
     Step 1: Register a fleet owner account.
-    After registration, fleet owner must register a company.
+    After registration, fleet owner may register a company (optional).
     """
     serializer = FleetOwnerRegistrationSerializer(data=request.data)
     
@@ -251,11 +252,12 @@ def register_fleet_owner(request):
         logger.info(f"New fleet owner registered: {user.email}")
         
         return Response({
-            'message': 'Registration successful. Please register your company to continue.',
+            'message': 'Registration successful.',
             'user': UserSerializer(user, context={'request': request}).data,
             'tokens': tokens,
+            'redirect_url': '/fleet-owner/dashboard',
             'next_step': 'register_company',
-            'requires_company': True
+            'requires_company': False,
         }, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -288,8 +290,8 @@ def login(request):
         # Determine redirect and next steps based on role and company status
         if user.is_fleet_owner:
             if not user.company:
-                response_data['redirect_url'] = '/fleet-owner/register-company'
-                response_data['requires_company'] = True
+                response_data['redirect_url'] = '/fleet-owner/dashboard'
+                response_data['requires_company'] = False
                 response_data['next_step'] = 'register_company'
             else:
                 response_data['redirect_url'] = '/fleet-owner/dashboard'
@@ -495,18 +497,19 @@ def register_company(request):
             'error': 'Only fleet owners can register a company.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    # Check if user already has a company
     if user.company:
-        return Response({
-            'error': 'You have already registered a company.',
-            'company': CompanySerializer(user.company, context={'request': request}).data
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
-    serializer = CompanyRegistrationSerializer(
-        data=request.data,
-        context={'request': request}
-    )
-    
+        serializer = CompanyRegistrationSerializer(
+            user.company,
+            data=request.data,
+            partial=True,
+            context={'request': request},
+        )
+    else:
+        serializer = CompanyRegistrationSerializer(
+            data=request.data,
+            context={'request': request},
+        )
+
     if serializer.is_valid():
         company = serializer.save()
         
@@ -533,25 +536,18 @@ def register_company(request):
 def view_company(request):
     """View current user's company details."""
     user = request.user
-    
-    if not user.company:
-        if user.is_fleet_owner:
-            return Response({
-                'error': 'No company found. Please register your company first.',
-                'requires_company': True,
-                'next_step': 'register_company'
-            }, status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response({
-                'error': 'No company found.'
-            }, status=status.HTTP_404_NOT_FOUND)
-    
-    # Fleet owners see their own company, drivers see their assigned company
+
     if user.is_fleet_owner:
-        company = get_object_or_404(Company, owner=user)
+        company = resolve_user_company(user) or ensure_fleet_owner_company(user)
     else:
-        company = user.company
-    
+        company = resolve_user_company(user)
+
+    if not company:
+        return Response(
+            {'error': 'No company found.'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
     serializer = CompanySerializer(company, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -567,13 +563,13 @@ def update_company(request):
             'error': 'Only fleet owners can update company details.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    if not user.company:
+    company = resolve_user_company(user) or ensure_fleet_owner_company(user)
+    if not company:
         return Response({
             'error': 'No company found. Please register your company first.',
             'requires_company': True
         }, status=status.HTTP_404_NOT_FOUND)
-    
-    company = user.company
+
     serializer = CompanyUpdateSerializer(
         company,
         data=request.data,
@@ -611,9 +607,9 @@ def check_company_status(request):
     
     return Response({
         'has_company': False,
-        'message': 'Please register your company to continue.',
-        'requires_company': True,
-        'next_step': 'register_company'
+        'message': 'Company registration is optional. Add your business details anytime.',
+        'requires_company': False,
+        'next_step': 'register_company',
     }, status=status.HTTP_200_OK)
 
 
@@ -641,14 +637,12 @@ def onboard_driver(request):
             'error': 'Your account must be verified to onboard drivers.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    # Check if fleet owner has a company
-    if not user.company:
-        return Response({
-            'error': 'You must register a company before onboarding drivers.',
-            'requires_company': True,
-            'next_step': 'register_company'
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
+    from oauth.fleet_workspace import ensure_fleet_owner_company
+
+    company = ensure_fleet_owner_company(user)
+    if not company:
+        return Response({'error': 'Unable to create fleet workspace.'}, status=status.HTTP_400_BAD_REQUEST)
+
     serializer = DriverOnboardingSerializer(
         data=request.data,
         context={'request': request}
@@ -723,10 +717,11 @@ def update_profile(request):
     
     if serializer.is_valid():
         serializer.save()
+        user.refresh_from_db()
         logger.info(f"Profile updated: {user.email}")
         return Response({
             'message': 'Profile updated successfully.',
-            'user': serializer.data
+            'user': UserSerializer(user, context={'request': request}).data
         }, status=status.HTTP_200_OK)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -861,17 +856,15 @@ def list_company_users(request):
             'error': 'Only fleet owners can view company users.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    if not user.company:
-        return Response({
-            'error': 'No company found. Please register your company first.',
-            'requires_company': True
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
+    company = ensure_fleet_owner_company(user)
+    if not company:
+        return Response({'count': 0, 'users': []}, status=status.HTTP_200_OK)
+
     # Get filters from query params
     role_filter = request.query_params.get('role', None)
     is_active_filter = request.query_params.get('is_active', None)
     
-    users = User.objects.filter(company=user.company).select_related('company')
+    users = User.objects.filter(company=company).select_related('company')
     
     if role_filter:
         users = users.filter(role=role_filter)
@@ -885,6 +878,34 @@ def list_company_users(request):
         'count': users.count(),
         'users': serializer.data
     }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_company_drivers(request):
+    """List drivers in the fleet owner's company (for trip/vehicle assignment)."""
+    user = request.user
+
+    if not user.is_fleet_owner:
+        return Response(
+            {'error': 'Only fleet owners can list company drivers.'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    company = ensure_fleet_owner_company(user)
+    if not company:
+        return Response({'count': 0, 'drivers': []}, status=status.HTTP_200_OK)
+
+    is_active_filter = request.query_params.get('is_active', None)
+    drivers = User.objects.filter(company=company, role=User.Role.DRIVER).select_related(
+        'company', 'driver_profile'
+    )
+    if is_active_filter is not None:
+        is_active = is_active_filter.lower() == 'true'
+        drivers = drivers.filter(is_active=is_active)
+
+    serializer = UserSerializer(drivers, many=True, context={'request': request})
+    return Response({'count': drivers.count(), 'drivers': serializer.data}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -1277,12 +1298,17 @@ def fleet_owner_dashboard(request):
     
     if not user.company:
         return Response({
-            'error': 'Please register your company first.',
-            'requires_company': True
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
+            'company': None,
+            'stats': {
+                'total_drivers': 0,
+                'active_drivers': 0,
+                'pending_kyc_documents': 0,
+                'expired_documents': 0,
+            },
+        }, status=status.HTTP_200_OK)
+
     company = user.company
-    
+
     # Get counts
     total_drivers = User.objects.filter(
         company=company,

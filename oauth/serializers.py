@@ -77,8 +77,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 data['redirect_url'] = '/fleet-owner/dashboard'
                 data['company'] = CompanySerializer(self.user.company, context={'request': self.context.get('request')}).data
             else:
-                data['redirect_url'] = '/fleet-owner/register-company'
-                data['requires_company'] = True
+                data['redirect_url'] = '/fleet-owner/dashboard'
+                data['requires_company'] = False
+                data['next_step'] = 'register_company'
         else:
             data['redirect_url'] = '/driver/dashboard'
         
@@ -178,13 +179,34 @@ class CompanyRegistrationSerializer(serializers.ModelSerializer):
         }
     
     def validate_name(self, value):
-        """Validate company name"""
+        """Validate company name on create (updates may keep the same name)."""
         request = self.context.get('request')
-        if request and request.user:
+        if request and request.user and not self.instance:
             if Company.objects.filter(owner=request.user).exists():
                 raise serializers.ValidationError("You have already registered a company.")
         return value
-    
+
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        user = request.user
+        for attr, val in validated_data.items():
+            setattr(instance, attr, val)
+        instance.save()
+        if user.company_id != instance.id:
+            user.company = instance
+            user.save(update_fields=['company'])
+        fleet_owner_profile = user.fleet_owner_profile
+        if 'name' in validated_data:
+            fleet_owner_profile.company_name = validated_data['name']
+        if 'registration_number' in validated_data:
+            fleet_owner_profile.business_registration_number = validated_data.get('registration_number') or ''
+        if 'address' in validated_data:
+            fleet_owner_profile.business_address = validated_data.get('address') or ''
+        if 'contact_phone' in validated_data:
+            fleet_owner_profile.business_phone = validated_data.get('contact_phone') or ''
+        fleet_owner_profile.save()
+        return instance
+
     def create(self, validated_data):
         """Create company and link to fleet owner"""
         request = self.context.get('request')
@@ -282,16 +304,6 @@ class DriverOnboardingSerializer(serializers.ModelSerializer, PasswordGeneration
         if User.objects.filter(phone_number=value).exists():
             raise serializers.ValidationError("A user with this phone number already exists.")
         return value
-    
-    def validate(self, data):
-        """Validate that the fleet owner has a company"""
-        request = self.context.get('request')
-        if request and request.user:
-            if not request.user.company:
-                raise serializers.ValidationError(
-                    "You must register a company before onboarding drivers."
-                )
-        return data
     
     def create(self, validated_data):
         """Create driver account with generated credentials"""
@@ -699,6 +711,7 @@ class UserSerializer(serializers.ModelSerializer):
     company_id = serializers.CharField(source='company.id', read_only=True, default=None)
     company_name = serializers.CharField(source='company.name', read_only=True, default=None)
     has_company = serializers.SerializerMethodField()
+    driver_profile_id = serializers.SerializerMethodField()
     
     class Meta:
         model = User
@@ -706,7 +719,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'email', 'phone_number', 'first_name', 'last_name',
             'full_name', 'role', 'avatar', 'avatar_url', 'is_verified',
             'is_active', 'date_joined', 'last_login',
-            'company_id', 'company_name', 'has_company'
+            'company_id', 'company_name', 'has_company', 'driver_profile_id',
         ]
         read_only_fields = [
             'id', 'email', 'role', 'is_verified', 'is_active',
@@ -717,7 +730,17 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.get_avatar_url(self.context.get('request'))
     
     def get_has_company(self, obj):
-        return obj.company is not None
+        if obj.company_id:
+            return True
+        if obj.role == obj.Role.FLEET_OWNER:
+            return Company.objects.filter(owner=obj).exists()
+        return False
+
+    def get_driver_profile_id(self, obj):
+        if obj.role != obj.Role.DRIVER:
+            return None
+        profile = getattr(obj, 'driver_profile', None)
+        return str(profile.id) if profile else None
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

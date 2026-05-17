@@ -36,6 +36,7 @@ urlpatterns = [
     
     # User management (fleet owner only)
     path('users/', views.list_company_users, name='list-company-users'),
+    path('users/drivers/', views.list_company_drivers, name='list-company-drivers'),
     path('users/<uuid:user_id>/', views.get_user_detail, name='get-user-detail'),
     path('users/<uuid:user_id>/deactivate/', views.deactivate_user, name='deactivate-user'),
     path('users/<uuid:user_id>/activate/', views.activate_user, name='activate-user'),
