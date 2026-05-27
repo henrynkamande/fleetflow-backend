@@ -56,6 +56,9 @@ INSTALLED_APPS = [
     'vehicles',
     'trips',
     'reports',
+    'billing',
+    'platform_api',
+    'content',
 ]
 
 MIDDLEWARE = [
@@ -97,11 +100,25 @@ if not MONGO_URI:
         f'{BASE_DIR / ".env"} (see .env.template).'
     )
 
+# Atlas / TLS: use Mozilla CA bundle (avoids missing system certs on some Linux setups).
+try:
+    import certifi
+
+    _MONGO_CLIENT_OPTIONS: dict = {'tlsCAFile': certifi.where()}
+except ImportError:
+    _MONGO_CLIENT_OPTIONS = {}
+
+if os.environ.get('MONGO_TLS_ALLOW_INVALID', '').lower() in ('true', '1', 'yes'):
+    if not DEBUG:
+        raise ImproperlyConfigured('MONGO_TLS_ALLOW_INVALID is only allowed when DEBUG=True.')
+    _MONGO_CLIENT_OPTIONS['tlsAllowInvalidCertificates'] = True
+
 DATABASES = {
     'default': {
         'ENGINE': 'django_mongodb_backend',
         'HOST': MONGO_URI,
         'NAME': os.environ.get('MONGO_DB_NAME', 'fleetflow'),
+        'OPTIONS': _MONGO_CLIENT_OPTIONS,
     },
 }
 
@@ -140,6 +157,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {
+        'NAME': 'oauth.validators.ComplexPasswordValidator',
+    },
 ]
 
 
@@ -148,13 +168,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # ============================================================================
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',  # Default
+    'oauth.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
-
-# Custom authentication backend for email login
-# AUTHENTICATION_BACKENDS = [
-#     'oauth.backends.EmailBackend',  # Custom email auth backend
-# ]
 
 
 # ============================================================================
@@ -321,34 +337,44 @@ FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 # EMAIL SETTINGS
 # ============================================================================
 
-if DEBUG:
-    # In development, print emails to console
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', '').strip()
+EMAIL_CONSOLE = os.environ.get('EMAIL_CONSOLE', '').lower() in ('true', '1', 'yes')
+APP_BRAND_NAME = os.environ.get('APP_BRAND_NAME', 'FleetVault')
+
+# Prefer SendGrid when configured (even in DEBUG) so OTP/reset codes reach real inboxes.
+if SENDGRID_API_KEY and not EMAIL_CONSOLE:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.sendgrid.net'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_USE_SSL = False
+    EMAIL_HOST_USER = 'apikey'
+    EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+elif DEBUG and not os.environ.get('EMAIL_BACKEND'):
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 else:
-    # In production, use SMTP
     EMAIL_BACKEND = os.environ.get(
         'EMAIL_BACKEND',
-        'django.core.mail.backends.smtp.EmailBackend'
+        'django.core.mail.backends.smtp.EmailBackend',
     )
 
-# SMTP Configuration (Update for production)
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 'yes')
-EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() in ('true', '1', 'yes')
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+_USE_SENDGRID = bool(SENDGRID_API_KEY and not EMAIL_CONSOLE)
+if not _USE_SENDGRID:
+    EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+    EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 'yes')
+    EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() in ('true', '1', 'yes')
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', 30))
 
+# Must be a verified sender in SendGrid (Single Sender or domain authentication).
 DEFAULT_FROM_EMAIL = os.environ.get(
     'DEFAULT_FROM_EMAIL',
-    'noreply@fleetflow.com'
+    'noreply@myfleetvault.com',
 )
-SERVER_EMAIL = os.environ.get(
-    'SERVER_EMAIL',
-    'server@fleetflow.com'
-)
-EMAIL_SUBJECT_PREFIX = '[Fleet Flow] '
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL', DEFAULT_FROM_EMAIL)
+EMAIL_SUBJECT_PREFIX = f'[{APP_BRAND_NAME}] '
 
 # Email templates (optional - for HTML emails)
 EMAIL_USE_HTML = os.environ.get('EMAIL_USE_HTML', 'False').lower() in ('true', '1', 'yes')
@@ -516,7 +542,7 @@ FLEET_FLOW = {
 }
 
 # Frontend URL (for email links and redirects)
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
 FRONTEND_VERIFY_EMAIL_URL = f'{FRONTEND_URL}/verify-email'
 FRONTEND_RESET_PASSWORD_URL = f'{FRONTEND_URL}/reset-password'
 FRONTEND_LOGIN_URL = f'{FRONTEND_URL}/login'

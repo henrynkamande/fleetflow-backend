@@ -74,6 +74,16 @@ def create_vehicle(request):
     if not company:
         return Response({'error': 'Unable to create fleet workspace.'}, status=status.HTTP_400_BAD_REQUEST)
 
+    from billing.access import company_has_platform_access
+    if not company_has_platform_access(company):
+        return Response(
+            {
+                'error': 'Active trial or subscription required.',
+                'code': 'billing_required',
+            },
+            status=status.HTTP_402_PAYMENT_REQUIRED,
+        )
+
     serializer = VehicleSerializer(data=request.data, context={'request': request})
     
     if serializer.is_valid():
@@ -88,6 +98,12 @@ def create_vehicle(request):
             company=company
         ).count()
         fleet_owner_profile.save(update_fields=['total_vehicles'])
+
+        try:
+            from billing.stripe_service import sync_subscription_quantity
+            sync_subscription_quantity(company)
+        except Exception:
+            logger.exception('Failed to sync Stripe subscription quantity after vehicle create')
         
         logger.info(f"Vehicle added by {user.email}: {vehicle.registration_number}")
         
@@ -151,9 +167,16 @@ def delete_vehicle(request, vehicle_id):
             'error': 'Only fleet owners can delete vehicles.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id, company=user.company)
+    company = ensure_fleet_owner_company(user)
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id, company=company)
     reg_number = vehicle.registration_number
     vehicle.delete()
+
+    try:
+        from billing.stripe_service import sync_subscription_quantity
+        sync_subscription_quantity(company)
+    except Exception:
+        logger.exception('Failed to sync Stripe subscription quantity after vehicle delete')
     
     logger.info(f"Vehicle deleted by {user.email}: {reg_number}")
     

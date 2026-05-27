@@ -30,6 +30,30 @@ URL prefixes (all under the Django site root):
 | `/users/api/` | Auth, users, company, drivers, KYC, dashboards |
 | `/vehicles/api/` | Vehicles |
 | `/trips/api/` | Trips |
+| `/reports/api/` | Financial reports |
+| `/billing/api/` | Stripe billing |
+| `/platform/api/` | Platform admin: `auth/login`, `auth/register`, overview, companies, users |
+| `/content/api/` | Public blog + admin blog CRUD (admin: platform JWT) |
+
+### Platform admin bootstrap
+
+```bash
+export PLATFORM_ADMIN_EMAIL=you@example.com
+export PLATFORM_ADMIN_PASSWORD='your-secure-password'
+python manage.py create_platform_admin
+```
+
+Sign in on the frontend; platform admins are sent to `/platform` (`redirect_url: /platform`).
+
+If login returns **400** with a small JSON body (`non_field_errors`: “Invalid email or password”), the user does not exist or the password is wrong. Run `migrate`, then `create_platform_admin` (or reset the password with the same command — it updates an existing email). Confirm locally:
+
+```bash
+python manage.py verify_login --email you@example.com --password 'YourSecurePass1!'
+```
+
+On failure, Django logs the exact validation errors when you attempt sign-in (`Login failed for …` in the runserver terminal).
+
+Product decisions: `docs/PLATFORM_AND_CONTENT.md` in the monorepo.
 
 ## Prerequisites
 
