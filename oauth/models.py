@@ -47,6 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Role(models.TextChoices):
         FLEET_OWNER = 'FLEET_OWNER', 'Fleet Owner'
         DRIVER = 'DRIVER', 'Driver'
+        PLATFORM_ADMIN = 'PLATFORM_ADMIN', 'Platform Admin'
     
     # Basic Information
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -127,6 +128,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_driver(self):
         return self.role == self.Role.DRIVER
+
+    @property
+    def is_platform_admin(self):
+        return self.role == self.Role.PLATFORM_ADMIN
     
     @property
     def avatar_url(self):
@@ -172,6 +177,25 @@ class Company(models.Model):
     # Subscription/Status
     is_active = models.BooleanField(default=True)
     subscription_plan = models.CharField(max_length=50, default='free')
+
+    class BillingStatus(models.TextChoices):
+        NOT_STARTED = 'NOT_STARTED', 'Not started'
+        TRIALING = 'TRIALING', 'Trialing'
+        ACTIVE = 'ACTIVE', 'Active'
+        PAST_DUE = 'PAST_DUE', 'Past due'
+        CANCELED = 'CANCELED', 'Canceled'
+        INCOMPLETE = 'INCOMPLETE', 'Incomplete'
+
+    billing_status = models.CharField(
+        max_length=20,
+        choices=BillingStatus.choices,
+        default=BillingStatus.NOT_STARTED,
+        db_index=True,
+    )
+    stripe_customer_id = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    stripe_subscription_id = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    trial_ends_at = models.DateTimeField(null=True, blank=True)
+    billing_quantity = models.PositiveIntegerField(default=0, help_text='Last synced billable vehicle count')
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -400,6 +424,42 @@ class FleetOwnerProfile(models.Model):
     
     def __str__(self):
         return f"Fleet Owner Profile - {self.user.full_name}"
+
+
+class EmailAuthCode(models.Model):
+    """Hashed email OTP / reset codes per user and purpose."""
+
+    class Purpose(models.TextChoices):
+        SIGNUP_VERIFY = 'SIGNUP_VERIFY', 'Signup verification'
+        PASSWORD_RESET = 'PASSWORD_RESET', 'Password reset'
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='email_auth_codes',
+    )
+    purpose = models.CharField(max_length=32, choices=Purpose.choices, db_index=True)
+    code_hash = models.CharField(max_length=128)
+    expires_at = models.DateTimeField()
+    sent_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        db_table = 'email_auth_codes'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'purpose'],
+                name='unique_user_email_auth_code_purpose',
+            ),
+        ]
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+    def __str__(self):
+        return f'{self.purpose} code for {self.user.email}'
 
 
 class KYCDocument(models.Model):

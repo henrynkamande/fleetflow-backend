@@ -3,18 +3,24 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.hashers import check_password
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate
+from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 from .models import (
-    User, Company, DriverProfile, FleetOwnerProfile, 
-    KYCDocument
+    User, Company, DriverProfile, FleetOwnerProfile,
+    KYCDocument, EmailAuthCode,
 )
+from . import auth_codes
+from .phone_utils import normalize_phone_number, phone_number_lookup_variants
 import pyotp
 import random
 import string
+import uuid
 
 
 class PasswordGenerationMixin:
@@ -72,7 +78,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['is_verified'] = self.user.is_verified
         
         # Determine redirect URL based on role and company status
-        if self.user.is_fleet_owner:
+        if self.user.is_platform_admin:
+            data['redirect_url'] = '/dashboard'
+        elif self.user.is_fleet_owner:
             if self.user.company:
                 data['redirect_url'] = '/fleet-owner/dashboard'
                 data['company'] = CompanySerializer(self.user.company, context={'request': self.context.get('request')}).data
@@ -144,14 +152,11 @@ class FleetOwnerRegistrationSerializer(serializers.ModelSerializer, PasswordGene
         """Create fleet owner account without company"""
         validated_data.pop('confirm_password')
         
-        # Set role and verification status
         validated_data['role'] = User.Role.FLEET_OWNER
-        validated_data['is_active'] = True
-        validated_data['is_verified'] = True  # Fleet owners are auto-verified
-        
-        # Create user WITHOUT company
+        validated_data['is_active'] = False
+        validated_data['is_verified'] = False
+
         user = User.objects.create_user(**validated_data)
-        
         return user
 
 
@@ -376,6 +381,165 @@ class DriverOnboardingSerializer(serializers.ModelSerializer, PasswordGeneration
             data['temp_password_valid_hours'] = 24
         
         return data
+
+
+def _placeholder_driver_email(company_id, phone_number: str) -> str:
+    """Internal-only email when fleet owner adds a driver without an address."""
+    digits = ''.join(c for c in phone_number if c.isdigit()) or uuid.uuid4().hex[:10]
+    candidate = f'driver.{company_id}.{digits}@fleetvault.internal'
+    n = 0
+    while User.objects.filter(email=candidate).exists():
+        n += 1
+        candidate = f'driver.{company_id}.{digits}.{n}@fleetvault.internal'
+    return candidate
+
+
+class DriverCreateSerializer(serializers.Serializer):
+    """
+    Fleet owner adds a driver to the fleet (no invite / no driver-app login).
+    Mirrors adding a vehicle: record-only for owner operations.
+    """
+
+    phone_number = serializers.CharField(max_length=20)
+    first_name = serializers.CharField(max_length=50)
+    last_name = serializers.CharField(max_length=50)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    drivers_license_number = serializers.CharField(
+        required=False, allow_blank=True, max_length=50
+    )
+    employment_status = serializers.ChoiceField(
+        choices=DriverProfile.EmploymentStatus.choices,
+        required=False,
+    )
+
+    def _resolve_company(self):
+        """Auto workspace company — no formal business registration required."""
+        company = self.context.get('company')
+        if company is not None:
+            return company
+        request = self.context.get('request')
+        if request and getattr(request.user, 'is_fleet_owner', False):
+            from .fleet_workspace import ensure_fleet_owner_company
+
+            company = ensure_fleet_owner_company(request.user)
+            if company is not None:
+                self.context['company'] = company
+        return company
+
+    def validate_phone_number(self, value):
+        company = self._resolve_company()
+        normalized = normalize_phone_number(value)
+        variants = phone_number_lookup_variants(value)
+        existing = User.objects.filter(phone_number__in=variants).first()
+        if not existing:
+            return normalized
+
+        if existing.role == User.Role.DRIVER and existing.company_id is None:
+            self._claim_existing_user = existing
+            return normalized
+
+        if (
+            existing.role == User.Role.DRIVER
+            and company is not None
+            and existing.company_id == company.id
+        ):
+            raise serializers.ValidationError('This driver is already in your fleet.')
+
+        raise serializers.ValidationError('A user with this phone number already exists.')
+
+    def validate_email(self, value):
+        if not value or not str(value).strip():
+            return ''
+        normalized = value.lower().strip()
+        if User.objects.filter(email=normalized).exists():
+            raise serializers.ValidationError('A user with this email already exists.')
+        return normalized
+
+    def validate_drivers_license_number(self, value):
+        if not value or not str(value).strip():
+            return None
+        license_number = value.strip()
+        company = self._resolve_company()
+        qs = DriverProfile.objects.filter(drivers_license_number=license_number)
+        claim_user = getattr(self, '_claim_existing_user', None)
+        if claim_user:
+            qs = qs.exclude(user_id=claim_user.id)
+        if not qs.exists():
+            return license_number
+        if company and qs.filter(user__company=company).exists():
+            raise serializers.ValidationError(
+                'A driver with this license number already exists in your fleet.'
+            )
+        raise serializers.ValidationError(
+            'A driver with this license number is already registered. Use a different number.'
+        )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        request = self.context['request']
+        fleet_owner = request.user
+        company = self._resolve_company()
+        if company is None:
+            from .fleet_workspace import ensure_fleet_owner_company
+
+            company = ensure_fleet_owner_company(fleet_owner)
+
+        claim_user = getattr(self, '_claim_existing_user', None)
+        if claim_user:
+            user = claim_user
+            user.company = company
+            user.first_name = validated_data['first_name']
+            user.last_name = validated_data['last_name']
+            user.phone_number = validated_data['phone_number']
+            user.is_active = True
+            user.is_verified = True
+            user.invited_by = fleet_owner
+            user.invitation_accepted = True
+            user.save(
+                update_fields=[
+                    'company',
+                    'first_name',
+                    'last_name',
+                    'phone_number',
+                    'is_active',
+                    'is_verified',
+                    'invited_by',
+                    'invitation_accepted',
+                ]
+            )
+        else:
+            email = validated_data.get('email') or ''
+            if not email:
+                email = _placeholder_driver_email(company.id, validated_data['phone_number'])
+
+            user = User.objects.create_user(
+                email=email,
+                phone_number=validated_data['phone_number'],
+                first_name=validated_data['first_name'],
+                last_name=validated_data['last_name'],
+                password=get_random_string(48),
+                role=User.Role.DRIVER,
+                company=company,
+                is_active=True,
+                is_verified=True,
+                invited_by=fleet_owner,
+                invitation_accepted=True,
+            )
+            user.set_unusable_password()
+            user.save(update_fields=['password'])
+
+        profile = user.driver_profile
+        license_number = validated_data.get('drivers_license_number')
+        if license_number:
+            profile.drivers_license_number = license_number
+        employment_status = validated_data.get('employment_status')
+        if employment_status:
+            profile.employment_status = employment_status
+        profile.date_hired = timezone.now().date()
+        profile.save()
+        DriverProfile.objects.get_or_create(user=user)
+
+        return user
 
 
 # ============================================================================
@@ -657,23 +821,42 @@ class UserLoginSerializer(serializers.Serializer):
         
         if email and password:
             user = authenticate(
-                request=self.context.get('request'), 
-                email=email, 
-                password=password
+                request=self.context.get('request'),
+                username=email,
+                password=password,
             )
-            
+
+            # Fallback when backends return None (e.g. Mongo/email edge cases).
+            if user is None:
+                try:
+                    candidate = User.objects.get(email=email)
+                except User.DoesNotExist:
+                    candidate = None
+                if candidate and candidate.check_password(password):
+                    user = candidate
+
             if not user:
                 raise serializers.ValidationError(
                     "Invalid email or password.",
-                    code='authentication_failed'
+                    code='authentication_failed',
                 )
-            
+
             if not user.is_active:
                 raise serializers.ValidationError(
-                    "Account is not active. Please verify your account first.",
+                    "Account is not active. Please verify your email with the OTP we sent.",
                     code='account_inactive'
                 )
-            
+
+            if (
+                user.is_fleet_owner
+                and not user.is_platform_admin
+                and not user.is_verified
+            ):
+                raise serializers.ValidationError(
+                    "Please verify your email before signing in.",
+                    code='email_not_verified',
+                )
+
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             refresh['email'] = user.email
@@ -699,17 +882,75 @@ class UserLoginSerializer(serializers.Serializer):
         return data
 
 
+class FleetOwnerLoginSerializer(UserLoginSerializer):
+    """Fleet owner / driver sign-in at /users/api/auth/login/ — not platform admins."""
+
+    def validate(self, data):
+        super().validate(data)
+        if self.user.is_platform_admin:
+            raise serializers.ValidationError(
+                'Platform administrators must use the platform sign-in page.',
+                code='wrong_portal',
+            )
+        return data
+
+
 # ============================================================================
 # USER/PROFILE SERIALIZERS
 # ============================================================================
 
+def serialize_user_for_api(user: User, request=None) -> dict:
+    """Build a JSON-safe user dict (MongoDB-tolerant avatar / company fields)."""
+    company_name = None
+    if user.company_id:
+        try:
+            company_name = user.company.name
+        except (ObjectDoesNotExist, AttributeError, Company.DoesNotExist):
+            company_name = Company.objects.filter(pk=user.company_id).values_list('name', flat=True).first()
+
+    avatar_value = None
+    if user.avatar and str(user.avatar).strip():
+        try:
+            avatar_value = user.avatar.name
+        except (ValueError, AttributeError):
+            avatar_value = str(user.avatar)
+
+    driver_profile_id = None
+    if user.role == User.Role.DRIVER:
+        driver_profile_id = str(user.pk)
+
+    return {
+        'id': str(user.pk),
+        'email': user.email,
+        'phone_number': user.phone_number,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'full_name': user.get_full_name(),
+        'role': user.role,
+        'avatar': avatar_value,
+        'avatar_url': user.get_avatar_url(request),
+        'is_verified': user.is_verified,
+        'is_active': user.is_active,
+        'date_joined': user.date_joined.isoformat() if user.date_joined else None,
+        'last_login': user.last_login.isoformat() if user.last_login else None,
+        'company_id': str(user.company_id) if user.company_id else None,
+        'company_name': company_name,
+        'has_company': bool(user.company_id)
+        or (
+            user.role == User.Role.FLEET_OWNER and Company.objects.filter(owner=user).exists()
+        ),
+        'driver_profile_id': driver_profile_id,
+    }
+
+
 class UserSerializer(serializers.ModelSerializer):
     """Base user serializer"""
     
+    avatar = serializers.SerializerMethodField()
     avatar_url = serializers.SerializerMethodField()
     full_name = serializers.ReadOnlyField()
-    company_id = serializers.CharField(source='company.id', read_only=True, default=None)
-    company_name = serializers.CharField(source='company.name', read_only=True, default=None)
+    company_id = serializers.SerializerMethodField()
+    company_name = serializers.SerializerMethodField()
     has_company = serializers.SerializerMethodField()
     driver_profile_id = serializers.SerializerMethodField()
     
@@ -725,10 +966,32 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'email', 'role', 'is_verified', 'is_active',
             'date_joined', 'last_login', 'company_id', 'company_name'
         ]
+
+    def to_representation(self, instance):
+        return serialize_user_for_api(instance, self.context.get('request'))
     
+    def get_avatar(self, obj):
+        if not obj.avatar or not str(obj.avatar).strip():
+            return None
+        try:
+            return obj.avatar.name
+        except (ValueError, AttributeError):
+            return None
+
     def get_avatar_url(self, obj):
         return obj.get_avatar_url(self.context.get('request'))
     
+    def get_company_id(self, obj):
+        return str(obj.company_id) if obj.company_id else None
+
+    def get_company_name(self, obj):
+        if not obj.company_id:
+            return None
+        try:
+            return obj.company.name
+        except (ObjectDoesNotExist, AttributeError, Company.DoesNotExist):
+            return Company.objects.filter(pk=obj.company_id).values_list('name', flat=True).first()
+
     def get_has_company(self, obj):
         if obj.company_id:
             return True
@@ -739,8 +1002,7 @@ class UserSerializer(serializers.ModelSerializer):
     def get_driver_profile_id(self, obj):
         if obj.role != obj.Role.DRIVER:
             return None
-        profile = getattr(obj, 'driver_profile', None)
-        return str(profile.id) if profile else None
+        return str(obj.pk)
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -907,10 +1169,14 @@ class CompanySerializer(serializers.ModelSerializer):
             'id', 'name', 'logo', 'registration_number',
             'address', 'contact_email', 'contact_phone',
             'is_active', 'subscription_plan', 'owner',
+            'billing_status', 'trial_ends_at', 'billing_quantity',
             'total_drivers', 'total_vehicles',
             'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'owner', 'created_at', 'updated_at']
+        read_only_fields = [
+            'id', 'owner', 'created_at', 'updated_at',
+            'billing_status', 'trial_ends_at', 'billing_quantity',
+        ]
     
     def get_total_drivers(self, obj):
         return obj.users.filter(role=User.Role.DRIVER).count()
@@ -952,27 +1218,193 @@ class PasswordChangeSerializer(serializers.Serializer):
         return user
 
 
+class SignupVerifyOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    otp = serializers.CharField(required=True, min_length=6, max_length=6)
+
+    def validate_email(self, value):
+        email = value.lower()
+        try:
+            user = User.objects.get(
+                email=email,
+                role=User.Role.FLEET_OWNER,
+                is_verified=False,
+            )
+        except User.DoesNotExist:
+            raise serializers.ValidationError(
+                'No pending signup found for this email. It may already be verified.'
+            )
+        self.user = user
+        return email
+
+    def validate_otp(self, value):
+        if not value.isdigit():
+            raise serializers.ValidationError('OTP must be a 6-digit number.')
+        return value
+
+    def validate(self, data):
+        ok, err = auth_codes.verify_code(
+            self.user,
+            EmailAuthCode.Purpose.SIGNUP_VERIFY,
+            data['otp'],
+        )
+        if not ok:
+            raise serializers.ValidationError({'otp': err})
+        return data
+
+    def save(self):
+        user = self.user
+        user.is_active = True
+        user.is_verified = True
+        user.save(update_fields=['is_active', 'is_verified'])
+        auth_codes.clear_code(user, EmailAuthCode.Purpose.SIGNUP_VERIFY)
+        return user
+
+
+class SignupResendOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    def validate_email(self, value):
+        email = value.lower()
+        try:
+            user = User.objects.get(
+                email=email,
+                role=User.Role.FLEET_OWNER,
+                is_verified=False,
+            )
+        except User.DoesNotExist:
+            raise serializers.ValidationError(
+                'No pending signup found for this email.'
+            )
+        self.user = user
+        return email
+
+    def validate(self, data):
+        if not auth_codes.can_resend(self.user, EmailAuthCode.Purpose.SIGNUP_VERIFY):
+            remaining = auth_codes.resend_cooldown_remaining(
+                self.user, EmailAuthCode.Purpose.SIGNUP_VERIFY
+            )
+            raise serializers.ValidationError({
+                'non_field_errors': [
+                    f'Please wait {remaining} seconds before requesting another OTP.',
+                ],
+                'cooldown_seconds': remaining,
+            })
+        return data
+
+    def save(self):
+        plain = auth_codes.issue_code(self.user, EmailAuthCode.Purpose.SIGNUP_VERIFY)
+        self.user._issued_otp = plain
+        return self.user
+
+
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
-    
+
     def validate_email(self, value):
+        email = value.lower()
         try:
-            user = User.objects.get(email=value.lower())
-            self.user = user
+            user = User.objects.get(email=email, is_active=True)
         except User.DoesNotExist:
-            pass
-        return value.lower()
+            self.user = None
+            return email
+
+        if not auth_codes.can_resend(user, EmailAuthCode.Purpose.PASSWORD_RESET):
+            remaining = auth_codes.resend_cooldown_remaining(
+                user, EmailAuthCode.Purpose.PASSWORD_RESET
+            )
+            raise serializers.ValidationError({
+                'non_field_errors': [
+                    f'Please wait {remaining} seconds before requesting another code.',
+                ],
+                'cooldown_seconds': remaining,
+            })
+        self.user = user
+        return email
+
+    def save(self):
+        user = getattr(self, 'user', None)
+        if not user:
+            return None
+        plain = auth_codes.issue_code(user, EmailAuthCode.Purpose.PASSWORD_RESET)
+        user._issued_reset_code = plain
+        return user
+
+
+class PasswordResetVerifySerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    code = serializers.CharField(required=True, min_length=6, max_length=6)
+
+    def validate(self, data):
+        email = data['email'].lower()
+        try:
+            user = User.objects.get(email=email, is_active=True)
+        except User.DoesNotExist:
+            raise serializers.ValidationError({'email': 'Invalid email or code.'})
+
+        if not data['code'].isdigit():
+            raise serializers.ValidationError({'code': 'Code must be a 6-digit number.'})
+
+        ok, err = auth_codes.verify_code(
+            user,
+            EmailAuthCode.Purpose.PASSWORD_RESET,
+            data['code'],
+        )
+        if not ok:
+            raise serializers.ValidationError({'code': err})
+
+        self.user = user
+        data['email'] = email
+        return data
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
-    token = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
+    code = serializers.CharField(required=True, min_length=6, max_length=6)
     new_password = serializers.CharField(required=True, validators=[validate_password])
     confirm_password = serializers.CharField(required=True)
-    
+
     def validate(self, data):
         if data['new_password'] != data['confirm_password']:
-            raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+            raise serializers.ValidationError({'confirm_password': 'Passwords do not match.'})
+
+        email = data['email'].lower()
+        try:
+            user = User.objects.get(email=email, is_active=True)
+        except User.DoesNotExist:
+            raise serializers.ValidationError({'code': 'Invalid email or code.'})
+
+        if not data['code'].isdigit():
+            raise serializers.ValidationError({'code': 'Code must be a 6-digit number.'})
+
+        ok, err = auth_codes.verify_code(
+            user,
+            EmailAuthCode.Purpose.PASSWORD_RESET,
+            data['code'],
+        )
+        if not ok:
+            raise serializers.ValidationError({'code': err})
+
+        if check_password(data['new_password'], user.password):
+            raise serializers.ValidationError({
+                'new_password': 'New password cannot be the same as your current password.',
+            })
+
+        self.user = user
+        data['email'] = email
         return data
+
+    def save(self):
+        user = self.user
+        user.set_password(self.validated_data['new_password'])
+        user.save()
+        auth_codes.clear_code(user, EmailAuthCode.Purpose.PASSWORD_RESET)
+        if user.is_driver:
+            driver_profile = user.driver_profile
+            driver_profile.password_changed = True
+            driver_profile.temp_password_expires_at = None
+            driver_profile.save(update_fields=['password_changed', 'temp_password_expires_at'])
+        return user
 
 
 class TokenRefreshSerializer(serializers.Serializer):

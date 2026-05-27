@@ -10,6 +10,8 @@ urlpatterns = [
     path('auth/logout/', views.logout, name='logout'),
     
     # OTP Management
+    path('auth/verify-signup-otp/', views.verify_signup_otp, name='verify-signup-otp'),
+    path('auth/resend-signup-otp/', views.resend_signup_otp, name='resend-signup-otp'),
     path('auth/resend-otp/', views.resend_driver_otp, name='resend-otp'),
     path('auth/verify-otp/', views.verify_driver_otp, name='verify-otp'),
     path('auth/check-temp-password/', views.check_temp_password_status, name='check-temp-password'),
@@ -20,7 +22,8 @@ urlpatterns = [
     path('company/update/', views.update_company, name='update-company'),
     path('company/status/', views.check_company_status, name='check-company-status'),
     
-    # Driver onboarding
+    # Drivers (fleet owner)
+    path('drivers/create/', views.create_driver, name='create-driver'),
     path('drivers/onboard/', views.onboard_driver, name='onboard-driver'),
     
     # Profile
@@ -32,6 +35,7 @@ urlpatterns = [
     # Password management
     path('password/change/', views.change_password, name='change-password'),
     path('password/forgot/', views.forgot_password, name='forgot-password'),
+    path('password/verify-reset-code/', views.verify_reset_code, name='verify-reset-code'),
     path('password/reset/', views.reset_password, name='reset-password'),
     
     # User management (fleet owner only)

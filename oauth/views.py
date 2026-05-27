@@ -1,27 +1,32 @@
 # views.py
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.db import IntegrityError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 import logging
 
-from .models import User, DriverProfile, FleetOwnerProfile, KYCDocument, Company
+from .models import User, DriverProfile, FleetOwnerProfile, KYCDocument, Company, EmailAuthCode
+from . import auth_codes
+from .email_utils import deliver_auth_email
 from .fleet_workspace import ensure_fleet_owner_company, resolve_user_company
 from .serializers import (
     FleetOwnerRegistrationSerializer,
     CompanyRegistrationSerializer,
     CompanyUpdateSerializer,
     DriverOnboardingSerializer,
+    DriverCreateSerializer,
+    serialize_user_for_api,
     ResendOTPSerializer,
     DriverOTPVerificationSerializer,
-    UserLoginSerializer,
+    FleetOwnerLoginSerializer,
     UserSerializer,
     UserUpdateSerializer,
     DriverProfileSerializer,
@@ -31,7 +36,10 @@ from .serializers import (
     KYCDocumentVerificationSerializer,
     PasswordChangeSerializer,
     PasswordResetRequestSerializer,
+    PasswordResetVerifySerializer,
     PasswordResetConfirmSerializer,
+    SignupVerifyOTPSerializer,
+    SignupResendOTPSerializer,
     TokenRefreshSerializer,
     LogoutSerializer,
     CustomTokenObtainPairSerializer,
@@ -182,6 +190,42 @@ def send_otp_resend_email(driver, otp):
         return False
 
 
+def send_signup_otp_email(user, otp):
+    brand = getattr(settings, 'APP_BRAND_NAME', 'FleetVault')
+    subject = f'{brand} — Verify your email'
+    message = f"""
+Hi {user.first_name},
+
+Your verification code is: {otp}
+
+This code expires in 30 minutes.
+
+If you did not create an account, you can ignore this email.
+
+Best regards,
+{brand} Team
+"""
+    return deliver_auth_email(subject, message, user.email)
+
+
+def send_password_reset_code_email(user, code):
+    brand = getattr(settings, 'APP_BRAND_NAME', 'FleetVault')
+    subject = f'{brand} — Password reset code'
+    message = f"""
+Hi {user.first_name},
+
+Your password reset code is: {code}
+
+This code expires in 30 minutes.
+
+If you did not request a reset, you can ignore this email.
+
+Best regards,
+{brand} Team
+"""
+    return deliver_auth_email(subject, message, user.email)
+
+
 def send_verification_confirmation(user):
     """Send verification confirmation email."""
     subject = 'Account Verified - Fleet Flow'
@@ -242,23 +286,31 @@ def register_fleet_owner(request):
     
     if serializer.is_valid():
         user = serializer.save()
-        
-        # Generate JWT tokens
-        tokens = get_tokens_for_user(user)
-        
-        # Send welcome email
-        send_welcome_email(user)
-        
-        logger.info(f"New fleet owner registered: {user.email}")
-        
-        return Response({
-            'message': 'Registration successful.',
-            'user': UserSerializer(user, context={'request': request}).data,
-            'tokens': tokens,
-            'redirect_url': '/fleet-owner/dashboard',
-            'next_step': 'register_company',
-            'requires_company': False,
-        }, status=status.HTTP_201_CREATED)
+        otp = auth_codes.issue_code(user, EmailAuthCode.Purpose.SIGNUP_VERIFY)
+        email_sent = send_signup_otp_email(user, otp)
+
+        logger.info(f'New fleet owner registered (pending OTP): {user.email}')
+
+        payload = {
+            'message': 'Registration successful. Enter the verification code sent to your email.',
+            'email': user.email,
+            'requires_verification': True,
+            'email_sent': email_sent,
+            'otp_expires_minutes': auth_codes.CODE_EXPIRY_SECONDS // 60,
+            'resend_cooldown_seconds': auth_codes.RESEND_COOLDOWN_SECONDS,
+        }
+        if not email_sent:
+            return Response(
+                {
+                    'message': 'Account created but we could not send the verification email. '
+                    'Try resend or contact support.',
+                    'email': user.email,
+                    'requires_verification': True,
+                    'email_sent': False,
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        return Response(payload, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -267,53 +319,59 @@ def register_fleet_owner(request):
 @permission_classes([AllowAny])
 def login(request):
     """Login user and return JWT tokens."""
-    serializer = UserLoginSerializer(
+    serializer = FleetOwnerLoginSerializer(
         data=request.data,
         context={'request': request}
     )
     
-    if serializer.is_valid():
-        user = serializer.user
-        tokens = serializer._tokens
-        
-        # Update last login
-        user.last_login = timezone.now()
-        user.save(update_fields=['last_login'])
-        
-        logger.info(f"User logged in: {user.email}")
-        
-        response_data = {
-            'tokens': tokens,
-            'user': UserSerializer(user, context={'request': request}).data,
-        }
-        
-        # Determine redirect and next steps based on role and company status
-        if user.is_fleet_owner:
-            if not user.company:
-                response_data['redirect_url'] = '/fleet-owner/dashboard'
-                response_data['requires_company'] = False
-                response_data['next_step'] = 'register_company'
-            else:
-                response_data['redirect_url'] = '/fleet-owner/dashboard'
-                response_data['company'] = CompanySerializer(
-                    user.company, context={'request': request}
-                ).data
-        elif user.is_driver:
-            if not user.is_verified:
-                response_data['redirect_url'] = '/driver/verify'
-                response_data['requires_verification'] = True
-                response_data['message'] = 'Please verify your account to continue.'
-            else:
-                response_data['redirect_url'] = '/driver/dashboard'
-                # Check if temp password needs changing
-                driver_profile = user.driver_profile
-                if not driver_profile.password_changed and not driver_profile.is_temp_password_expired:
-                    response_data['requires_password_change'] = True
-                    response_data['temp_password_hours_remaining'] = driver_profile.temp_password_hours_remaining
-        
-        return Response(response_data, status=status.HTTP_200_OK)
-    
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if not serializer.is_valid():
+        email_hint = (request.data.get('email') or '')[:80]
+        logger.warning('Login failed for %s: %s', email_hint, serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    user = serializer.user
+    tokens = serializer._tokens
+
+    user.last_login = timezone.now()
+    user.save(update_fields=['last_login'])
+
+    logger.info(f"User logged in: {user.email}")
+
+    response_data = {
+        'tokens': tokens,
+        'user': UserSerializer(user, context={'request': request}).data,
+    }
+
+    if user.is_fleet_owner:
+        from billing.access import company_has_platform_access, company_requires_checkout
+        from oauth.fleet_workspace import ensure_fleet_owner_company
+
+        company = resolve_user_company(user) or ensure_fleet_owner_company(user)
+        response_data['redirect_url'] = '/fleet-owner/dashboard'
+        if not user.company and company and not company.registration_number:
+            response_data['requires_company'] = False
+            response_data['next_step'] = 'register_company'
+        if company:
+            response_data['company'] = CompanySerializer(
+                company, context={'request': request}
+            ).data
+        if company:
+            response_data['billing_status'] = company.billing_status
+            response_data['requires_billing_checkout'] = company_requires_checkout(company)
+            response_data['has_billing_access'] = company_has_platform_access(company)
+    elif user.is_driver:
+        if not user.is_verified:
+            response_data['redirect_url'] = '/driver/verify'
+            response_data['requires_verification'] = True
+            response_data['message'] = 'Please verify your account to continue.'
+        else:
+            response_data['redirect_url'] = '/driver/dashboard'
+            driver_profile = user.driver_profile
+            if not driver_profile.password_changed and not driver_profile.is_temp_password_expired:
+                response_data['requires_password_change'] = True
+                response_data['temp_password_hours_remaining'] = driver_profile.temp_password_hours_remaining
+
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -348,6 +406,46 @@ def logout(request):
 # ============================================================================
 # OTP MANAGEMENT ENDPOINTS
 # ============================================================================
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_signup_otp(request):
+    """Verify fleet owner signup OTP; activate account (login separately)."""
+    serializer = SignupVerifyOTPSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        send_welcome_email(user)
+        send_verification_confirmation(user)
+        logger.info(f'Fleet owner email verified: {user.email}')
+        return Response({
+            'message': 'Email verified successfully. You can now sign in.',
+            'email': user.email,
+        }, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def resend_signup_otp(request):
+    serializer = SignupResendOTPSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        email_sent = send_signup_otp_email(user, user._issued_otp)
+        payload = {
+            'message': 'A new verification code has been sent.',
+            'email': user.email,
+            'email_sent': email_sent,
+            'otp_expires_minutes': auth_codes.CODE_EXPIRY_SECONDS // 60,
+            'resend_cooldown_seconds': auth_codes.RESEND_COOLDOWN_SECONDS,
+        }
+        if not email_sent and not settings.DEBUG:
+            return Response(
+                {'message': 'Could not send email. Please try again shortly.', 'email_sent': False},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        return Response(payload, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -614,7 +712,78 @@ def check_company_status(request):
 
 
 # ============================================================================
-# DRIVER ONBOARDING (Step 3)
+# DRIVER MANAGEMENT (fleet owner)
+# ============================================================================
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_driver(request):
+    """Add a driver to the fleet (no platform invitation)."""
+    user = request.user
+
+    if not user.is_fleet_owner:
+        return Response(
+            {'error': 'Only fleet owners can add drivers.'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    # Informal fleets: auto-create a workspace company; no separate registration step.
+    company = ensure_fleet_owner_company(user)
+    if not company:
+        return Response(
+            {'error': 'Could not set up your fleet workspace. Try again or contact support.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    serializer = DriverCreateSerializer(
+        data=request.data,
+        context={'request': request, 'company': company},
+    )
+
+    if serializer.is_valid():
+        try:
+            driver_user = serializer.save()
+        except serializers.ValidationError as exc:
+            return Response(exc.detail, status=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError:
+            return Response(
+                {
+                    'non_field_errors': [
+                        'Could not save this driver because of a duplicate phone or license number.'
+                    ]
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            fleet_owner_profile, _ = FleetOwnerProfile.objects.get_or_create(user=user)
+            fleet_owner_profile.active_drivers = User.objects.filter(
+                company=company,
+                role=User.Role.DRIVER,
+                is_active=True,
+            ).count()
+            fleet_owner_profile.save(update_fields=['active_drivers'])
+        except Exception:
+            logger.exception('Failed to update fleet owner active_drivers after driver create')
+
+        logger.info(
+            f"Driver added by {user.email}: {driver_user.get_full_name()} "
+            f"for company {company.name}"
+        )
+
+        return Response(
+            {
+                'message': 'Driver added successfully.',
+                'driver': serialize_user_for_api(driver_user, request),
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ============================================================================
+# DRIVER ONBOARDING (Step 3 — driver app invites)
 # ============================================================================
 
 @api_view(['POST'])
@@ -810,34 +979,51 @@ def change_password(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def forgot_password(request):
-    """Request password reset."""
+    """Request password reset code by email."""
     serializer = PasswordResetRequestSerializer(data=request.data)
-    
     if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    if hasattr(serializer, 'user'):
-        logger.info(f"Password reset requested for: {serializer.user.email}")
-        # Implement password reset email logic here
-    
-    # Always return success to prevent email enumeration
-    return Response({
-        'message': 'If the email exists, a password reset link has been sent.'
-    }, status=status.HTTP_200_OK)
+        status_code = status.HTTP_400_BAD_REQUEST
+        if 'cooldown_seconds' in serializer.errors:
+            status_code = status.HTTP_429_TOO_MANY_REQUESTS
+        return Response(serializer.errors, status=status_code)
+
+    user = serializer.save()
+    if user:
+        send_password_reset_code_email(user, user._issued_reset_code)
+        logger.info(f'Password reset code sent for: {user.email}')
+
+    payload = {
+        'message': 'If the email exists, a reset code has been sent.',
+        'resend_cooldown_seconds': auth_codes.RESEND_COOLDOWN_SECONDS,
+        'code_expires_minutes': auth_codes.CODE_EXPIRY_SECONDS // 60,
+    }
+    return Response(payload, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_reset_code(request):
+    """Validate reset code before showing the new-password form."""
+    serializer = PasswordResetVerifySerializer(data=request.data)
+    if serializer.is_valid():
+        return Response({
+            'message': 'Code verified. You can set a new password.',
+            'email': serializer.validated_data['email'],
+            'verified': True,
+        }, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def reset_password(request):
-    """Reset password with token."""
+    """Reset password using email + code."""
     serializer = PasswordResetConfirmSerializer(data=request.data)
-    
     if serializer.is_valid():
-        # Implement password reset logic here
+        serializer.save()
         return Response({
-            'message': 'Password has been reset successfully.'
+            'message': 'Password has been reset successfully. You can now sign in.',
         }, status=status.HTTP_200_OK)
-    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
