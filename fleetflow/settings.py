@@ -104,7 +104,10 @@ if not MONGO_URI:
 try:
     import certifi
 
-    _MONGO_CLIENT_OPTIONS: dict = {'tlsCAFile': certifi.where()}
+    _ca_bundle = certifi.where()
+    # Help OpenSSL-backed clients on minimal Linux (e.g. Render) find Mozilla roots.
+    os.environ.setdefault('SSL_CERT_FILE', _ca_bundle)
+    _MONGO_CLIENT_OPTIONS: dict = {'tlsCAFile': _ca_bundle}
 except ImportError:
     _MONGO_CLIENT_OPTIONS = {}
 
