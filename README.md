@@ -98,6 +98,15 @@ Copy `.env.template` to `.env` and fill in values (loaded automatically at start
 
 Run `python manage.py migrate` against your cluster before serving traffic. JWT refresh rotation does not use the token blacklist app (Simple JWT’s blacklist models are SQL-oriented); access and refresh tokens still work.
 
+## Render + MongoDB Atlas
+
+If deploy logs show `ServerSelectionTimeoutError` / `SSL handshake failed` / `TLSV1_ALERT_INTERNAL_ERROR` during `manage.py migrate`, check the following:
+
+1. **Python version** — New Render services default to Python 3.14, which can break TLS to Atlas. This repo pins **`3.12`** via `.python-version`. Alternatively set `PYTHON_VERSION` to a full version (e.g. `3.12.8`) on the service. Redeploy after changing.
+2. **Atlas Network Access** — In Atlas → Network Access, allow outbound from Render (e.g. `0.0.0.0/0` for a quick test, or [Render outbound IPs](https://render.com/docs/static-outbound-ip-addresses) on a paid plan).
+3. **`MONGO_URI` on Render** — Set the same Atlas SRV URI you use locally (`mongodb+srv://…`), with URL-encoded password if it contains special characters.
+4. **Start command** — Example: `python manage.py migrate && gunicorn fleetflow.wsgi:application --bind 0.0.0.0:$PORT`
+
 ## Production notes
 
 - Run with **Gunicorn** (already in `requirements.txt`), e.g. `gunicorn fleetflow.wsgi:application`, behind a reverse proxy with TLS.
