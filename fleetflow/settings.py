@@ -371,6 +371,20 @@ if not _USE_SENDGRID:
     EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', 30))
 
+# Fail fast in production when outbound email is not configured.
+if not DEBUG and not EMAIL_CONSOLE:
+    if _USE_SENDGRID:
+        if not SENDGRID_API_KEY:
+            raise ImproperlyConfigured(
+                'SENDGRID_API_KEY is required when using SendGrid in production.'
+            )
+    else:
+        if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
+            raise ImproperlyConfigured(
+                'Production email is not configured. Set SENDGRID_API_KEY or '
+                'set EMAIL_HOST_USER and EMAIL_HOST_PASSWORD.'
+            )
+
 # Must be a verified sender in SendGrid (Single Sender or domain authentication).
 DEFAULT_FROM_EMAIL = os.environ.get(
     'DEFAULT_FROM_EMAIL',

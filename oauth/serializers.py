@@ -108,56 +108,103 @@ class FleetOwnerRegistrationSerializer(serializers.ModelSerializer, PasswordGene
     Step 1: Register fleet owner account (without company).
     After registration, fleet owner must create a company.
     """
-    
+
     password = serializers.CharField(
-        write_only=True, 
+        write_only=True,
         required=True,
         validators=[validate_password],
         style={'input_type': 'password'}
     )
     confirm_password = serializers.CharField(
-        write_only=True, 
+        write_only=True,
         required=True,
         style={'input_type': 'password'}
     )
-    
+
     class Meta:
         model = User
         fields = [
             'email', 'phone_number', 'first_name', 'last_name',
             'password', 'confirm_password'
         ]
-    
+
     def validate_email(self, value):
-        """Validate and normalize email"""
-        if User.objects.filter(email=value.lower()).exists():
-            raise serializers.ValidationError("A user with this email already exists.")
-        return value.lower()
-    
+        """Validate and normalize email."""
+        email = value.lower()
+        existing = User.objects.filter(email=email).first()
+        if not existing:
+            return email
+
+        if existing.role == User.Role.FLEET_OWNER and not existing.is_verified:
+            self._pending_email_user = existing
+            return email
+
+        raise serializers.ValidationError("A user with this email already exists.")
+
     def validate_phone_number(self, value):
-        """Validate phone number"""
-        if User.objects.filter(phone_number=value).exists():
-            raise serializers.ValidationError("A user with this phone number already exists.")
-        return value
-    
+        """Validate phone number."""
+        existing = User.objects.filter(phone_number=value).first()
+        if not existing:
+            return value
+
+        if existing.role == User.Role.FLEET_OWNER and not existing.is_verified:
+            self._pending_phone_user = existing
+            return value
+
+        raise serializers.ValidationError("A user with this phone number already exists.")
+
+    def _resolve_pending_user(self):
+        by_email = getattr(self, '_pending_email_user', None)
+        by_phone = getattr(self, '_pending_phone_user', None)
+        if by_email and by_phone and by_email.id != by_phone.id:
+            raise serializers.ValidationError({
+                'email': 'This email is already linked to another pending signup.',
+                'phone_number': 'This phone number is already linked to another pending signup.',
+            })
+        return by_email or by_phone
+
     def validate(self, data):
-        """Validate passwords match"""
+        """Validate passwords and pending-signup consistency."""
         if data['password'] != data['confirm_password']:
             raise serializers.ValidationError({
-                "confirm_password": "Passwords do not match."
+                'confirm_password': 'Passwords do not match.'
             })
+        self._pending_user = self._resolve_pending_user()
         return data
-    
+
+    def _save_pending_user(self, pending_user, validated_data):
+        pending_user.email = validated_data['email']
+        pending_user.phone_number = validated_data['phone_number']
+        pending_user.first_name = validated_data['first_name']
+        pending_user.last_name = validated_data['last_name']
+        pending_user.role = User.Role.FLEET_OWNER
+        pending_user.is_active = False
+        pending_user.is_verified = False
+        pending_user.set_password(validated_data['password'])
+        pending_user.save(update_fields=[
+            'email',
+            'phone_number',
+            'first_name',
+            'last_name',
+            'role',
+            'is_active',
+            'is_verified',
+            'password',
+        ])
+        return pending_user
+
     def create(self, validated_data):
-        """Create fleet owner account without company"""
+        """Create or refresh a pending fleet owner account."""
         validated_data.pop('confirm_password')
-        
+
+        pending_user = getattr(self, '_pending_user', None)
+        if pending_user:
+            return self._save_pending_user(pending_user, validated_data)
+
         validated_data['role'] = User.Role.FLEET_OWNER
         validated_data['is_active'] = False
         validated_data['is_verified'] = False
-
-        user = User.objects.create_user(**validated_data)
-        return user
+        return User.objects.create_user(**validated_data)
 
 
 # ============================================================================

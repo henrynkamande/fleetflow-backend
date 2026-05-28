@@ -53,202 +53,171 @@ logger = logging.getLogger(__name__)
 # HELPER FUNCTIONS
 # ============================================================================
 
+def _format_transactional_email(recipient_name, intro, detail_lines=None, action_lines=None, security_note=None):
+    """Build a consistent plain-text transactional email body."""
+    details = "\n".join(detail_lines or [])
+    actions = "\n".join(action_lines or [])
+
+    sections = [
+        f"Hello {recipient_name},",
+        "",
+        intro.strip(),
+    ]
+
+    if details:
+        sections.extend(["", details])
+
+    if actions:
+        sections.extend(["", "What to do next:", actions])
+
+    if security_note:
+        sections.extend(["", security_note.strip()])
+
+    sections.extend(
+        [
+            "",
+            "Regards,",
+            "Fleet Flow Support Team",
+        ]
+    )
+    return "\n".join(sections).strip()
+
+
 def send_welcome_email(user):
     """Send welcome email to fleet owner."""
-    subject = 'Welcome to Fleet Flow!'
-    message = f"""
-    Hi {user.first_name},
-    
-    Welcome to Fleet Flow! Your fleet owner account has been created successfully.
-    
-    Next step: Register your company to start managing your fleet.
-    
-    Best regards,
-    Fleet Flow Team
-    """
-    
-    try:
-        send_mail(
-            subject, message, settings.DEFAULT_FROM_EMAIL,
-            [user.email], fail_silently=True,
-        )
-        logger.info(f"Welcome email sent to {user.email}")
-        return True
-    except Exception as e:
-        logger.error(f"Failed to send welcome email to {user.email}: {str(e)}")
-        return False
+    subject = "Welcome to Fleet Flow"
+    message = _format_transactional_email(
+        recipient_name=user.first_name,
+        intro="Your fleet owner account has been created successfully.",
+        action_lines=[
+            "- Sign in to your dashboard.",
+            "- Complete your company profile to begin managing operations.",
+        ],
+        security_note="If you did not create this account, please contact support immediately.",
+    )
+    return deliver_auth_email(subject, message, user.email)
 
 
 def send_company_registration_email(user, company):
     """Send company registration confirmation email."""
-    subject = 'Company Registered - Fleet Flow'
-    message = f"""
-    Hi {user.first_name},
-    
-    Your company "{company.name}" has been registered successfully on Fleet Flow.
-    
-    You can now:
-    - Onboard drivers to your company
-    - Add vehicles to your fleet
-    - Start managing your operations
-    
-    Best regards,
-    Fleet Flow Team
-    """
-    
-    try:
-        send_mail(
-            subject, message, settings.DEFAULT_FROM_EMAIL,
-            [user.email], fail_silently=True,
-        )
-        logger.info(f"Company registration email sent to {user.email}")
-        return True
-    except Exception as e:
-        logger.error(f"Failed to send company registration email: {str(e)}")
-        return False
+    subject = "Company Registration Confirmed"
+    message = _format_transactional_email(
+        recipient_name=user.first_name,
+        intro=f'Your company "{company.name}" is now registered on Fleet Flow.',
+        action_lines=[
+            "- Invite and onboard your drivers.",
+            "- Add your vehicles and documentation.",
+            "- Start tracking operations from your dashboard.",
+        ],
+    )
+    return deliver_auth_email(subject, message, user.email)
 
 
 def send_onboarding_email(driver, password=None, otp=None):
     """Send onboarding email with credentials and OTP."""
     company_name = driver.company.name if driver.company else "Fleet Flow"
     invited_by_name = driver.invited_by.full_name if driver.invited_by else "Fleet Flow"
-    
-    subject = f'Welcome to {company_name} - Verify Your Account'
-    
-    message = f"""
-    Hi {driver.first_name},
-    
-    You have been added to {company_name} on Fleet Flow by {invited_by_name}.
-    """
-    
-    # Add OTP option if provided
+
+    subject = f"Welcome to {company_name} - Verify Your Account"
+
+    details = [f"You were added to {company_name} by {invited_by_name}."]
+    actions = []
+
     if otp:
-        message += f"""
-    OPTION 1 - Verify with OTP (Recommended):
-    Your OTP for account verification: {otp}
-    This OTP is valid for 5 minutes.
-    You will be prompted to set your own password after verification.
-    """
-    
-    # Add temporary password option if provided
-    if password:
-        message += f"""
-    OPTION 2 - Login with Temporary Password:
-    Email: {driver.email}
-    Temporary Password: {password}
-    This password is valid for 24 hours only.
-    You must change your password within 24 hours.
-    """
-    
-    message += """
-    Please verify your account immediately using either option above.
-    
-    Best regards,
-    Fleet Flow Team
-    """
-    
-    try:
-        send_mail(
-            subject, message, settings.DEFAULT_FROM_EMAIL,
-            [driver.email], fail_silently=True,
+        details.extend(
+            [
+                "",
+                "Verification code:",
+                f"- OTP: {otp}",
+                "- Expires in 5 minutes.",
+            ]
         )
-        logger.info(f"Onboarding email sent to {driver.email}")
-        return True
-    except Exception as e:
-        logger.error(f"Failed to send onboarding email to {driver.email}: {str(e)}")
-        return False
+        actions.append("- Use the OTP first (recommended) to verify your account.")
+
+    if password:
+        details.extend(
+            [
+                "",
+                "Temporary sign-in details:",
+                f"- Email: {driver.email}",
+                f"- Temporary password: {password}",
+                "- Temporary password expires in 24 hours.",
+            ]
+        )
+        actions.append("- If you use the temporary password, change it immediately after login.")
+
+    actions.append("- Complete verification as soon as possible to activate full account access.")
+
+    message = _format_transactional_email(
+        recipient_name=driver.first_name,
+        intro="Your Fleet Flow driver account is ready.",
+        detail_lines=details,
+        action_lines=actions,
+        security_note="If this invitation is unexpected, please contact your fleet administrator.",
+    )
+    return deliver_auth_email(subject, message, driver.email)
 
 
 def send_otp_resend_email(driver, otp):
     """Send OTP resend email."""
     company_name = driver.company.name if driver.company else "Fleet Flow"
-    
-    subject = f'{company_name} - New OTP for Account Verification'
-    message = f"""
-    Hi {driver.first_name},
-    
-    You requested a new OTP for your Fleet Flow account.
-    
-    Your new OTP: {otp}
-    This OTP is valid for 5 minutes.
-    
-    Your temporary password is still valid for login if you prefer.
-    
-    Best regards,
-    Fleet Flow Team
-    """
-    
-    try:
-        send_mail(
-            subject, message, settings.DEFAULT_FROM_EMAIL,
-            [driver.email], fail_silently=True,
-        )
-        logger.info(f"OTP resend email sent to {driver.email}")
-        return True
-    except Exception as e:
-        logger.error(f"Failed to send OTP resend email: {str(e)}")
-        return False
+
+    subject = f"{company_name} - New Verification Code"
+    message = _format_transactional_email(
+        recipient_name=driver.first_name,
+        intro="You requested a new verification code for your account.",
+        detail_lines=[
+            f"- OTP: {otp}",
+            "- Expires in 5 minutes.",
+            "- Your temporary password remains valid if it has not expired.",
+        ],
+        action_lines=["- Enter this OTP in the verification screen to continue."],
+        security_note="If you did not request this code, please secure your account immediately.",
+    )
+    return deliver_auth_email(subject, message, driver.email)
 
 
 def send_signup_otp_email(user, otp):
     brand = getattr(settings, 'APP_BRAND_NAME', 'FleetVault')
-    subject = f'{brand} — Verify your email'
-    message = f"""
-Hi {user.first_name},
-
-Your verification code is: {otp}
-
-This code expires in 30 minutes.
-
-If you did not create an account, you can ignore this email.
-
-Best regards,
-{brand} Team
-"""
+    subject = f"{brand} - Verify Your Email Address"
+    message = _format_transactional_email(
+        recipient_name=user.first_name,
+        intro="Thank you for registering. Please verify your email to continue.",
+        detail_lines=[
+            f"- Verification code: {otp}",
+            "- Expires in 30 minutes.",
+        ],
+        action_lines=["- Enter this code in the verification prompt to activate your account."],
+        security_note="If you did not create this account, you can safely ignore this email.",
+    )
     return deliver_auth_email(subject, message, user.email)
 
 
 def send_password_reset_code_email(user, code):
     brand = getattr(settings, 'APP_BRAND_NAME', 'FleetVault')
-    subject = f'{brand} — Password reset code'
-    message = f"""
-Hi {user.first_name},
-
-Your password reset code is: {code}
-
-This code expires in 30 minutes.
-
-If you did not request a reset, you can ignore this email.
-
-Best regards,
-{brand} Team
-"""
+    subject = f"{brand} - Password Reset Code"
+    message = _format_transactional_email(
+        recipient_name=user.first_name,
+        intro="We received a request to reset your password.",
+        detail_lines=[
+            f"- Password reset code: {code}",
+            "- Expires in 30 minutes.",
+        ],
+        action_lines=["- Enter this code in the password reset flow to set a new password."],
+        security_note="If you did not request a password reset, no action is required.",
+    )
     return deliver_auth_email(subject, message, user.email)
 
 
 def send_verification_confirmation(user):
     """Send verification confirmation email."""
-    subject = 'Account Verified - Fleet Flow'
-    message = f"""
-    Hi {user.first_name},
-    
-    Your Fleet Flow account has been verified successfully.
-    You can now login and start using the app.
-    
-    Best regards,
-    Fleet Flow Team
-    """
-    
-    try:
-        send_mail(
-            subject, message, settings.DEFAULT_FROM_EMAIL,
-            [user.email], fail_silently=True,
-        )
-        logger.info(f"Verification confirmation sent to {user.email}")
-        return True
-    except Exception as e:
-        logger.error(f"Failed to send verification confirmation to {user.email}: {str(e)}")
-        return False
+    subject = "Account Verified Successfully"
+    message = _format_transactional_email(
+        recipient_name=user.first_name,
+        intro="Your Fleet Flow account has been verified successfully.",
+        action_lines=["- Sign in to continue setting up and managing your fleet operations."],
+    )
+    return deliver_auth_email(subject, message, user.email)
 
 
 def get_tokens_for_user(user):
