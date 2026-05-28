@@ -3127,3 +3127,127 @@
 [INFO] 2026-05-25 11:43:38,599 log 21743 132787948472000 "OPTIONS /platform/api/companies/?page=1 HTTP/1.1" 200 0
 [INFO] 2026-05-25 11:43:39,777 log 21743 132787948472000 "GET /platform/api/companies/?page=1 HTTP/1.1" 200 367
 [INFO] 2026-05-25 11:43:39,777 log 21743 132787948472000 "GET /platform/api/companies/?page=1 HTTP/1.1" 200 367
+[INFO] 2026-05-27 10:42:36,962 autoreload 34802 130672010764800 Watching for file changes with StatReloader
+[INFO] 2026-05-27 10:42:36,962 autoreload 34802 130672010764800 Watching for file changes with StatReloader
+[INFO] 2026-05-27 10:47:00,133 log 34802 130671410403008 "OPTIONS /billing/api/config/ HTTP/1.1" 200 0
+[INFO] 2026-05-27 10:47:00,133 log 34802 130671410403008 "OPTIONS /billing/api/config/ HTTP/1.1" 200 0
+[ERROR] 2026-05-27 10:47:03,199 log 34802 130671410403008 "GET /billing/api/config/ HTTP/1.1" 500 169609
+[ERROR] 2026-05-27 10:47:03,199 log 34802 130671410403008 "GET /billing/api/config/ HTTP/1.1" 500 169609
+[ERROR] 2026-05-27 10:47:04,304 log 34802 130671410403008 "GET /billing/api/config/ HTTP/1.1" 500 169609
+[ERROR] 2026-05-27 10:47:04,304 log 34802 130671410403008 "GET /billing/api/config/ HTTP/1.1" 500 169609
+[ERROR] 2026-05-27 10:47:06,938 log 34802 130671410403008 "GET /billing/api/config/ HTTP/1.1" 500 169609
+[ERROR] 2026-05-27 10:47:06,938 log 34802 130671410403008 "GET /billing/api/config/ HTTP/1.1" 500 169609
+[INFO] 2026-05-27 10:47:08,948 log 34802 130671410403008 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-05-27 10:47:08,948 log 34802 130671410403008 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-05-27 10:47:08,993 log 34802 130671410403008 "OPTIONS /users/api/profile/ HTTP/1.1" 200 0
+[INFO] 2026-05-27 10:47:08,993 log 34802 130671410403008 "OPTIONS /users/api/profile/ HTTP/1.1" 200 0
+[ERROR] 2026-05-27 10:47:12,175 log 34802 130671402010304 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-27 10:47:12,175 log 34802 130671402010304 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-27 10:47:12,186 log 34802 130671410403008 "GET /billing/api/status/ HTTP/1.1" 500 169609
+[ERROR] 2026-05-27 10:47:12,186 log 34802 130671410403008 "GET /billing/api/status/ HTTP/1.1" 500 169609
+[ERROR] 2026-05-27 10:47:13,269 log 34802 130671410403008 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-27 10:47:13,269 log 34802 130671410403008 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-27 10:47:13,326 log 34802 130671402010304 "GET /billing/api/status/ HTTP/1.1" 500 169609
+[ERROR] 2026-05-27 10:47:13,326 log 34802 130671402010304 "GET /billing/api/status/ HTTP/1.1" 500 169609
+[ERROR] 2026-05-27 10:47:15,877 log 34802 130671402010304 "GET /billing/api/status/ HTTP/1.1" 500 169609
+[ERROR] 2026-05-27 10:47:15,877 log 34802 130671402010304 "GET /billing/api/status/ HTTP/1.1" 500 169609
+[ERROR] 2026-05-27 10:47:19,994 log 34802 130671402010304 "GET /billing/api/status/ HTTP/1.1" 500 169609
+[ERROR] 2026-05-27 10:47:19,994 log 34802 130671402010304 "GET /billing/api/status/ HTTP/1.1" 500 169609
+[INFO] 2026-05-27 10:50:14,004 autoreload 34802 130672010764800 /home/jowamupro/software/fleetflow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-27 10:50:14,004 autoreload 34802 130672010764800 /home/jowamupro/software/fleetflow/fleetflow-backend/fleetflow/urls.py changed, reloading.
+[INFO] 2026-05-27 10:50:58,941 autoreload 35593 125441419956736 Watching for file changes with StatReloader
+[INFO] 2026-05-27 10:50:58,941 autoreload 35593 125441419956736 Watching for file changes with StatReloader
+[INFO] 2026-05-27 10:52:26,505 autoreload 35593 125441419956736 /home/jowamupro/software/fleetflow/fleetflow-backend/platform_api/urls.py changed, reloading.
+[INFO] 2026-05-27 10:52:26,505 autoreload 35593 125441419956736 /home/jowamupro/software/fleetflow/fleetflow-backend/platform_api/urls.py changed, reloading.
+[INFO] 2026-05-27 10:52:30,191 autoreload 36644 132801730163200 Watching for file changes with StatReloader
+[INFO] 2026-05-27 10:52:30,191 autoreload 36644 132801730163200 Watching for file changes with StatReloader
+[ERROR] 2026-05-27 10:54:41,652 log 36644 132800992769728 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-27 10:54:41,652 log 36644 132800992769728 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-27 10:54:42,689 log 36644 132800992769728 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-27 10:54:42,689 log 36644 132800992769728 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[INFO] 2026-05-27 10:54:43,920 log 36644 132800992769728 "OPTIONS /platform/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-05-27 10:54:43,920 log 36644 132800992769728 "OPTIONS /platform/api/auth/login/ HTTP/1.1" 200 0
+[WARNING] 2026-05-27 10:54:45,828 log 36644 132800992769728 "POST /platform/api/auth/login/ HTTP/1.1" 400 120
+[WARNING] 2026-05-27 10:54:45,828 log 36644 132800992769728 "POST /platform/api/auth/login/ HTTP/1.1" 400 120
+[WARNING] 2026-05-27 10:54:48,318 log 36644 132800992769728 "POST /platform/api/auth/login/ HTTP/1.1" 400 120
+[WARNING] 2026-05-27 10:54:48,318 log 36644 132800992769728 "POST /platform/api/auth/login/ HTTP/1.1" 400 120
+[INFO] 2026-05-27 10:54:59,168 log 36644 132800992769728 "POST /platform/api/auth/login/ HTTP/1.1" 200 1399
+[INFO] 2026-05-27 10:54:59,168 log 36644 132800992769728 "POST /platform/api/auth/login/ HTTP/1.1" 200 1399
+[INFO] 2026-05-27 10:55:00,551 log 36644 132800984377024 "OPTIONS /platform/api/overview/?period=30d HTTP/1.1" 200 0
+[INFO] 2026-05-27 10:55:00,551 log 36644 132800984377024 "OPTIONS /platform/api/overview/?period=30d HTTP/1.1" 200 0
+[WARNING] 2026-05-27 10:55:00,947 log 36644 132800992769728 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:55:00,947 log 36644 132800992769728 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:55:02,340 log 36644 132800992769728 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:55:02,340 log 36644 132800992769728 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:55:04,760 log 36644 132800992769728 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:55:04,760 log 36644 132800992769728 "GET /billing/api/status/ HTTP/1.1" 403 46
+[INFO] 2026-05-27 10:55:08,321 log 36644 132800984377024 "GET /platform/api/overview/?period=30d HTTP/1.1" 200 911
+[INFO] 2026-05-27 10:55:08,321 log 36644 132800984377024 "GET /platform/api/overview/?period=30d HTTP/1.1" 200 911
+[WARNING] 2026-05-27 10:55:53,912 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:55:53,912 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:57:55,418 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:57:55,418 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:57:56,811 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:57:56,811 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:57:59,201 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:57:59,201 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:58:04,199 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 10:58:04,199 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 11:04:44,773 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 11:04:44,773 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 11:04:55,975 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 11:04:55,975 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 11:04:58,353 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 11:04:58,353 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 11:05:02,738 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-27 11:05:02,738 log 36644 132800984377024 "GET /billing/api/status/ HTTP/1.1" 403 46
+[INFO] 2026-05-28 07:23:10,889 autoreload 351735 134619105116672 Watching for file changes with StatReloader
+[INFO] 2026-05-28 07:23:10,889 autoreload 351735 134619105116672 Watching for file changes with StatReloader
+[INFO] 2026-05-28 07:26:46,142 log 351735 134618367915712 "OPTIONS /users/api/auth/register/ HTTP/1.1" 200 0
+[INFO] 2026-05-28 07:26:46,142 log 351735 134618367915712 "OPTIONS /users/api/auth/register/ HTTP/1.1" 200 0
+[WARNING] 2026-05-28 07:26:47,915 log 351735 134618367915712 "POST /users/api/auth/register/ HTTP/1.1" 400 70
+[WARNING] 2026-05-28 07:26:47,915 log 351735 134618367915712 "POST /users/api/auth/register/ HTTP/1.1" 400 70
+[WARNING] 2026-05-28 07:26:50,070 log 351735 134618367915712 "POST /users/api/auth/register/ HTTP/1.1" 400 70
+[WARNING] 2026-05-28 07:26:50,070 log 351735 134618367915712 "POST /users/api/auth/register/ HTTP/1.1" 400 70
+[INFO] 2026-05-28 07:27:10,832 email_utils 351735 134618367915712 Auth email sent to josephwamiti8711@gmail.com (FleetVault — Verify your email)
+[INFO] 2026-05-28 07:27:10,832 email_utils 351735 134618367915712 Auth email sent to josephwamiti8711@gmail.com (FleetVault — Verify your email)
+[INFO] 2026-05-28 07:27:10,832 views 351735 134618367915712 New fleet owner registered (pending OTP): josephwamiti8711@gmail.com
+[INFO] 2026-05-28 07:27:10,832 views 351735 134618367915712 New fleet owner registered (pending OTP): josephwamiti8711@gmail.com
+[INFO] 2026-05-28 07:27:10,834 log 351735 134618367915712 "POST /users/api/auth/register/ HTTP/1.1" 201 224
+[INFO] 2026-05-28 07:27:10,834 log 351735 134618367915712 "POST /users/api/auth/register/ HTTP/1.1" 201 224
+[INFO] 2026-05-28 07:28:49,177 log 351735 134618367915712 "OPTIONS /users/api/auth/verify-signup-otp/ HTTP/1.1" 200 0
+[INFO] 2026-05-28 07:28:49,177 log 351735 134618367915712 "OPTIONS /users/api/auth/verify-signup-otp/ HTTP/1.1" 200 0
+[INFO] 2026-05-28 07:28:54,860 views 351735 134618367915712 Welcome email sent to josephwamiti8711@gmail.com
+[INFO] 2026-05-28 07:28:54,860 views 351735 134618367915712 Welcome email sent to josephwamiti8711@gmail.com
+[INFO] 2026-05-28 07:28:57,983 views 351735 134618367915712 Verification confirmation sent to josephwamiti8711@gmail.com
+[INFO] 2026-05-28 07:28:57,983 views 351735 134618367915712 Verification confirmation sent to josephwamiti8711@gmail.com
+[INFO] 2026-05-28 07:28:57,983 views 351735 134618367915712 Fleet owner email verified: josephwamiti8711@gmail.com
+[INFO] 2026-05-28 07:28:57,983 views 351735 134618367915712 Fleet owner email verified: josephwamiti8711@gmail.com
+[INFO] 2026-05-28 07:28:57,985 log 351735 134618367915712 "POST /users/api/auth/verify-signup-otp/ HTTP/1.1" 200 100
+[INFO] 2026-05-28 07:28:57,985 log 351735 134618367915712 "POST /users/api/auth/verify-signup-otp/ HTTP/1.1" 200 100
+[INFO] 2026-05-28 07:29:02,822 log 351735 134618367915712 "OPTIONS /users/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-05-28 07:29:02,822 log 351735 134618367915712 "OPTIONS /users/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-05-28 07:29:05,392 views 351735 134618367915712 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-05-28 07:29:05,392 views 351735 134618367915712 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-05-28 07:29:08,770 log 351735 134618367915712 "POST /users/api/auth/login/ HTTP/1.1" 200 2488
+[INFO] 2026-05-28 07:29:08,770 log 351735 134618367915712 "POST /users/api/auth/login/ HTTP/1.1" 200 2488
+[INFO] 2026-05-28 07:29:11,910 log 351735 134618367915712 "OPTIONS /billing/api/config/ HTTP/1.1" 200 0
+[INFO] 2026-05-28 07:29:11,910 log 351735 134618367915712 "OPTIONS /billing/api/config/ HTTP/1.1" 200 0
+[INFO] 2026-05-28 07:29:11,939 log 351735 134618359523008 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-05-28 07:29:11,939 log 351735 134618359523008 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-05-28 07:29:12,365 log 351735 134618367915712 "GET /billing/api/config/ HTTP/1.1" 200 400
+[INFO] 2026-05-28 07:29:12,365 log 351735 134618367915712 "GET /billing/api/config/ HTTP/1.1" 200 400
+[INFO] 2026-05-28 07:29:12,764 autoreload 351735 134619105116672 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-05-28 07:29:12,764 autoreload 351735 134619105116672 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-05-28 07:29:49,560 autoreload 352748 132536556605952 Watching for file changes with StatReloader
+[INFO] 2026-05-28 07:29:49,560 autoreload 352748 132536556605952 Watching for file changes with StatReloader
+[INFO] 2026-05-28 07:33:09,320 autoreload 352748 132536556605952 /home/jowamupro/software/fleetflow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-28 07:33:09,320 autoreload 352748 132536556605952 /home/jowamupro/software/fleetflow/fleetflow-backend/fleetflow/settings.py changed, reloading.
+[INFO] 2026-05-28 07:33:56,501 autoreload 353630 124011875561984 Watching for file changes with StatReloader
+[INFO] 2026-05-28 07:33:56,501 autoreload 353630 124011875561984 Watching for file changes with StatReloader
+[INFO] 2026-05-28 07:38:17,271 log 353630 124011140871872 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-05-28 07:38:17,271 log 353630 124011140871872 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-05-28 07:42:21,491 autoreload 353630 124011875561984 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-28 07:42:21,491 autoreload 353630 124011875561984 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-28 07:42:23,714 autoreload 354431 135018397962752 Watching for file changes with StatReloader
+[INFO] 2026-05-28 07:42:23,714 autoreload 354431 135018397962752 Watching for file changes with StatReloader
