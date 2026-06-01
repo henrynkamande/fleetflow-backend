@@ -3251,3 +3251,495 @@
 [INFO] 2026-05-28 07:42:21,491 autoreload 353630 124011875561984 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
 [INFO] 2026-05-28 07:42:23,714 autoreload 354431 135018397962752 Watching for file changes with StatReloader
 [INFO] 2026-05-28 07:42:23,714 autoreload 354431 135018397962752 Watching for file changes with StatReloader
+[INFO] 2026-05-30 08:51:18,876 autoreload 6173 125663063450112 Watching for file changes with StatReloader
+[INFO] 2026-05-30 08:51:18,876 autoreload 6173 125663063450112 Watching for file changes with StatReloader
+[INFO] 2026-05-30 08:53:39,774 autoreload 6173 125663063450112 /home/jowamupro/software/fleetflow/fleetflow-backend/platform_api/serializers_auth.py changed, reloading.
+[INFO] 2026-05-30 08:53:39,774 autoreload 6173 125663063450112 /home/jowamupro/software/fleetflow/fleetflow-backend/platform_api/serializers_auth.py changed, reloading.
+[INFO] 2026-05-30 08:53:42,424 autoreload 7824 130831055708672 Watching for file changes with StatReloader
+[INFO] 2026-05-30 08:53:42,424 autoreload 7824 130831055708672 Watching for file changes with StatReloader
+[INFO] 2026-05-30 08:59:52,481 log 7824 130830455264960 "OPTIONS /users/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 08:59:52,481 log 7824 130830455264960 "OPTIONS /users/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 08:59:56,096 views 7824 130830455264960 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-05-30 08:59:56,096 views 7824 130830455264960 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-05-30 08:59:57,946 log 7824 130830455264960 "POST /users/api/auth/login/ HTTP/1.1" 200 2782
+[INFO] 2026-05-30 08:59:57,946 log 7824 130830455264960 "POST /users/api/auth/login/ HTTP/1.1" 200 2782
+[INFO] 2026-05-30 09:00:09,991 log 7824 130830446872256 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:00:09,991 log 7824 130830446872256 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:00:09,997 log 7824 130830455264960 "OPTIONS /billing/api/config/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:00:09,997 log 7824 130830455264960 "OPTIONS /billing/api/config/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:00:10,405 log 7824 130830455264960 "GET /billing/api/config/ HTTP/1.1" 200 400
+[INFO] 2026-05-30 09:00:10,405 log 7824 130830455264960 "GET /billing/api/config/ HTTP/1.1" 200 400
+[INFO] 2026-05-30 09:00:13,743 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-05-30 09:00:13,743 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-05-30 09:01:08,496 log 7824 130830446872256 "OPTIONS /users/api/profile/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:01:08,496 log 7824 130830446872256 "OPTIONS /users/api/profile/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:01:09,322 log 7824 130830446872256 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 09:01:09,322 log 7824 130830446872256 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 09:01:13,911 log 7824 130830446872256 "OPTIONS /platform/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:01:13,911 log 7824 130830446872256 "OPTIONS /platform/api/auth/login/ HTTP/1.1" 200 0
+[WARNING] 2026-05-30 09:01:17,080 log 7824 130830446872256 "POST /platform/api/auth/login/ HTTP/1.1" 400 94
+[WARNING] 2026-05-30 09:01:17,080 log 7824 130830446872256 "POST /platform/api/auth/login/ HTTP/1.1" 400 94
+[WARNING] 2026-05-30 09:01:21,274 log 7824 130830446872256 "POST /platform/api/auth/login/ HTTP/1.1" 400 94
+[WARNING] 2026-05-30 09:01:21,274 log 7824 130830446872256 "POST /platform/api/auth/login/ HTTP/1.1" 400 94
+[INFO] 2026-05-30 09:05:48,183 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-05-30 09:05:48,183 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-05-30 09:10:34,619 log 7824 130830446872256 "OPTIONS /platform/api/auth/register/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:10:34,619 log 7824 130830446872256 "OPTIONS /platform/api/auth/register/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:10:44,294 log 7824 130830446872256 "POST /platform/api/auth/register/ HTTP/1.1" 201 1421
+[INFO] 2026-05-30 09:10:44,294 log 7824 130830446872256 "POST /platform/api/auth/register/ HTTP/1.1" 201 1421
+[INFO] 2026-05-30 09:10:53,456 log 7824 130830455264960 "OPTIONS /platform/api/overview/?period=30d HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:10:53,456 log 7824 130830455264960 "OPTIONS /platform/api/overview/?period=30d HTTP/1.1" 200 0
+[WARNING] 2026-05-30 09:10:53,801 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:10:53,801 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:10:55,162 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:10:55,162 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 403 46
+[INFO] 2026-05-30 09:10:58,935 log 7824 130830455264960 "GET /platform/api/overview/?period=30d HTTP/1.1" 200 722
+[INFO] 2026-05-30 09:10:58,935 log 7824 130830455264960 "GET /platform/api/overview/?period=30d HTTP/1.1" 200 722
+[WARNING] 2026-05-30 09:10:59,120 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:10:59,120 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:11:03,492 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:11:03,492 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:22:49,383 log 7824 130830455264960 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:22:49,383 log 7824 130830455264960 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:22:50,763 log 7824 130830455264960 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:22:50,763 log 7824 130830455264960 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:22:53,129 log 7824 130830455264960 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:22:53,129 log 7824 130830455264960 "GET /billing/api/status/ HTTP/1.1" 403 46
+[INFO] 2026-05-30 09:22:54,909 log 7824 130830446872256 "GET /users/api/profile/ HTTP/1.1" 200 417
+[INFO] 2026-05-30 09:22:54,909 log 7824 130830446872256 "GET /users/api/profile/ HTTP/1.1" 200 417
+[WARNING] 2026-05-30 09:22:57,509 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:22:57,509 log 7824 130830446872256 "GET /billing/api/status/ HTTP/1.1" 403 46
+[INFO] 2026-05-30 09:22:58,993 log 7824 130830455264960 "GET /platform/api/overview/?period=30d HTTP/1.1" 200 722
+[INFO] 2026-05-30 09:22:58,993 log 7824 130830455264960 "GET /platform/api/overview/?period=30d HTTP/1.1" 200 722
+[INFO] 2026-05-30 09:26:37,611 autoreload 7824 130831055708672 /home/jowamupro/software/fleetflow/fleetflow-backend/platform_api/services/overview.py changed, reloading.
+[INFO] 2026-05-30 09:26:37,611 autoreload 7824 130831055708672 /home/jowamupro/software/fleetflow/fleetflow-backend/platform_api/services/overview.py changed, reloading.
+[INFO] 2026-05-30 09:26:45,133 autoreload 13214 139936607584768 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:26:45,133 autoreload 13214 139936607584768 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:26:55,158 autoreload 13214 139936607584768 /home/jowamupro/software/fleetflow/fleetflow-backend/platform_api/views.py changed, reloading.
+[INFO] 2026-05-30 09:26:55,158 autoreload 13214 139936607584768 /home/jowamupro/software/fleetflow/fleetflow-backend/platform_api/views.py changed, reloading.
+[INFO] 2026-05-30 09:26:57,190 autoreload 13436 133233151439360 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:26:57,190 autoreload 13436 133233151439360 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:27:19,670 autoreload 13436 133233151439360 /home/jowamupro/software/fleetflow/fleetflow-backend/platform_api/views.py changed, reloading.
+[INFO] 2026-05-30 09:27:19,670 autoreload 13436 133233151439360 /home/jowamupro/software/fleetflow/fleetflow-backend/platform_api/views.py changed, reloading.
+[INFO] 2026-05-30 09:27:22,042 autoreload 13677 133520746304000 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:27:22,042 autoreload 13677 133520746304000 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:27:25,911 autoreload 13677 133520746304000 /home/jowamupro/software/fleetflow/fleetflow-backend/platform_api/urls.py changed, reloading.
+[INFO] 2026-05-30 09:27:25,911 autoreload 13677 133520746304000 /home/jowamupro/software/fleetflow/fleetflow-backend/platform_api/urls.py changed, reloading.
+[INFO] 2026-05-30 09:27:27,857 autoreload 13898 129028436824576 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:27:27,857 autoreload 13898 129028436824576 Watching for file changes with StatReloader
+[WARNING] 2026-05-30 09:30:57,261 log 13898 129027971991232 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:30:57,261 log 13898 129027971991232 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:30:58,638 log 13898 129027971991232 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:30:58,638 log 13898 129027971991232 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:31:01,036 log 13898 129027971991232 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:31:01,036 log 13898 129027971991232 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:31:01,793 log 13898 129027971991232 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:31:01,793 log 13898 129027971991232 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:32:18,024 log 13898 129027971991232 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:32:18,024 log 13898 129027971991232 "GET /billing/api/status/ HTTP/1.1" 403 46
+[INFO] 2026-05-30 09:32:20,429 log 13898 129027962549952 "GET /users/api/profile/ HTTP/1.1" 200 417
+[INFO] 2026-05-30 09:32:20,429 log 13898 129027962549952 "GET /users/api/profile/ HTTP/1.1" 200 417
+[INFO] 2026-05-30 09:32:28,442 log 13898 129027962549952 "GET /platform/api/overview/?period=30d HTTP/1.1" 200 1411
+[INFO] 2026-05-30 09:32:28,442 log 13898 129027962549952 "GET /platform/api/overview/?period=30d HTTP/1.1" 200 1411
+[WARNING] 2026-05-30 09:46:22,550 log 13898 129027962549952 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:46:22,550 log 13898 129027962549952 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:46:24,946 log 13898 129027962549952 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:46:24,946 log 13898 129027962549952 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:46:29,315 log 13898 129027962549952 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:46:29,315 log 13898 129027962549952 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:46:46,984 log 13898 129027962549952 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:46:46,984 log 13898 129027962549952 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:46:49,361 log 13898 129027962549952 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 09:46:49,361 log 13898 129027962549952 "GET /billing/api/status/ HTTP/1.1" 403 46
+[INFO] 2026-05-30 09:47:04,950 views 13898 129027962549952 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-05-30 09:47:04,950 views 13898 129027962549952 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-05-30 09:47:06,742 log 13898 129027962549952 "POST /users/api/auth/login/ HTTP/1.1" 200 2782
+[INFO] 2026-05-30 09:47:06,742 log 13898 129027962549952 "POST /users/api/auth/login/ HTTP/1.1" 200 2782
+[INFO] 2026-05-30 09:47:08,534 log 13898 129027962549952 "GET /billing/api/config/ HTTP/1.1" 200 400
+[INFO] 2026-05-30 09:47:08,534 log 13898 129027962549952 "GET /billing/api/config/ HTTP/1.1" 200 400
+[INFO] 2026-05-30 09:47:11,056 log 13898 129027971991232 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-05-30 09:47:11,056 log 13898 129027971991232 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-05-30 09:48:15,835 log 13898 129027971991232 "OPTIONS /platform/api/vehicles/?page=1 HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:48:15,835 log 13898 129027971991232 "OPTIONS /platform/api/vehicles/?page=1 HTTP/1.1" 200 0
+[ERROR] 2026-05-30 09:48:16,409 log 13898 129027971991232 "GET /platform/api/vehicles/?page=1 HTTP/1.1" 500 29135
+[ERROR] 2026-05-30 09:48:16,409 log 13898 129027971991232 "GET /platform/api/vehicles/?page=1 HTTP/1.1" 500 29135
+[INFO] 2026-05-30 09:49:02,518 autoreload 13898 129028436824576 /home/jowamupro/software/fleetflow/fleetflow-backend/billing/conf.py changed, reloading.
+[INFO] 2026-05-30 09:49:02,518 autoreload 13898 129028436824576 /home/jowamupro/software/fleetflow/fleetflow-backend/billing/conf.py changed, reloading.
+[INFO] 2026-05-30 09:49:07,052 autoreload 15990 137687677567488 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:49:07,052 autoreload 15990 137687677567488 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:49:09,794 autoreload 15990 137687677567488 /home/jowamupro/software/fleetflow/fleetflow-backend/billing/views.py changed, reloading.
+[INFO] 2026-05-30 09:49:09,794 autoreload 15990 137687677567488 /home/jowamupro/software/fleetflow/fleetflow-backend/billing/views.py changed, reloading.
+[INFO] 2026-05-30 09:49:14,663 autoreload 16213 126102999638528 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:49:14,663 autoreload 16213 126102999638528 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:49:18,905 autoreload 16213 126102999638528 /home/jowamupro/software/fleetflow/fleetflow-backend/billing/stripe_service.py changed, reloading.
+[INFO] 2026-05-30 09:49:18,905 autoreload 16213 126102999638528 /home/jowamupro/software/fleetflow/fleetflow-backend/billing/stripe_service.py changed, reloading.
+[INFO] 2026-05-30 09:49:20,511 autoreload 16425 126867669291520 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:49:20,511 autoreload 16425 126867669291520 Watching for file changes with StatReloader
+[INFO] 2026-05-30 09:50:28,587 log 16425 126867201836736 "OPTIONS /billing/api/checkout-session/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:50:28,587 log 16425 126867201836736 "OPTIONS /billing/api/checkout-session/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:50:29,324 _util 16425 126867201836736 message='Request to Stripe api' method=post url=https://api.stripe.com/v1/customers
+[INFO] 2026-05-30 09:50:31,085 _util 16425 126867201836736 message='Stripe API response' path=https://api.stripe.com/v1/customers response_code=200
+[INFO] 2026-05-30 09:50:31,642 _util 16425 126867201836736 message='Request to Stripe api' method=get url=https://api.stripe.com/v1/prices?lookup_keys[0]=fleetflow_per_vehicle_monthly&active=true&limit=1
+[INFO] 2026-05-30 09:50:32,622 _util 16425 126867201836736 message='Stripe API response' path=https://api.stripe.com/v1/prices?lookup_keys[0]=fleetflow_per_vehicle_monthly&active=true&limit=1 response_code=200
+[INFO] 2026-05-30 09:50:32,981 _util 16425 126867201836736 message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+[INFO] 2026-05-30 09:50:33,828 _util 16425 126867201836736 message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+[INFO] 2026-05-30 09:50:33,835 log 16425 126867201836736 "POST /billing/api/checkout-session/ HTTP/1.1" 200 574
+[INFO] 2026-05-30 09:50:33,835 log 16425 126867201836736 "POST /billing/api/checkout-session/ HTTP/1.1" 200 574
+[INFO] 2026-05-30 09:51:05,225 log 16425 126867201836736 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-05-30 09:51:05,225 log 16425 126867201836736 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-05-30 09:51:07,345 log 16425 126867193444032 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 09:51:07,345 log 16425 126867193444032 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 09:51:09,740 log 16425 126867193444032 "OPTIONS /reports/api/overview/?period=30d HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:51:09,740 log 16425 126867193444032 "OPTIONS /reports/api/overview/?period=30d HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:51:14,767 log 16425 126867193444032 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 592
+[INFO] 2026-05-30 09:51:14,767 log 16425 126867193444032 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 592
+[INFO] 2026-05-30 09:51:15,934 log 16425 126867201836736 "OPTIONS /billing/api/confirm-checkout/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:51:15,934 log 16425 126867201836736 "OPTIONS /billing/api/confirm-checkout/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:51:16,677 _util 16425 126867201836736 message='Request to Stripe api' method=get url=https://api.stripe.com/v1/checkout/sessions/cs_test_a12SexNFAT5RDQl8fdAlGk5C0Cqb1DbEamSvDt2PP57vVkS8HGS7DzziR0
+[INFO] 2026-05-30 09:51:17,036 log 16425 126867193444032 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-05-30 09:51:17,036 log 16425 126867193444032 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-05-30 09:51:17,672 _util 16425 126867201836736 message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions/cs_test_a12SexNFAT5RDQl8fdAlGk5C0Cqb1DbEamSvDt2PP57vVkS8HGS7DzziR0 response_code=200
+[INFO] 2026-05-30 09:51:17,673 _util 16425 126867201836736 message='Request to Stripe api' method=get url=https://api.stripe.com/v1/subscriptions/sub_1TcjXkReX2UmkS1XdRlfPpP6
+[INFO] 2026-05-30 09:51:18,083 _util 16425 126867201836736 message='Stripe API response' path=https://api.stripe.com/v1/subscriptions/sub_1TcjXkReX2UmkS1XdRlfPpP6 response_code=200
+[INFO] 2026-05-30 09:51:18,882 log 16425 126867201836736 "POST /billing/api/confirm-checkout/ HTTP/1.1" 200 73
+[INFO] 2026-05-30 09:51:18,882 log 16425 126867201836736 "POST /billing/api/confirm-checkout/ HTTP/1.1" 200 73
+[INFO] 2026-05-30 09:51:20,765 log 16425 126867201836736 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 09:51:20,765 log 16425 126867201836736 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 09:51:22,401 log 16425 126867201836736 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 09:51:22,401 log 16425 126867201836736 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 09:51:25,214 log 16425 126867201836736 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 592
+[INFO] 2026-05-30 09:51:25,214 log 16425 126867201836736 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 592
+[INFO] 2026-05-30 09:51:45,557 log 16425 126867201836736 "OPTIONS /vehicles/api/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:51:45,557 log 16425 126867201836736 "OPTIONS /vehicles/api/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:51:47,237 log 16425 126867201836736 "GET /vehicles/api/ HTTP/1.1" 200 25
+[INFO] 2026-05-30 09:51:47,237 log 16425 126867201836736 "GET /vehicles/api/ HTTP/1.1" 200 25
+[INFO] 2026-05-30 09:51:48,625 log 16425 126867201836736 "OPTIONS /users/api/users/drivers/?is_active=true HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:51:48,625 log 16425 126867201836736 "OPTIONS /users/api/users/drivers/?is_active=true HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:51:50,107 log 16425 126867201836736 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 24
+[INFO] 2026-05-30 09:51:50,107 log 16425 126867201836736 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 24
+[INFO] 2026-05-30 09:52:26,672 log 16425 126867201836736 "OPTIONS /vehicles/api/create/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:52:26,672 log 16425 126867201836736 "OPTIONS /vehicles/api/create/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:52:30,021 _util 16425 126867201836736 message='Request to Stripe api' method=get url=https://api.stripe.com/v1/subscriptions/sub_1TcjXkReX2UmkS1XdRlfPpP6
+[INFO] 2026-05-30 09:52:30,989 _util 16425 126867201836736 message='Stripe API response' path=https://api.stripe.com/v1/subscriptions/sub_1TcjXkReX2UmkS1XdRlfPpP6 response_code=200
+[INFO] 2026-05-30 09:52:30,994 _util 16425 126867201836736 message='Request to Stripe api' method=post url=https://api.stripe.com/v1/subscription_items/si_UbxSjAdKzBbo0W
+[INFO] 2026-05-30 09:52:31,649 _util 16425 126867201836736 message='Stripe API response' path=https://api.stripe.com/v1/subscription_items/si_UbxSjAdKzBbo0W response_code=200
+[INFO] 2026-05-30 09:52:32,023 stripe_service 16425 126867201836736 Synced Stripe quantity=1 for company 541c6cf6-c6f6-46bf-b173-ed02c3d25d73
+[INFO] 2026-05-30 09:52:32,025 views 16425 126867201836736 Vehicle added by josephwamiti8711@gmail.com: `KCA 112R
+[INFO] 2026-05-30 09:52:32,031 log 16425 126867201836736 "POST /vehicles/api/create/ HTTP/1.1" 201 1116
+[INFO] 2026-05-30 09:52:32,031 log 16425 126867201836736 "POST /vehicles/api/create/ HTTP/1.1" 201 1116
+[INFO] 2026-05-30 09:52:33,407 log 16425 126867193444032 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 09:52:33,407 log 16425 126867193444032 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 09:52:34,872 log 16425 126867201836736 "GET /vehicles/api/ HTTP/1.1" 200 1089
+[INFO] 2026-05-30 09:52:34,872 log 16425 126867201836736 "GET /vehicles/api/ HTTP/1.1" 200 1089
+[INFO] 2026-05-30 09:53:00,775 log 16425 126867201836736 "OPTIONS /users/api/users/?role=DRIVER HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:53:00,775 log 16425 126867201836736 "OPTIONS /users/api/users/?role=DRIVER HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:53:02,431 log 16425 126867201836736 "GET /users/api/users/?role=DRIVER HTTP/1.1" 200 22
+[INFO] 2026-05-30 09:53:02,431 log 16425 126867201836736 "GET /users/api/users/?role=DRIVER HTTP/1.1" 200 22
+[INFO] 2026-05-30 09:53:37,908 log 16425 126867201836736 "OPTIONS /users/api/drivers/create/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:53:37,908 log 16425 126867201836736 "OPTIONS /users/api/drivers/create/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:53:46,495 views 16425 126867201836736 Driver added by josephwamiti8711@gmail.com: Joseph Wamiti for company Joseph Wamiti's Fleet
+[INFO] 2026-05-30 09:53:46,495 views 16425 126867201836736 Driver added by josephwamiti8711@gmail.com: Joseph Wamiti for company Joseph Wamiti's Fleet
+[INFO] 2026-05-30 09:53:46,496 log 16425 126867201836736 "POST /users/api/drivers/create/ HTTP/1.1" 201 604
+[INFO] 2026-05-30 09:53:46,496 log 16425 126867201836736 "POST /users/api/drivers/create/ HTTP/1.1" 201 604
+[INFO] 2026-05-30 09:53:46,548 log 16425 126867201836736 "OPTIONS /vehicles/api/d77e2871-f53b-41e7-a823-584a99565bf8/assign-driver/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:53:46,548 log 16425 126867201836736 "OPTIONS /vehicles/api/d77e2871-f53b-41e7-a823-584a99565bf8/assign-driver/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:53:49,928 views 16425 126867201836736 Driver Joseph Wamiti assigned to `KCA 112R
+[INFO] 2026-05-30 09:53:50,658 log 16425 126867201836736 "POST /vehicles/api/d77e2871-f53b-41e7-a823-584a99565bf8/assign-driver/ HTTP/1.1" 200 1191
+[INFO] 2026-05-30 09:53:50,658 log 16425 126867201836736 "POST /vehicles/api/d77e2871-f53b-41e7-a823-584a99565bf8/assign-driver/ HTTP/1.1" 200 1191
+[INFO] 2026-05-30 09:53:52,987 log 16425 126867201836736 "GET /users/api/users/?role=DRIVER HTTP/1.1" 200 576
+[INFO] 2026-05-30 09:53:52,987 log 16425 126867201836736 "GET /users/api/users/?role=DRIVER HTTP/1.1" 200 576
+[INFO] 2026-05-30 09:53:54,754 log 16425 126867193444032 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 09:53:54,754 log 16425 126867193444032 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 09:53:57,756 log 16425 126867193444032 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 09:53:57,756 log 16425 126867193444032 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 09:54:04,338 log 16425 126867201836736 "OPTIONS /trips/api/?driver=b85375db-f675-40fd-8e1c-7f7b23057584&status=COMPLETED&date_from=2026-05-25&date_to=2026-05-31 HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:54:04,338 log 16425 126867201836736 "OPTIONS /trips/api/?driver=b85375db-f675-40fd-8e1c-7f7b23057584&status=COMPLETED&date_from=2026-05-25&date_to=2026-05-31 HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:54:04,343 log 16425 126867193444032 "OPTIONS /users/api/users/b85375db-f675-40fd-8e1c-7f7b23057584/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:54:04,343 log 16425 126867193444032 "OPTIONS /users/api/users/b85375db-f675-40fd-8e1c-7f7b23057584/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:54:05,454 log 16425 126867201836736 "GET /users/api/users/b85375db-f675-40fd-8e1c-7f7b23057584/ HTTP/1.1" 200 554
+[INFO] 2026-05-30 09:54:05,454 log 16425 126867201836736 "GET /users/api/users/b85375db-f675-40fd-8e1c-7f7b23057584/ HTTP/1.1" 200 554
+[INFO] 2026-05-30 09:54:05,808 log 16425 126867193444032 "GET /trips/api/?driver=b85375db-f675-40fd-8e1c-7f7b23057584&status=COMPLETED&date_from=2026-05-25&date_to=2026-05-31 HTTP/1.1" 200 22
+[INFO] 2026-05-30 09:54:05,808 log 16425 126867193444032 "GET /trips/api/?driver=b85375db-f675-40fd-8e1c-7f7b23057584&status=COMPLETED&date_from=2026-05-25&date_to=2026-05-31 HTTP/1.1" 200 22
+[INFO] 2026-05-30 09:54:13,527 log 16425 126867193444032 "OPTIONS /trips/api/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:54:13,527 log 16425 126867193444032 "OPTIONS /trips/api/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 09:54:14,995 log 16425 126867193444032 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 09:54:14,995 log 16425 126867193444032 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 09:54:20,635 log 16425 126867193444032 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 578
+[INFO] 2026-05-30 09:54:20,635 log 16425 126867193444032 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 578
+[INFO] 2026-05-30 10:04:10,074 autoreload 16425 126867669291520 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-30 10:04:10,074 autoreload 16425 126867669291520 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-30 10:04:12,740 autoreload 17943 126035595563520 Watching for file changes with StatReloader
+[INFO] 2026-05-30 10:04:12,740 autoreload 17943 126035595563520 Watching for file changes with StatReloader
+[INFO] 2026-05-30 10:04:23,669 log 17943 126034993206976 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 10:04:23,669 log 17943 126034993206976 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 10:04:45,725 log 17943 126034993206976 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 10:04:45,725 log 17943 126034993206976 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 10:04:47,257 log 17943 126034984814272 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 544
+[INFO] 2026-05-30 10:04:47,257 log 17943 126034984814272 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 544
+[INFO] 2026-05-30 11:30:09,584 log 17943 126034984814272 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 11:30:09,584 log 17943 126034984814272 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 11:30:09,734 log 17943 126034976421568 "OPTIONS /users/api/profile/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 11:30:09,734 log 17943 126034976421568 "OPTIONS /users/api/profile/ HTTP/1.1" 200 0
+[ERROR] 2026-05-30 11:30:10,017 log 17943 126034976421568 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-30 11:30:10,017 log 17943 126034976421568 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-30 11:30:10,027 log 17943 126034993206976 "GET /vehicles/api/ HTTP/1.1" 500 30099
+[ERROR] 2026-05-30 11:30:10,027 log 17943 126034993206976 "GET /vehicles/api/ HTTP/1.1" 500 30099
+[ERROR] 2026-05-30 11:30:10,027 log 17943 126034984814272 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 11:30:10,027 log 17943 126034984814272 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 11:30:12,427 log 17943 126034984814272 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-30 11:30:12,427 log 17943 126034984814272 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-30 11:30:12,438 log 17943 126034976421568 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 11:30:12,438 log 17943 126034976421568 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 11:30:16,387 log 17943 126034976421568 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 11:30:16,387 log 17943 126034976421568 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[INFO] 2026-05-30 11:36:06,338 log 17943 126034993206976 "OPTIONS /users/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 11:36:06,338 log 17943 126034993206976 "OPTIONS /users/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 11:36:09,595 views 17943 126034993206976 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-05-30 11:36:09,595 views 17943 126034993206976 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-05-30 11:36:11,416 log 17943 126034993206976 "POST /users/api/auth/login/ HTTP/1.1" 200 2795
+[INFO] 2026-05-30 11:36:11,416 log 17943 126034993206976 "POST /users/api/auth/login/ HTTP/1.1" 200 2795
+[INFO] 2026-05-30 11:36:13,217 log 17943 126034993206976 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 11:36:13,217 log 17943 126034993206976 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 11:36:14,757 log 17943 126034984814272 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 592
+[INFO] 2026-05-30 11:36:14,757 log 17943 126034984814272 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 592
+[INFO] 2026-05-30 11:36:19,506 log 17943 126034993206976 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 11:36:19,506 log 17943 126034993206976 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 11:36:20,976 log 17943 126034984814272 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 11:36:20,976 log 17943 126034984814272 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 11:36:21,963 log 17943 126034993206976 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 544
+[INFO] 2026-05-30 11:36:21,963 log 17943 126034993206976 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 544
+[INFO] 2026-05-30 11:42:45,499 log 17943 126034976421568 "OPTIONS /reports/api/income/?period=90d&granularity=monthly HTTP/1.1" 200 0
+[INFO] 2026-05-30 11:42:45,499 log 17943 126034976421568 "OPTIONS /reports/api/income/?period=90d&granularity=monthly HTTP/1.1" 200 0
+[INFO] 2026-05-30 11:42:46,787 log 17943 126034984814272 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 544
+[INFO] 2026-05-30 11:42:46,787 log 17943 126034984814272 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 544
+[INFO] 2026-05-30 11:42:48,509 log 17943 126034993206976 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 11:42:48,509 log 17943 126034993206976 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 11:42:49,054 log 17943 126034984814272 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 11:42:49,054 log 17943 126034984814272 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 11:42:50,419 log 17943 126034993206976 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 11:42:50,419 log 17943 126034993206976 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 11:42:52,106 log 17943 126034968028864 "GET /users/api/users/?role=DRIVER HTTP/1.1" 200 542
+[INFO] 2026-05-30 11:42:52,106 log 17943 126034968028864 "GET /users/api/users/?role=DRIVER HTTP/1.1" 200 542
+[INFO] 2026-05-30 11:42:52,695 log 17943 126034976421568 "GET /reports/api/income/?period=90d&granularity=monthly HTTP/1.1" 200 314
+[INFO] 2026-05-30 11:42:52,695 log 17943 126034976421568 "GET /reports/api/income/?period=90d&granularity=monthly HTTP/1.1" 200 314
+[INFO] 2026-05-30 11:44:25,677 log 17943 126034968028864 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 11:44:25,677 log 17943 126034968028864 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 11:44:26,813 log 17943 126034984814272 "GET /users/api/users/?role=DRIVER HTTP/1.1" 200 542
+[INFO] 2026-05-30 11:44:26,813 log 17943 126034984814272 "GET /users/api/users/?role=DRIVER HTTP/1.1" 200 542
+[INFO] 2026-05-30 11:44:28,899 log 17943 126034993206976 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 11:44:28,899 log 17943 126034993206976 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 11:44:29,705 log 17943 126034976421568 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 544
+[INFO] 2026-05-30 11:44:29,705 log 17943 126034976421568 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 544
+[INFO] 2026-05-30 11:44:34,215 log 17943 126034976421568 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 11:44:34,215 log 17943 126034976421568 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 12:21:52,362 log 17943 126034993206976 "OPTIONS /users/api/users/drivers/?is_active=true HTTP/1.1" 200 0
+[INFO] 2026-05-30 12:21:52,362 log 17943 126034993206976 "OPTIONS /users/api/users/drivers/?is_active=true HTTP/1.1" 200 0
+[INFO] 2026-05-30 12:21:53,959 log 17943 126034993206976 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 544
+[INFO] 2026-05-30 12:21:53,959 log 17943 126034993206976 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 544
+[INFO] 2026-05-30 12:34:48,131 log 17943 126034993206976 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:34:48,131 log 17943 126034993206976 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:36:05,497 log 17943 126034968028864 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 12:36:05,497 log 17943 126034968028864 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 12:36:05,862 log 17943 126034993206976 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:36:05,862 log 17943 126034993206976 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:36:27,431 log 17943 126034968028864 "OPTIONS /vehicles/api/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 12:36:27,431 log 17943 126034968028864 "OPTIONS /vehicles/api/ HTTP/1.1" 200 0
+[ERROR] 2026-05-30 12:36:27,651 log 17943 126034976421568 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-30 12:36:27,651 log 17943 126034976421568 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-30 12:36:27,652 log 17943 126034968028864 "GET /vehicles/api/ HTTP/1.1" 500 30099
+[ERROR] 2026-05-30 12:36:27,652 log 17943 126034968028864 "GET /vehicles/api/ HTTP/1.1" 500 30099
+[ERROR] 2026-05-30 12:36:27,660 log 17943 126034993206976 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 12:36:27,660 log 17943 126034993206976 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 12:36:28,697 log 17943 126034993206976 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-30 12:36:28,697 log 17943 126034993206976 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-30 12:36:28,747 log 17943 126034968028864 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 12:36:28,747 log 17943 126034968028864 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 12:36:30,800 log 17943 126034968028864 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 12:36:30,800 log 17943 126034968028864 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 12:36:34,870 log 17943 126034968028864 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 12:36:34,870 log 17943 126034968028864 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 12:36:51,238 log 17943 126034968028864 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 12:36:51,238 log 17943 126034968028864 "GET /billing/api/status/ HTTP/1.1" 500 170074
+[ERROR] 2026-05-30 12:36:51,246 log 17943 126034993206976 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[ERROR] 2026-05-30 12:36:51,246 log 17943 126034993206976 "GET /users/api/profile/ HTTP/1.1" 500 30115
+[INFO] 2026-05-30 12:36:53,207 log 17943 126034993206976 "OPTIONS /reports/api/overview/?period=30d HTTP/1.1" 200 0
+[INFO] 2026-05-30 12:36:53,207 log 17943 126034993206976 "OPTIONS /reports/api/overview/?period=30d HTTP/1.1" 200 0
+[ERROR] 2026-05-30 12:36:53,254 log 17943 126034993206976 "GET /reports/api/overview/?period=30d HTTP/1.1" 500 30157
+[ERROR] 2026-05-30 12:36:53,254 log 17943 126034993206976 "GET /reports/api/overview/?period=30d HTTP/1.1" 500 30157
+[INFO] 2026-05-30 12:37:36,852 views 17943 126034993206976 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-05-30 12:37:36,852 views 17943 126034993206976 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-05-30 12:37:38,648 log 17943 126034993206976 "POST /users/api/auth/login/ HTTP/1.1" 200 2795
+[INFO] 2026-05-30 12:37:38,648 log 17943 126034993206976 "POST /users/api/auth/login/ HTTP/1.1" 200 2795
+[INFO] 2026-05-30 12:37:40,172 log 17943 126034993206976 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:37:40,172 log 17943 126034993206976 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:37:42,367 log 17943 126034968028864 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 592
+[INFO] 2026-05-30 12:37:42,367 log 17943 126034968028864 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 592
+[INFO] 2026-05-30 12:37:50,014 log 17943 126034993206976 "OPTIONS /trips/api/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 12:37:50,014 log 17943 126034993206976 "OPTIONS /trips/api/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 12:37:52,727 log 17943 126034993206976 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 12:37:52,727 log 17943 126034993206976 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 12:37:53,071 log 17943 126034976421568 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 544
+[INFO] 2026-05-30 12:37:53,071 log 17943 126034976421568 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 544
+[INFO] 2026-05-30 12:37:54,181 log 17943 126034968028864 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 12:37:54,181 log 17943 126034968028864 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 12:38:57,496 log 17943 126034976421568 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 12:38:57,496 log 17943 126034976421568 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 12:38:57,829 log 17943 126034968028864 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:38:57,829 log 17943 126034968028864 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:38:59,319 log 17943 126034993206976 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 592
+[INFO] 2026-05-30 12:38:59,319 log 17943 126034993206976 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 592
+[INFO] 2026-05-30 12:40:00,162 autoreload 17943 126035595563520 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/fleet_workspace.py changed, reloading.
+[INFO] 2026-05-30 12:40:00,162 autoreload 17943 126035595563520 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/fleet_workspace.py changed, reloading.
+[INFO] 2026-05-30 12:40:02,901 autoreload 27669 137499525689856 Watching for file changes with StatReloader
+[INFO] 2026-05-30 12:40:02,901 autoreload 27669 137499525689856 Watching for file changes with StatReloader
+[INFO] 2026-05-30 12:40:11,975 autoreload 27669 137499525689856 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-30 12:40:11,975 autoreload 27669 137499525689856 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-30 12:40:15,892 autoreload 27905 128048245293568 Watching for file changes with StatReloader
+[INFO] 2026-05-30 12:40:15,892 autoreload 27905 128048245293568 Watching for file changes with StatReloader
+[INFO] 2026-05-30 12:40:19,339 autoreload 27905 128048245293568 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-05-30 12:40:19,339 autoreload 27905 128048245293568 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-05-30 12:40:23,914 autoreload 28149 135596525457920 Watching for file changes with StatReloader
+[INFO] 2026-05-30 12:40:23,914 autoreload 28149 135596525457920 Watching for file changes with StatReloader
+[INFO] 2026-05-30 12:40:28,570 autoreload 28149 135596525457920 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-30 12:40:28,570 autoreload 28149 135596525457920 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-05-30 12:40:31,274 autoreload 28377 136065798533632 Watching for file changes with StatReloader
+[INFO] 2026-05-30 12:40:31,274 autoreload 28377 136065798533632 Watching for file changes with StatReloader
+[INFO] 2026-05-30 12:40:46,227 autoreload 28377 136065798533632 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/fleet_workspace.py changed, reloading.
+[INFO] 2026-05-30 12:40:46,227 autoreload 28377 136065798533632 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/fleet_workspace.py changed, reloading.
+[INFO] 2026-05-30 12:40:48,267 autoreload 28625 132865877697024 Watching for file changes with StatReloader
+[INFO] 2026-05-30 12:40:48,267 autoreload 28625 132865877697024 Watching for file changes with StatReloader
+[INFO] 2026-05-30 12:41:05,558 log 28625 132865274668736 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 578
+[INFO] 2026-05-30 12:41:05,558 log 28625 132865274668736 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 578
+[INFO] 2026-05-30 12:47:58,772 log 28625 132865266276032 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:47:58,772 log 28625 132865266276032 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:48:03,065 log 28625 132865266276032 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 12:48:03,065 log 28625 132865266276032 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 12:48:06,024 log 28625 132865266276032 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 578
+[INFO] 2026-05-30 12:48:06,024 log 28625 132865266276032 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 578
+[INFO] 2026-05-30 12:48:06,252 log 28625 132865257883328 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 12:48:06,252 log 28625 132865257883328 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 12:48:18,595 log 28625 132865274668736 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 12:48:18,595 log 28625 132865274668736 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 12:49:04,837 log 28625 132865274668736 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:49:04,837 log 28625 132865274668736 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:49:07,074 log 28625 132865266276032 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 12:49:07,074 log 28625 132865266276032 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 12:49:07,351 log 28625 132865274668736 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:49:07,351 log 28625 132865274668736 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 12:49:08,759 log 28625 132865266276032 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 12:49:08,759 log 28625 132865266276032 "GET /trips/api/ HTTP/1.1" 200 22
+[INFO] 2026-05-30 12:49:09,401 log 28625 132865257883328 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 12:49:09,401 log 28625 132865257883328 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 12:52:58,022 log 28625 132865249490624 "GET /content/api/posts/?status=published&limit=24&page=1 HTTP/1.1" 200 24
+[INFO] 2026-05-30 12:52:58,022 log 28625 132865249490624 "GET /content/api/posts/?status=published&limit=24&page=1 HTTP/1.1" 200 24
+[INFO] 2026-05-30 12:55:11,539 log 28625 132865257883328 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 12:55:11,539 log 28625 132865257883328 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 12:55:12,108 log 28625 132865274668736 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 578
+[INFO] 2026-05-30 12:55:12,108 log 28625 132865274668736 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 578
+[INFO] 2026-05-30 12:55:12,263 log 28625 132865249490624 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 12:55:12,263 log 28625 132865249490624 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 12:55:13,128 log 28625 132865266276032 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 12:55:13,128 log 28625 132865266276032 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 12:55:17,162 log 28625 132865249490624 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 12:55:17,162 log 28625 132865249490624 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 13:04:16,997 log 28625 132865249490624 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 13:04:16,997 log 28625 132865249490624 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 13:04:18,395 log 28625 132865249490624 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 13:04:18,395 log 28625 132865249490624 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 13:04:21,014 log 28625 132865266276032 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 13:04:21,014 log 28625 132865266276032 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 13:04:23,925 log 28625 132865249490624 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 13:04:23,925 log 28625 132865249490624 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-30 13:05:17,903 log 28625 132865249490624 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 578
+[INFO] 2026-05-30 13:05:17,903 log 28625 132865249490624 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 578
+[INFO] 2026-05-30 13:06:48,831 log 28625 132865249490624 "OPTIONS /trips/api/create/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 13:06:48,831 log 28625 132865249490624 "OPTIONS /trips/api/create/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 13:06:51,531 views 28625 132865249490624 Trip created by josephwamiti8711@gmail.com: TRIP-20260530-0001
+[INFO] 2026-05-30 13:06:52,261 log 28625 132865249490624 "POST /trips/api/create/ HTTP/1.1" 201 1555
+[INFO] 2026-05-30 13:06:52,261 log 28625 132865249490624 "POST /trips/api/create/ HTTP/1.1" 201 1555
+[INFO] 2026-05-30 13:06:57,068 log 28625 132865249490624 "GET /trips/api/ HTTP/1.1" 200 1529
+[INFO] 2026-05-30 13:06:57,068 log 28625 132865249490624 "GET /trips/api/ HTTP/1.1" 200 1529
+[INFO] 2026-05-30 13:08:07,733 log 28625 132865249490624 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 13:08:07,733 log 28625 132865249490624 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-30 13:09:17,351 log 28625 132865249490624 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 13:09:17,351 log 28625 132865249490624 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-05-30 13:09:25,742 log 28625 132865249490624 "OPTIONS /platform/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-05-30 13:09:25,742 log 28625 132865249490624 "OPTIONS /platform/api/auth/login/ HTTP/1.1" 200 0
+[WARNING] 2026-05-30 13:09:30,406 log 28625 132865249490624 "POST /platform/api/auth/login/ HTTP/1.1" 400 51
+[WARNING] 2026-05-30 13:09:30,406 log 28625 132865249490624 "POST /platform/api/auth/login/ HTTP/1.1" 400 51
+[WARNING] 2026-05-30 13:09:35,477 log 28625 132865249490624 "POST /platform/api/auth/login/ HTTP/1.1" 400 51
+[WARNING] 2026-05-30 13:09:35,477 log 28625 132865249490624 "POST /platform/api/auth/login/ HTTP/1.1" 400 51
+[INFO] 2026-05-30 13:09:51,231 log 28625 132865249490624 "POST /platform/api/auth/login/ HTTP/1.1" 200 1399
+[INFO] 2026-05-30 13:09:51,231 log 28625 132865249490624 "POST /platform/api/auth/login/ HTTP/1.1" 200 1399
+[INFO] 2026-05-30 13:09:52,396 log 28625 132865266276032 "OPTIONS /platform/api/overview/?period=30d HTTP/1.1" 200 0
+[INFO] 2026-05-30 13:09:52,396 log 28625 132865266276032 "OPTIONS /platform/api/overview/?period=30d HTTP/1.1" 200 0
+[WARNING] 2026-05-30 13:09:52,857 log 28625 132865249490624 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 13:09:52,857 log 28625 132865249490624 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 13:09:54,279 log 28625 132865249490624 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 13:09:54,279 log 28625 132865249490624 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 13:09:56,653 log 28625 132865249490624 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 13:09:56,653 log 28625 132865249490624 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 13:10:01,025 log 28625 132865249490624 "GET /billing/api/status/ HTTP/1.1" 403 46
+[WARNING] 2026-05-30 13:10:01,025 log 28625 132865249490624 "GET /billing/api/status/ HTTP/1.1" 403 46
+[INFO] 2026-05-30 13:10:01,922 log 28625 132865266276032 "GET /platform/api/overview/?period=30d HTTP/1.1" 200 1785
+[INFO] 2026-05-30 13:10:01,922 log 28625 132865266276032 "GET /platform/api/overview/?period=30d HTTP/1.1" 200 1785
+[INFO] 2026-05-30 13:10:02,374 log 28625 132865266276032 "OPTIONS /platform/api/users/?page=1 HTTP/1.1" 200 0
+[INFO] 2026-05-30 13:10:02,374 log 28625 132865266276032 "OPTIONS /platform/api/users/?page=1 HTTP/1.1" 200 0
+[INFO] 2026-05-30 13:10:05,312 log 28625 132865266276032 "GET /platform/api/users/?page=1 HTTP/1.1" 200 2362
+[INFO] 2026-05-30 13:10:05,312 log 28625 132865266276032 "GET /platform/api/users/?page=1 HTTP/1.1" 200 2362
+[INFO] 2026-05-30 13:10:14,695 log 28625 132865266276032 "OPTIONS /platform/api/vehicles/?page=1 HTTP/1.1" 200 0
+[INFO] 2026-05-30 13:10:14,695 log 28625 132865266276032 "OPTIONS /platform/api/vehicles/?page=1 HTTP/1.1" 200 0
+[INFO] 2026-05-30 13:10:17,863 log 28625 132865266276032 "GET /platform/api/vehicles/?page=1 HTTP/1.1" 200 478
+[INFO] 2026-05-30 13:10:17,863 log 28625 132865266276032 "GET /platform/api/vehicles/?page=1 HTTP/1.1" 200 478
+[INFO] 2026-05-30 13:10:40,274 log 28625 132865266276032 "OPTIONS /platform/api/subscriptions/?page=1 HTTP/1.1" 200 0
+[INFO] 2026-05-30 13:10:40,274 log 28625 132865266276032 "OPTIONS /platform/api/subscriptions/?page=1 HTTP/1.1" 200 0
+[INFO] 2026-05-30 13:10:43,205 log 28625 132865266276032 "GET /platform/api/subscriptions/?page=1 HTTP/1.1" 200 427
+[INFO] 2026-05-30 13:10:43,205 log 28625 132865266276032 "GET /platform/api/subscriptions/?page=1 HTTP/1.1" 200 427
+[INFO] 2026-05-30 13:10:52,983 log 28625 132865266276032 "OPTIONS /platform/api/system-expenses/?page=1 HTTP/1.1" 200 0
+[INFO] 2026-05-30 13:10:52,983 log 28625 132865266276032 "OPTIONS /platform/api/system-expenses/?page=1 HTTP/1.1" 200 0
+[INFO] 2026-05-30 13:10:55,432 log 28625 132865266276032 "GET /platform/api/system-expenses/?page=1 HTTP/1.1" 200 162
+[INFO] 2026-05-30 13:10:55,432 log 28625 132865266276032 "GET /platform/api/system-expenses/?page=1 HTTP/1.1" 200 162
+[INFO] 2026-05-30 13:11:46,129 log 28625 132865266276032 "GET /users/api/profile/ HTTP/1.1" 200 447
+[INFO] 2026-05-30 13:11:46,129 log 28625 132865266276032 "GET /users/api/profile/ HTTP/1.1" 200 447
+[INFO] 2026-05-31 19:27:55,839 autoreload 40490 124932461146624 Watching for file changes with StatReloader
+[INFO] 2026-05-31 19:27:55,839 autoreload 40490 124932461146624 Watching for file changes with StatReloader
+[INFO] 2026-05-31 19:28:22,703 log 40490 124931857700544 "OPTIONS /users/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-05-31 19:28:22,703 log 40490 124931857700544 "OPTIONS /users/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-05-31 19:28:25,162 views 40490 124931857700544 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-05-31 19:28:25,162 views 40490 124931857700544 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-05-31 19:28:26,982 log 40490 124931857700544 "POST /users/api/auth/login/ HTTP/1.1" 200 2795
+[INFO] 2026-05-31 19:28:26,982 log 40490 124931857700544 "POST /users/api/auth/login/ HTTP/1.1" 200 2795
+[INFO] 2026-05-31 19:28:32,618 log 40490 124931857700544 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-05-31 19:28:32,618 log 40490 124931857700544 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-05-31 19:28:32,676 log 40490 124931857700544 "OPTIONS /reports/api/overview/?period=30d HTTP/1.1" 200 0
+[INFO] 2026-05-31 19:28:32,676 log 40490 124931857700544 "OPTIONS /reports/api/overview/?period=30d HTTP/1.1" 200 0
+[INFO] 2026-05-31 19:28:34,110 log 40490 124931857700544 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-31 19:28:34,110 log 40490 124931857700544 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-31 19:28:38,385 log 40490 124931849307840 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 1051
+[INFO] 2026-05-31 19:28:38,385 log 40490 124931849307840 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 1051
+[INFO] 2026-05-31 19:28:57,653 log 40490 124931849307840 "OPTIONS /vehicles/api/ HTTP/1.1" 200 0
+[INFO] 2026-05-31 19:28:57,653 log 40490 124931849307840 "OPTIONS /vehicles/api/ HTTP/1.1" 200 0
+[INFO] 2026-05-31 19:29:00,778 log 40490 124931849307840 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-31 19:29:00,778 log 40490 124931849307840 "GET /vehicles/api/ HTTP/1.1" 200 1162
+[INFO] 2026-05-31 19:48:55,499 log 40490 124931849307840 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-05-31 19:48:55,499 log 40490 124931849307840 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-01 06:16:52,183 autoreload 9079 133482886820352 Watching for file changes with StatReloader
+[INFO] 2026-06-01 06:16:52,183 autoreload 9079 133482886820352 Watching for file changes with StatReloader
+[INFO] 2026-06-01 06:21:41,725 autoreload 9079 133482886820352 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-06-01 06:21:41,725 autoreload 9079 133482886820352 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-06-01 06:21:43,951 autoreload 9860 138309152367104 Watching for file changes with StatReloader
+[INFO] 2026-06-01 06:21:43,951 autoreload 9860 138309152367104 Watching for file changes with StatReloader
+[INFO] 2026-06-01 06:21:47,780 autoreload 9860 138309152367104 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/views.py changed, reloading.
+[INFO] 2026-06-01 06:21:47,780 autoreload 9860 138309152367104 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/views.py changed, reloading.
+[INFO] 2026-06-01 06:21:50,135 autoreload 10077 133205564436992 Watching for file changes with StatReloader
+[INFO] 2026-06-01 06:21:50,135 autoreload 10077 133205564436992 Watching for file changes with StatReloader
+[INFO] 2026-06-01 06:21:54,452 autoreload 10077 133205564436992 /home/jowamupro/software/fleetflow/fleetflow-backend/vehicles/views.py changed, reloading.
+[INFO] 2026-06-01 06:21:54,452 autoreload 10077 133205564436992 /home/jowamupro/software/fleetflow/fleetflow-backend/vehicles/views.py changed, reloading.
+[INFO] 2026-06-01 06:21:56,919 autoreload 10284 140295279608320 Watching for file changes with StatReloader
+[INFO] 2026-06-01 06:21:56,919 autoreload 10284 140295279608320 Watching for file changes with StatReloader
+[INFO] 2026-06-01 06:22:18,741 autoreload 10284 140295279608320 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-06-01 06:22:18,741 autoreload 10284 140295279608320 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-06-01 06:22:20,962 autoreload 10527 130297691353600 Watching for file changes with StatReloader
+[INFO] 2026-06-01 06:22:20,962 autoreload 10527 130297691353600 Watching for file changes with StatReloader
+[INFO] 2026-06-01 06:30:22,304 log 10527 130296957630144 "GET /content/api/posts/?status=published&limit=24&page=1 HTTP/1.1" 200 24
+[INFO] 2026-06-01 06:30:22,304 log 10527 130296957630144 "GET /content/api/posts/?status=published&limit=24&page=1 HTTP/1.1" 200 24

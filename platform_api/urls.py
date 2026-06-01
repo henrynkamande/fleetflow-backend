@@ -10,4 +10,14 @@ urlpatterns = [
     path('companies/', views.platform_companies, name='platform-companies'),
     path('companies/<uuid:company_id>/', views.platform_company_detail, name='platform-company-detail'),
     path('users/', views.platform_users, name='platform-users'),
+    path('users/<uuid:user_id>/', views.platform_user_detail, name='platform-user-detail'),
+    path('vehicles/', views.platform_vehicles, name='platform-vehicles'),
+    path('vehicles/<uuid:vehicle_id>/', views.platform_vehicle_detail, name='platform-vehicle-detail'),
+    path('subscriptions/', views.platform_subscriptions, name='platform-subscriptions'),
+    path('system-expenses/', views.platform_system_expenses, name='platform-system-expenses'),
+    path(
+        'system-expenses/<uuid:expense_id>/',
+        views.platform_system_expense_detail,
+        name='platform-system-expense-detail',
+    ),
 ]

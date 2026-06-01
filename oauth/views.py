@@ -16,7 +16,9 @@ import logging
 from .models import User, DriverProfile, FleetOwnerProfile, KYCDocument, Company, EmailAuthCode
 from . import auth_codes
 from .email_utils import deliver_auth_email
-from .fleet_workspace import ensure_fleet_owner_company, resolve_user_company
+from fleetflow.pagination import paginate_queryset
+
+from .fleet_workspace import ensure_fleet_owner_company, resolve_user_company, company_members_queryset
 from .serializers import (
     FleetOwnerRegistrationSerializer,
     CompanyRegistrationSerializer,
@@ -1019,19 +1021,21 @@ def list_company_users(request):
     role_filter = request.query_params.get('role', None)
     is_active_filter = request.query_params.get('is_active', None)
     
-    users = User.objects.filter(company=company).select_related('company')
+    users = company_members_queryset(user, company).select_related('company')
     
     if role_filter:
         users = users.filter(role=role_filter)
     if is_active_filter is not None:
         is_active = is_active_filter.lower() == 'true'
         users = users.filter(is_active=is_active)
-    
-    serializer = UserSerializer(users, many=True, context={'request': request})
-    
+
+    users = users.order_by('-date_joined')
+    page_obj, meta = paginate_queryset(request, users)
+    serializer = UserSerializer(page_obj.object_list, many=True, context={'request': request})
+
     return Response({
-        'count': users.count(),
-        'users': serializer.data
+        **meta,
+        'users': serializer.data,
     }, status=status.HTTP_200_OK)
 
 
@@ -1052,15 +1056,17 @@ def list_company_drivers(request):
         return Response({'count': 0, 'drivers': []}, status=status.HTTP_200_OK)
 
     is_active_filter = request.query_params.get('is_active', None)
-    drivers = User.objects.filter(company=company, role=User.Role.DRIVER).select_related(
-        'company', 'driver_profile'
-    )
+    drivers = company_members_queryset(user, company).filter(
+        role=User.Role.DRIVER,
+    ).select_related('company', 'driver_profile')
     if is_active_filter is not None:
         is_active = is_active_filter.lower() == 'true'
         drivers = drivers.filter(is_active=is_active)
 
-    serializer = UserSerializer(drivers, many=True, context={'request': request})
-    return Response({'count': drivers.count(), 'drivers': serializer.data}, status=status.HTTP_200_OK)
+    drivers = drivers.order_by('-date_joined')
+    page_obj, meta = paginate_queryset(request, drivers)
+    serializer = UserSerializer(page_obj.object_list, many=True, context={'request': request})
+    return Response({**meta, 'drivers': serializer.data}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -1178,16 +1184,18 @@ def list_kyc_documents(request):
         documents = documents.filter(document_type=doc_type)
     if verification_status:
         documents = documents.filter(verification_status=verification_status)
-    
+
+    documents = documents.order_by('-uploaded_at')
+    page_obj, meta = paginate_queryset(request, documents)
     serializer = KYCDocumentSerializer(
-        documents,
+        page_obj.object_list,
         many=True,
-        context={'request': request}
+        context={'request': request},
     )
-    
+
     return Response({
-        'count': documents.count(),
-        'documents': serializer.data
+        **meta,
+        'documents': serializer.data,
     }, status=status.HTTP_200_OK)
 
 

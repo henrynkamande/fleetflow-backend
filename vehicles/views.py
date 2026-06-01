@@ -8,6 +8,7 @@ from django.utils import timezone
 import logging
 
 from oauth.fleet_workspace import ensure_fleet_owner_company
+from fleetflow.pagination import paginate_queryset
 
 from .models import Vehicle, VehicleDocument, VehicleServiceRecord, VehicleExpense, FuelLog
 from .serializers import (
@@ -50,12 +51,14 @@ def list_vehicles(request):
         vehicles = vehicles.filter(vehicle_type=type_filter)
     if driver_id:
         vehicles = vehicles.filter(assigned_driver_id=driver_id)
-    
-    serializer = VehicleSerializer(vehicles, many=True, context={'request': request})
-    
+
+    vehicles = vehicles.select_related('assigned_driver', 'assigned_driver__user', 'company').order_by('-created_at')
+    page_obj, meta = paginate_queryset(request, vehicles)
+    serializer = VehicleSerializer(page_obj.object_list, many=True, context={'request': request})
+
     return Response({
-        'count': vehicles.count(),
-        'vehicles': serializer.data
+        **meta,
+        'vehicles': serializer.data,
     }, status=status.HTTP_200_OK)
 
 

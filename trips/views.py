@@ -10,7 +10,9 @@ import logging
 import uuid as uuid_lib
 
 from oauth.fleet_workspace import ensure_fleet_owner_company
+from fleetflow.pagination import paginate_queryset
 
+from .list_stats import build_trip_list_stats
 from .models import Trip, TripStop, TripExpense
 from .serializers import (
     TripSerializer, TripStopSerializer, TripExpenseSerializer,
@@ -83,13 +85,23 @@ def list_trips(request):
     # Drivers can only see their own trips
     if user.is_driver:
         trips = trips.filter(driver=user.driver_profile)
-    
-    serializer = TripSerializer(trips, many=True, context={'request': request})
-    
-    return Response({
-        'count': trips.count(),
-        'trips': serializer.data
-    }, status=status.HTTP_200_OK)
+
+    trips = trips.select_related('vehicle', 'driver', 'driver__user').order_by('-planned_departure_time')
+
+    stats = None
+    if request.query_params.get('include_stats', '').lower() in ('1', 'true', 'yes'):
+        stats = build_trip_list_stats(trips)
+
+    page_obj, meta = paginate_queryset(request, trips)
+    serializer = TripSerializer(page_obj.object_list, many=True, context={'request': request})
+
+    payload = {
+        **meta,
+        'trips': serializer.data,
+    }
+    if stats is not None:
+        payload['stats'] = stats
+    return Response(payload, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
