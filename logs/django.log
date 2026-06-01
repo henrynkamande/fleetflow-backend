@@ -3821,3 +3821,55 @@
 [INFO] 2026-06-01 07:27:08,735 autoreload 20369 124060356391424 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
 [INFO] 2026-06-01 07:27:13,834 autoreload 20573 131768049308160 Watching for file changes with StatReloader
 [INFO] 2026-06-01 07:27:13,834 autoreload 20573 131768049308160 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:30:52,891 log 20573 131767314937536 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-01 07:30:52,891 log 20573 131767314937536 "GET /billing/api/status/ HTTP/1.1" 200 204
+[ERROR] 2026-06-01 07:41:15,298 log 20573 131767314937536 "GET /billing/api/status/ HTTP/1.1" 500 169924
+[ERROR] 2026-06-01 07:41:15,298 log 20573 131767314937536 "GET /billing/api/status/ HTTP/1.1" 500 169924
+[ERROR] 2026-06-01 07:41:16,364 log 20573 131767314937536 "GET /billing/api/status/ HTTP/1.1" 500 169924
+[ERROR] 2026-06-01 07:41:16,364 log 20573 131767314937536 "GET /billing/api/status/ HTTP/1.1" 500 169924
+[INFO] 2026-06-01 07:41:18,142 log 20573 131767314937536 "OPTIONS /users/api/auth/logout/ HTTP/1.1" 200 0
+[INFO] 2026-06-01 07:41:18,142 log 20573 131767314937536 "OPTIONS /users/api/auth/logout/ HTTP/1.1" 200 0
+[ERROR] 2026-06-01 07:41:18,207 log 20573 131767314937536 "POST /users/api/auth/logout/ HTTP/1.1" 500 30090
+[ERROR] 2026-06-01 07:41:18,207 log 20573 131767314937536 "POST /users/api/auth/logout/ HTTP/1.1" 500 30090
+[INFO] 2026-06-01 07:41:48,759 log 20573 131767314937536 "OPTIONS /users/api/auth/register/ HTTP/1.1" 200 0
+[INFO] 2026-06-01 07:41:48,759 log 20573 131767314937536 "OPTIONS /users/api/auth/register/ HTTP/1.1" 200 0
+[WARNING] 2026-06-01 07:41:49,556 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 400 137
+[WARNING] 2026-06-01 07:41:49,556 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 400 137
+[WARNING] 2026-06-01 07:41:51,311 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 400 137
+[WARNING] 2026-06-01 07:41:51,311 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 400 137
+[WARNING] 2026-06-01 07:41:57,124 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 400 72
+[WARNING] 2026-06-01 07:41:57,124 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 400 72
+[WARNING] 2026-06-01 07:41:58,840 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 400 72
+[WARNING] 2026-06-01 07:41:58,840 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 400 72
+[WARNING] 2026-06-01 07:42:58,679 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 400 72
+[WARNING] 2026-06-01 07:42:58,679 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 400 72
+[WARNING] 2026-06-01 07:43:00,442 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 400 72
+[WARNING] 2026-06-01 07:43:00,442 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 400 72
+[INFO] 2026-06-01 07:44:20,290 views 20573 131767314937536 Fleet owner signup pending OTP: josephwamiti8711@gmail.com
+[INFO] 2026-06-01 07:44:20,290 views 20573 131767314937536 Fleet owner signup pending OTP: josephwamiti8711@gmail.com
+[INFO] 2026-06-01 07:44:20,292 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 201 231
+[INFO] 2026-06-01 07:44:20,292 log 20573 131767314937536 "POST /users/api/auth/register/ HTTP/1.1" 201 231
+[INFO] 2026-06-01 07:44:23,673 email_utils 20573 131767304447680 Auth email sent to josephwamiti8711@gmail.com (FleetVault - Verify Your Email Address)
+[INFO] 2026-06-01 07:44:23,673 email_utils 20573 131767304447680 Auth email sent to josephwamiti8711@gmail.com (FleetVault - Verify Your Email Address)
+[INFO] 2026-06-01 07:45:06,670 log 20573 131767314937536 "OPTIONS /users/api/auth/verify-signup-otp/ HTTP/1.1" 200 0
+[INFO] 2026-06-01 07:45:06,670 log 20573 131767314937536 "OPTIONS /users/api/auth/verify-signup-otp/ HTTP/1.1" 200 0
+[INFO] 2026-06-01 07:45:13,215 email_utils 20573 131767314937536 Auth email sent to josephwamiti8711@gmail.com (Welcome to Fleet Flow)
+[INFO] 2026-06-01 07:45:13,215 email_utils 20573 131767314937536 Auth email sent to josephwamiti8711@gmail.com (Welcome to Fleet Flow)
+[INFO] 2026-06-01 07:45:15,727 email_utils 20573 131767314937536 Auth email sent to josephwamiti8711@gmail.com (Account Verified Successfully)
+[INFO] 2026-06-01 07:45:15,727 email_utils 20573 131767314937536 Auth email sent to josephwamiti8711@gmail.com (Account Verified Successfully)
+[INFO] 2026-06-01 07:45:15,728 views 20573 131767314937536 Fleet owner email verified: josephwamiti8711@gmail.com
+[INFO] 2026-06-01 07:45:15,728 views 20573 131767314937536 Fleet owner email verified: josephwamiti8711@gmail.com
+[INFO] 2026-06-01 07:45:15,732 log 20573 131767314937536 "POST /users/api/auth/verify-signup-otp/ HTTP/1.1" 200 100
+[INFO] 2026-06-01 07:45:15,732 log 20573 131767314937536 "POST /users/api/auth/verify-signup-otp/ HTTP/1.1" 200 100
+[INFO] 2026-06-01 07:46:42,787 autoreload 20573 131768049308160 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/apps.py changed, reloading.
+[INFO] 2026-06-01 07:46:42,787 autoreload 20573 131768049308160 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/apps.py changed, reloading.
+[INFO] 2026-06-01 07:46:49,748 apps 22407 138781192561152 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-01 07:46:49,748 apps 22407 138781192561152 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-01 07:46:49,754 autoreload 22407 138781192561152 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:46:49,754 autoreload 22407 138781192561152 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:46:53,075 autoreload 22407 138781192561152 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-06-01 07:46:53,075 autoreload 22407 138781192561152 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-06-01 07:46:58,069 apps 22628 133112304407040 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-01 07:46:58,069 apps 22628 133112304407040 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-01 07:46:58,075 autoreload 22628 133112304407040 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:46:58,075 autoreload 22628 133112304407040 Watching for file changes with StatReloader

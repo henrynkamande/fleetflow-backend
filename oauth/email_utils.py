@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 def schedule_auth_email(subject: str, message: str, recipient: str) -> None:
     """Send mail in a background thread so HTTP workers are not blocked on SMTP."""
+    logger.info('Scheduling auth email to %s (%s)', recipient, subject)
 
     def _send() -> None:
         try:
@@ -21,7 +22,7 @@ def schedule_auth_email(subject: str, message: str, recipient: str) -> None:
     threading.Thread(
         target=_send,
         name=f'auth-email-{recipient[:40]}',
-        daemon=True,
+        daemon=False,
     ).start()
 
 

@@ -89,7 +89,17 @@ Signup and password reset need outbound email. Set on the **backend** service:
 | `DEFAULT_FROM_EMAIL` | Must match a **verified** sender in SendGrid (e.g. `noreply@myfleetvault.com`) |
 | `APP_BRAND_NAME` | Optional; used in subject lines (default `FleetVault`) |
 
-Do **not** set `EMAIL_CONSOLE=true` in production. After deploy, check logs for `Auth email sent` or `Auth email failed`. Signup OTP mail is queued on a background thread so registration is not blocked on SMTP; keep `EMAIL_TIMEOUT` (default 10s) below your Gunicorn `--timeout` (e.g. 60s).
+Do **not** set `EMAIL_CONSOLE=true` in production.
+
+**Localhost vs production:** With `DEBUG=True` and no `SENDGRID_API_KEY`, OTPs are printed to the **runserver terminal** (console backend), not your real inbox. Production must set `SENDGRID_API_KEY` and a **verified** `DEFAULT_FROM_EMAIL` in SendGrid (Sender Authentication). After deploy, startup logs include `Outbound email: SendGrid SMTP …`. Signup returns **503** if SendGrid rejects the send (no silent success).
+
+Verify delivery on Render:
+
+```bash
+python manage.py test_auth_email you@example.com
+```
+
+Then check Render logs for `Auth email sent` / `Auth email failed`, SendGrid → Activity, and the recipient spam folder. Keep `EMAIL_TIMEOUT` (default 10s) below Gunicorn `--timeout` (e.g. 60s).
 
 Fleet owner signup stores data in `pending_fleet_owner_signups` until OTP succeeds; no `User` row is created until verification.
 
