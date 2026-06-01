@@ -1,10 +1,28 @@
 """Outbound auth email helpers."""
 import logging
+import threading
 
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db import connection
 
 logger = logging.getLogger(__name__)
+
+
+def schedule_auth_email(subject: str, message: str, recipient: str) -> None:
+    """Send mail in a background thread so HTTP workers are not blocked on SMTP."""
+
+    def _send() -> None:
+        try:
+            deliver_auth_email(subject, message, recipient)
+        finally:
+            connection.close()
+
+    threading.Thread(
+        target=_send,
+        name=f'auth-email-{recipient[:40]}',
+        daemon=True,
+    ).start()
 
 
 def deliver_auth_email(subject: str, message: str, recipient: str) -> bool:

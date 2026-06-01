@@ -369,7 +369,8 @@ if not _USE_SENDGRID:
     EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() in ('true', '1', 'yes')
     EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
     EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', 30))
+# Keep below Gunicorn worker timeout so a stuck SMTP connect does not kill the worker.
+EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', 10))
 
 # Fail fast in production when outbound email is not configured.
 if not DEBUG and not EMAIL_CONSOLE:

@@ -3811,3 +3811,13 @@
 [INFO] 2026-06-01 07:13:39,640 autoreload 18658 127723494171136 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
 [INFO] 2026-06-01 07:13:43,113 autoreload 18925 136417696379392 Watching for file changes with StatReloader
 [INFO] 2026-06-01 07:13:43,113 autoreload 18925 136417696379392 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:18:57,287 log 18925 136416952579776 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-01 07:18:57,287 log 18925 136416952579776 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-01 07:27:01,091 autoreload 18925 136417696379392 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/email_utils.py changed, reloading.
+[INFO] 2026-06-01 07:27:01,091 autoreload 18925 136417696379392 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/email_utils.py changed, reloading.
+[INFO] 2026-06-01 07:27:04,957 autoreload 20369 124060356391424 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:27:04,957 autoreload 20369 124060356391424 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:27:08,735 autoreload 20369 124060356391424 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-06-01 07:27:08,735 autoreload 20369 124060356391424 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-06-01 07:27:13,834 autoreload 20573 131768049308160 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:27:13,834 autoreload 20573 131768049308160 Watching for file changes with StatReloader

@@ -15,7 +15,7 @@ import logging
 
 from .models import User, DriverProfile, FleetOwnerProfile, KYCDocument, Company, EmailAuthCode
 from . import auth_codes, pending_signup
-from .email_utils import deliver_auth_email
+from .email_utils import deliver_auth_email, schedule_auth_email
 from fleetflow.pagination import paginate_queryset
 
 from .fleet_workspace import ensure_fleet_owner_company, resolve_user_company, company_members_queryset
@@ -187,7 +187,7 @@ def send_signup_otp_email(user, otp):
     )
 
 
-def send_signup_otp_email_to(*, recipient_email: str, first_name: str, otp: str) -> bool:
+def _signup_otp_email_content(*, first_name: str, otp: str) -> tuple[str, str]:
     brand = getattr(settings, 'APP_BRAND_NAME', 'FleetVault')
     subject = f"{brand} - Verify Your Email Address"
     message = _format_transactional_email(
@@ -200,7 +200,17 @@ def send_signup_otp_email_to(*, recipient_email: str, first_name: str, otp: str)
         action_lines=["- Enter this code in the verification prompt to activate your account."],
         security_note="If you did not create this account, you can safely ignore this email.",
     )
+    return subject, message
+
+
+def send_signup_otp_email_to(*, recipient_email: str, first_name: str, otp: str) -> bool:
+    subject, message = _signup_otp_email_content(first_name=first_name, otp=otp)
     return deliver_auth_email(subject, message, recipient_email)
+
+
+def schedule_signup_otp_email_to(*, recipient_email: str, first_name: str, otp: str) -> None:
+    subject, message = _signup_otp_email_content(first_name=first_name, otp=otp)
+    schedule_auth_email(subject, message, recipient_email)
 
 
 def send_password_reset_code_email(user, code):
@@ -266,26 +276,11 @@ def register_fleet_owner(request):
     if serializer.is_valid():
         pending = serializer.save()
         otp = pending_signup.issue_code(pending)
-        email_sent = send_signup_otp_email_to(
+        schedule_signup_otp_email_to(
             recipient_email=pending.email,
             first_name=pending.first_name,
             otp=otp,
         )
-
-        if not email_sent:
-            failed_email = pending.email
-            pending.delete()
-            logger.error('Signup OTP email failed for %s', failed_email)
-            return Response(
-                {
-                    'message': 'We could not send the verification email. '
-                    'Check your address and try again, or contact support.',
-                    'email': failed_email,
-                    'requires_verification': True,
-                    'email_sent': False,
-                },
-                status=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
 
         logger.info('Fleet owner signup pending OTP: %s', pending.email)
 
@@ -419,24 +414,21 @@ def resend_signup_otp(request):
     serializer = SignupResendOTPSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-        email_sent = send_signup_otp_email_to(
+        schedule_signup_otp_email_to(
             recipient_email=serializer._recipient_email,
             first_name=serializer._first_name,
             otp=serializer._issued_otp,
         )
-        payload = {
-            'message': 'A new verification code has been sent.',
-            'email': serializer._recipient_email,
-            'email_sent': email_sent,
-            'otp_expires_minutes': pending_signup.CODE_EXPIRY_SECONDS // 60,
-            'resend_cooldown_seconds': pending_signup.RESEND_COOLDOWN_SECONDS,
-        }
-        if not email_sent:
-            return Response(
-                {'message': 'Could not send email. Please try again shortly.', 'email_sent': False},
-                status=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
-        return Response(payload, status=status.HTTP_200_OK)
+        return Response(
+            {
+                'message': 'A new verification code has been sent.',
+                'email': serializer._recipient_email,
+                'email_sent': True,
+                'otp_expires_minutes': pending_signup.CODE_EXPIRY_SECONDS // 60,
+                'resend_cooldown_seconds': pending_signup.RESEND_COOLDOWN_SECONDS,
+            },
+            status=status.HTTP_200_OK,
+        )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
