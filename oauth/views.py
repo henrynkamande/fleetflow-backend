@@ -14,7 +14,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 import logging
 
 from .models import User, DriverProfile, FleetOwnerProfile, KYCDocument, Company, EmailAuthCode
-from . import auth_codes
+from . import auth_codes, pending_signup
 from .email_utils import deliver_auth_email
 from fleetflow.pagination import paginate_queryset
 
@@ -180,10 +180,18 @@ def send_otp_resend_email(driver, otp):
 
 
 def send_signup_otp_email(user, otp):
+    return send_signup_otp_email_to(
+        recipient_email=user.email,
+        first_name=user.first_name,
+        otp=otp,
+    )
+
+
+def send_signup_otp_email_to(*, recipient_email: str, first_name: str, otp: str) -> bool:
     brand = getattr(settings, 'APP_BRAND_NAME', 'FleetVault')
     subject = f"{brand} - Verify Your Email Address"
     message = _format_transactional_email(
-        recipient_name=user.first_name,
+        recipient_name=first_name,
         intro="Thank you for registering. Please verify your email to continue.",
         detail_lines=[
             f"- Verification code: {otp}",
@@ -192,7 +200,7 @@ def send_signup_otp_email(user, otp):
         action_lines=["- Enter this code in the verification prompt to activate your account."],
         security_note="If you did not create this account, you can safely ignore this email.",
     )
-    return deliver_auth_email(subject, message, user.email)
+    return deliver_auth_email(subject, message, recipient_email)
 
 
 def send_password_reset_code_email(user, code):
@@ -256,32 +264,42 @@ def register_fleet_owner(request):
     serializer = FleetOwnerRegistrationSerializer(data=request.data)
     
     if serializer.is_valid():
-        user = serializer.save()
-        otp = auth_codes.issue_code(user, EmailAuthCode.Purpose.SIGNUP_VERIFY)
-        email_sent = send_signup_otp_email(user, otp)
+        pending = serializer.save()
+        otp = pending_signup.issue_code(pending)
+        email_sent = send_signup_otp_email_to(
+            recipient_email=pending.email,
+            first_name=pending.first_name,
+            otp=otp,
+        )
 
-        logger.info(f'New fleet owner registered (pending OTP): {user.email}')
-
-        payload = {
-            'message': 'Registration successful. Enter the verification code sent to your email.',
-            'email': user.email,
-            'requires_verification': True,
-            'email_sent': email_sent,
-            'otp_expires_minutes': auth_codes.CODE_EXPIRY_SECONDS // 60,
-            'resend_cooldown_seconds': auth_codes.RESEND_COOLDOWN_SECONDS,
-        }
         if not email_sent:
+            failed_email = pending.email
+            pending.delete()
+            logger.error('Signup OTP email failed for %s', failed_email)
             return Response(
                 {
-                    'message': 'Account created but we could not send the verification email. '
-                    'Try resend or contact support.',
-                    'email': user.email,
+                    'message': 'We could not send the verification email. '
+                    'Check your address and try again, or contact support.',
+                    'email': failed_email,
                     'requires_verification': True,
                     'email_sent': False,
                 },
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
-        return Response(payload, status=status.HTTP_201_CREATED)
+
+        logger.info('Fleet owner signup pending OTP: %s', pending.email)
+
+        return Response(
+            {
+                'message': 'Enter the verification code sent to your email to finish creating your account.',
+                'email': pending.email,
+                'requires_verification': True,
+                'email_sent': True,
+                'otp_expires_minutes': pending_signup.CODE_EXPIRY_SECONDS // 60,
+                'resend_cooldown_seconds': pending_signup.RESEND_COOLDOWN_SECONDS,
+            },
+            status=status.HTTP_201_CREATED,
+        )
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -400,16 +418,20 @@ def verify_signup_otp(request):
 def resend_signup_otp(request):
     serializer = SignupResendOTPSerializer(data=request.data)
     if serializer.is_valid():
-        user = serializer.save()
-        email_sent = send_signup_otp_email(user, user._issued_otp)
+        serializer.save()
+        email_sent = send_signup_otp_email_to(
+            recipient_email=serializer._recipient_email,
+            first_name=serializer._first_name,
+            otp=serializer._issued_otp,
+        )
         payload = {
             'message': 'A new verification code has been sent.',
-            'email': user.email,
+            'email': serializer._recipient_email,
             'email_sent': email_sent,
-            'otp_expires_minutes': auth_codes.CODE_EXPIRY_SECONDS // 60,
-            'resend_cooldown_seconds': auth_codes.RESEND_COOLDOWN_SECONDS,
+            'otp_expires_minutes': pending_signup.CODE_EXPIRY_SECONDS // 60,
+            'resend_cooldown_seconds': pending_signup.RESEND_COOLDOWN_SECONDS,
         }
-        if not email_sent and not settings.DEBUG:
+        if not email_sent:
             return Response(
                 {'message': 'Could not send email. Please try again shortly.', 'email_sent': False},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
