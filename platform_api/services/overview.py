@@ -32,13 +32,16 @@ def build_platform_overview(period: str | None) -> dict:
     for row in companies_qs.values('billing_status').annotate(count=Count('id')):
         billing_breakdown[row['billing_status']] = row['count']
 
-    users_qs = User.objects.filter(is_active=True)
-    fleet_owners = users_qs.filter(role=User.Role.FLEET_OWNER).count()
-    drivers_total = users_qs.filter(role=User.Role.DRIVER).count()
-    drivers_verified = users_qs.filter(role=User.Role.DRIVER, is_verified=True).count()
+    users_qs = User.objects.exclude(role=User.Role.PLATFORM_ADMIN)
+    total_users = users_qs.count()
+    active_users_qs = users_qs.filter(is_active=True)
+    fleet_owners = active_users_qs.filter(role=User.Role.FLEET_OWNER).count()
+    drivers_total = active_users_qs.filter(role=User.Role.DRIVER).count()
+    drivers_verified = active_users_qs.filter(role=User.Role.DRIVER, is_verified=True).count()
     drivers_unverified = drivers_total - drivers_verified
 
     vehicles_total = Vehicle.objects.count()
+    trips_total = Trip.objects.exclude(status=Trip.TripStatus.CANCELLED).count()
     trips_in_period = Trip.objects.filter(
         planned_departure_time__date__gte=start,
         planned_departure_time__date__lte=end,
@@ -83,6 +86,37 @@ def build_platform_overview(period: str | None) -> dict:
             }
         )
 
+    from billing import conf as billing_conf
+
+    unit_cents = billing_conf.BILLING_UNIT_AMOUNT_CENTS
+    active_subs = companies_qs.filter(billing_status=Company.BillingStatus.ACTIVE)
+    trialing_subs = companies_qs.filter(billing_status=Company.BillingStatus.TRIALING)
+    pending_payment = companies_qs.filter(
+        billing_status__in=[
+            Company.BillingStatus.INCOMPLETE,
+            Company.BillingStatus.PAST_DUE,
+        ]
+    )
+    mrr_cents = 0
+    for row in active_subs.values('billing_quantity'):
+        qty = row.get('billing_quantity') or 0
+        mrr_cents += int(qty) * unit_cents
+    outstanding_cents = 0
+    for row in pending_payment.values('billing_quantity'):
+        qty = row.get('billing_quantity') or 0
+        outstanding_cents += int(qty) * unit_cents
+
+    recent_activity = []
+    for user in User.objects.exclude(role=User.Role.PLATFORM_ADMIN).order_by('-date_joined')[:8]:
+        recent_activity.append(
+            {
+                'type': 'user_joined',
+                'at': user.date_joined.isoformat(),
+                'title': user.get_full_name(),
+                'detail': f'{user.role} · {user.email}',
+            }
+        )
+
     attention = []
     trial_cutoff = timezone.now() + timedelta(days=7)
     for company in companies_qs.select_related('owner').filter(
@@ -107,6 +141,7 @@ def build_platform_overview(period: str | None) -> dict:
             'billing_breakdown': billing_breakdown,
         },
         'users': {
+            'total': total_users,
             'fleet_owners': fleet_owners,
             'drivers': drivers_total,
             'drivers_verified': drivers_verified,
@@ -114,12 +149,21 @@ def build_platform_overview(period: str | None) -> dict:
         },
         'fleet_ops': {
             'vehicles': vehicles_total,
+            'trips_total': trips_total,
             'trips_in_period': trip_count,
             'revenue': _money(cur_fin['revenue']),
             'expenses': _money(cur_fin['expenses']),
             'profit': _money(cur_fin['profit']),
             'revenue_previous': _money(prev_fin['revenue']),
         },
+        'subscriptions': {
+            'active': active_subs.count(),
+            'trialing': trialing_subs.count(),
+            'pending_payment': pending_payment.count(),
+            'mrr': _money(mrr_cents / 100),
+            'outstanding_revenue': _money(outstanding_cents / 100),
+        },
+        'recent_activity': recent_activity,
         'risk': {
             'kyc_pending': kyc_pending,
         },

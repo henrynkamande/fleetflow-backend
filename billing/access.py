@@ -3,6 +3,16 @@ from oauth.models import Company
 from . import conf
 
 
+def allow_trial_without_payment() -> bool:
+    if not conf.BILLING_ENFORCE:
+        return True
+    if conf.BILLING_ALLOW_TRIAL_WITHOUT_PAYMENT:
+        return True
+    if not conf.stripe_configured():
+        return True
+    return False
+
+
 def company_has_platform_access(company: Company | None) -> bool:
     if company is None:
         return False

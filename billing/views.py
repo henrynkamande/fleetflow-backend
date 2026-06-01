@@ -11,12 +11,13 @@ from oauth.fleet_workspace import ensure_fleet_owner_company
 from oauth.models import Company
 
 from . import conf
-from .access import company_has_platform_access, company_requires_checkout
+from .access import allow_trial_without_payment, company_has_platform_access, company_requires_checkout
 from .stripe_service import (
     billable_vehicle_count,
     confirm_checkout_session,
     create_billing_portal_session,
     create_trial_checkout_session,
+    start_local_trial,
 )
 
 stripe_configured = conf.stripe_configured
@@ -45,6 +46,7 @@ def billing_config(request):
             'stripe_publishable_key': conf.STRIPE_PUBLISHABLE_KEY if stripe_configured() else '',
             'stripe_configured': stripe_configured(),
             'billing_enforced': conf.BILLING_ENFORCE and stripe_configured(),
+            'allow_trial_without_payment': allow_trial_without_payment(),
             'pricing': _public_pricing_payload(),
         }
     )
@@ -103,6 +105,36 @@ def create_checkout_session(request):
         return Response({'detail': str(exc)}, status=status.HTTP_502_BAD_GATEWAY)
 
     return Response({'checkout_url': session.url, 'session_id': session.id})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def start_trial_without_payment(request):
+    user = request.user
+    if not user.is_fleet_owner:
+        return Response(
+            {'detail': 'Only fleet owners can start a trial.'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+    if not allow_trial_without_payment():
+        return Response(
+            {'detail': 'Trial without payment is not enabled on this server.'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    company = ensure_fleet_owner_company(user)
+    if not company:
+        return Response({'detail': 'No company workspace.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    company = start_local_trial(company)
+    return Response(
+        {
+            'billing_status': company.billing_status,
+            'trial_ends_at': company.trial_ends_at,
+            'has_access': company_has_platform_access(company),
+            'requires_checkout': company_requires_checkout(company),
+        }
+    )
 
 
 @api_view(['POST'])

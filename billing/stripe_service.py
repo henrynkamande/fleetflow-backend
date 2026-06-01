@@ -4,7 +4,7 @@ import logging
 from typing import Any
 
 import stripe
-from datetime import datetime, timezone as dt_timezone
+from datetime import datetime, timedelta, timezone as dt_timezone
 
 from django.utils import timezone
 
@@ -126,6 +126,30 @@ def confirm_checkout_session(company: Company, session_id: str) -> Company:
     subscription = client.subscriptions.retrieve(subscription_id)
     apply_subscription_state(company, subscription)
     company.refresh_from_db()
+    return company
+
+
+def start_local_trial(company: Company) -> Company:
+    """Activate trial without Stripe (dev / billing not enforced)."""
+    if company.billing_status in (
+        Company.BillingStatus.TRIALING,
+        Company.BillingStatus.ACTIVE,
+    ):
+        return company
+
+    company.billing_status = Company.BillingStatus.TRIALING
+    company.subscription_plan = 'trial'
+    company.trial_ends_at = timezone.now() + timedelta(days=conf.BILLING_TRIAL_DAYS)
+    company.billing_quantity = billable_vehicle_count(company)
+    company.save(
+        update_fields=[
+            'billing_status',
+            'subscription_plan',
+            'trial_ends_at',
+            'billing_quantity',
+            'updated_at',
+        ]
+    )
     return company
 
 

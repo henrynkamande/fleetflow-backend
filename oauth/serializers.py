@@ -964,7 +964,11 @@ def serialize_user_for_api(user: User, request=None) -> dict:
 
     driver_profile_id = None
     if user.role == User.Role.DRIVER:
-        driver_profile_id = str(user.pk)
+        try:
+            driver_profile_id = str(user.driver_profile.id)
+        except (ObjectDoesNotExist, AttributeError, DriverProfile.DoesNotExist):
+            # DriverProfile PK is the user id; assignment APIs still need a stable id.
+            driver_profile_id = str(user.pk)
 
     return {
         'id': str(user.pk),
@@ -1049,7 +1053,10 @@ class UserSerializer(serializers.ModelSerializer):
     def get_driver_profile_id(self, obj):
         if obj.role != obj.Role.DRIVER:
             return None
-        return str(obj.pk)
+        try:
+            return str(obj.driver_profile.id)
+        except (ObjectDoesNotExist, AttributeError, DriverProfile.DoesNotExist):
+            return str(obj.pk)
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

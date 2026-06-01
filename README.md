@@ -107,6 +107,14 @@ If deploy logs show `ServerSelectionTimeoutError` / `SSL handshake failed` / `TL
 3. **`MONGO_URI` on Render** — Set the same Atlas SRV URI you use locally (`mongodb+srv://…`), with URL-encoded password if it contains special characters.
 4. **Start command** — Example: `python manage.py migrate && gunicorn fleetflow.wsgi:application --bind 0.0.0.0:$PORT`
 
+## Scale & performance
+
+- **List APIs** (`trips`, `vehicles`, company `users` / `drivers`, KYC) accept `page` and `page_size` (alias `limit`, max **100**). Responses include `count`, `page`, `page_size`, and `total_pages` plus the list key (`trips`, `vehicles`, etc.). Trip lists support `include_stats=true` on page 1 for dashboard aggregates without loading every row.
+- **Indexes**: trips are indexed on `(company, planned_departure_time)` and common filter fields; run `python manage.py migrate` after deploy.
+- **Throttling**: DRF default user/anon throttles are configured in `settings.py`; tune for production load.
+- **Horizontal scale**: run stateless Gunicorn workers behind a load balancer; use MongoDB connection limits appropriate to worker count.
+- **Later**: Redis cache for dashboard overview, read preference for reporting, background workers for exports and billing webhooks (Celery/RQ).
+
 ## Production notes
 
 - Run with **Gunicorn** (already in `requirements.txt`), e.g. `gunicorn fleetflow.wsgi:application`, behind a reverse proxy with TLS.

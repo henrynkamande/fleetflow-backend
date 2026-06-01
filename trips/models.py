@@ -301,6 +301,7 @@ class Trip(models.Model):
         verbose_name_plural = 'Trips'
         indexes = [
             models.Index(fields=['company', 'status']),
+            models.Index(fields=['company', 'planned_departure_time']),
             models.Index(fields=['vehicle', 'status']),
             models.Index(fields=['driver', 'status']),
             models.Index(fields=['trip_number']),
