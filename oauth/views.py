@@ -276,11 +276,26 @@ def register_fleet_owner(request):
     if serializer.is_valid():
         pending = serializer.save()
         otp = pending_signup.issue_code(pending)
-        schedule_signup_otp_email_to(
+        email_sent = send_signup_otp_email_to(
             recipient_email=pending.email,
             first_name=pending.first_name,
             otp=otp,
         )
+
+        if not email_sent:
+            failed_email = pending.email
+            pending.delete()
+            logger.error('Signup OTP email failed for %s', failed_email)
+            return Response(
+                {
+                    'message': 'We could not send the verification email. '
+                    'Try again in a moment or contact support if this continues.',
+                    'email': failed_email,
+                    'requires_verification': True,
+                    'email_sent': False,
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
 
         logger.info('Fleet owner signup pending OTP: %s', pending.email)
 
@@ -414,21 +429,24 @@ def resend_signup_otp(request):
     serializer = SignupResendOTPSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-        schedule_signup_otp_email_to(
+        email_sent = send_signup_otp_email_to(
             recipient_email=serializer._recipient_email,
             first_name=serializer._first_name,
             otp=serializer._issued_otp,
         )
-        return Response(
-            {
-                'message': 'A new verification code has been sent.',
-                'email': serializer._recipient_email,
-                'email_sent': True,
-                'otp_expires_minutes': pending_signup.CODE_EXPIRY_SECONDS // 60,
-                'resend_cooldown_seconds': pending_signup.RESEND_COOLDOWN_SECONDS,
-            },
-            status=status.HTTP_200_OK,
-        )
+        payload = {
+            'message': 'A new verification code has been sent.',
+            'email': serializer._recipient_email,
+            'email_sent': email_sent,
+            'otp_expires_minutes': pending_signup.CODE_EXPIRY_SECONDS // 60,
+            'resend_cooldown_seconds': pending_signup.RESEND_COOLDOWN_SECONDS,
+        }
+        if not email_sent:
+            return Response(
+                {'message': 'Could not send email. Please try again shortly.', 'email_sent': False},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        return Response(payload, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
