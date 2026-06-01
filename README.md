@@ -79,6 +79,20 @@ python manage.py runserver
 
 The API defaults to `http://127.0.0.1:8000/`. With `DEBUG=True`, the browsable API is enabled for JSON endpoints.
 
+## Email (SendGrid) on Render / production
+
+Signup and password reset need outbound email. Set on the **backend** service:
+
+| Variable | Purpose |
+|----------|---------|
+| `SENDGRID_API_KEY` | SendGrid API key (Mail Send → SMTP uses `apikey` as username) |
+| `DEFAULT_FROM_EMAIL` | Must match a **verified** sender in SendGrid (e.g. `noreply@myfleetvault.com`) |
+| `APP_BRAND_NAME` | Optional; used in subject lines (default `FleetVault`) |
+
+Do **not** set `EMAIL_CONSOLE=true` in production. After deploy, check logs for `Auth email sent` or `Auth email failed`.
+
+Fleet owner signup stores data in `pending_fleet_owner_signups` until OTP succeeds; no `User` row is created until verification.
+
 ## Configuration (environment variables)
 
 Copy `.env.template` to `.env` and fill in values (loaded automatically at startup), or export variables in your shell.

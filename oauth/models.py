@@ -426,6 +426,38 @@ class FleetOwnerProfile(models.Model):
         return f"Fleet Owner Profile - {self.user.full_name}"
 
 
+class PendingFleetOwnerSignup(models.Model):
+    """
+    Fleet owner signup before email verification.
+    No User row exists until OTP is confirmed.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(unique=True, db_index=True)
+    phone_number = models.CharField(max_length=20)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    password = models.CharField(max_length=128)
+    code_hash = models.CharField(max_length=128, blank=True)
+    code_expires_at = models.DateTimeField(null=True, blank=True)
+    code_sent_at = models.DateTimeField(null=True, blank=True)
+    code_attempts = models.PositiveSmallIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'pending_fleet_owner_signups'
+
+    @property
+    def is_code_expired(self):
+        if not self.code_expires_at:
+            return True
+        return timezone.now() > self.code_expires_at
+
+    def __str__(self):
+        return f'Pending signup {self.email}'
+
+
 class EmailAuthCode(models.Model):
     """Hashed email OTP / reset codes per user and purpose."""
 

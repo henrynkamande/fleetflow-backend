@@ -13,8 +13,9 @@ from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from .models import (
     User, Company, DriverProfile, FleetOwnerProfile,
-    KYCDocument, EmailAuthCode,
+    KYCDocument, EmailAuthCode, PendingFleetOwnerSignup,
 )
+from . import pending_signup
 from . import auth_codes
 from .phone_utils import normalize_phone_number, phone_number_lookup_variants
 import pyotp
@@ -103,108 +104,69 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 # FLEET OWNER ACCOUNT REGISTRATION (Step 1)
 # ============================================================================
 
-class FleetOwnerRegistrationSerializer(serializers.ModelSerializer, PasswordGenerationMixin):
+class FleetOwnerRegistrationSerializer(serializers.ModelSerializer):
     """
-    Step 1: Register fleet owner account (without company).
-    After registration, fleet owner must create a company.
+    Step 1: Collect signup data; User is created only after email OTP verification.
     """
 
     password = serializers.CharField(
         write_only=True,
         required=True,
         validators=[validate_password],
-        style={'input_type': 'password'}
+        style={'input_type': 'password'},
     )
     confirm_password = serializers.CharField(
         write_only=True,
         required=True,
-        style={'input_type': 'password'}
+        style={'input_type': 'password'},
     )
 
     class Meta:
-        model = User
+        model = PendingFleetOwnerSignup
         fields = [
             'email', 'phone_number', 'first_name', 'last_name',
-            'password', 'confirm_password'
+            'password', 'confirm_password',
         ]
 
     def validate_email(self, value):
-        """Validate and normalize email."""
         email = value.lower()
-        existing = User.objects.filter(email=email).first()
-        if not existing:
-            return email
-
-        if existing.role == User.Role.FLEET_OWNER and not existing.is_verified:
-            self._pending_email_user = existing
-            return email
-
-        raise serializers.ValidationError("A user with this email already exists.")
+        if User.objects.filter(email=email, is_verified=True).exists():
+            raise serializers.ValidationError('A user with this email already exists.')
+        return email
 
     def validate_phone_number(self, value):
-        """Validate phone number."""
-        existing = User.objects.filter(phone_number=value).first()
-        if not existing:
-            return value
-
-        if existing.role == User.Role.FLEET_OWNER and not existing.is_verified:
-            self._pending_phone_user = existing
-            return value
-
-        raise serializers.ValidationError("A user with this phone number already exists.")
-
-    def _resolve_pending_user(self):
-        by_email = getattr(self, '_pending_email_user', None)
-        by_phone = getattr(self, '_pending_phone_user', None)
-        if by_email and by_phone and by_email.id != by_phone.id:
-            raise serializers.ValidationError({
-                'email': 'This email is already linked to another pending signup.',
-                'phone_number': 'This phone number is already linked to another pending signup.',
-            })
-        return by_email or by_phone
+        if User.objects.filter(phone_number=value, is_verified=True).exists():
+            raise serializers.ValidationError('A user with this phone number already exists.')
+        return value
 
     def validate(self, data):
-        """Validate passwords and pending-signup consistency."""
         if data['password'] != data['confirm_password']:
-            raise serializers.ValidationError({
-                'confirm_password': 'Passwords do not match.'
-            })
-        self._pending_user = self._resolve_pending_user()
+            raise serializers.ValidationError({'confirm_password': 'Passwords do not match.'})
         return data
 
-    def _save_pending_user(self, pending_user, validated_data):
-        pending_user.email = validated_data['email']
-        pending_user.phone_number = validated_data['phone_number']
-        pending_user.first_name = validated_data['first_name']
-        pending_user.last_name = validated_data['last_name']
-        pending_user.role = User.Role.FLEET_OWNER
-        pending_user.is_active = False
-        pending_user.is_verified = False
-        pending_user.set_password(validated_data['password'])
-        pending_user.save(update_fields=[
-            'email',
-            'phone_number',
-            'first_name',
-            'last_name',
-            'role',
-            'is_active',
-            'is_verified',
-            'password',
-        ])
-        return pending_user
-
     def create(self, validated_data):
-        """Create or refresh a pending fleet owner account."""
+        from django.contrib.auth.hashers import make_password
+
         validated_data.pop('confirm_password')
+        email = validated_data['email'].lower()
+        plain_password = validated_data.pop('password')
 
-        pending_user = getattr(self, '_pending_user', None)
-        if pending_user:
-            return self._save_pending_user(pending_user, validated_data)
+        User.objects.filter(
+            email=email,
+            role=User.Role.FLEET_OWNER,
+            is_verified=False,
+        ).delete()
 
-        validated_data['role'] = User.Role.FLEET_OWNER
-        validated_data['is_active'] = False
-        validated_data['is_verified'] = False
-        return User.objects.create_user(**validated_data)
+        pending, _created = PendingFleetOwnerSignup.objects.update_or_create(
+            email=email,
+            defaults={
+                'phone_number': validated_data['phone_number'],
+                'first_name': validated_data['first_name'],
+                'last_name': validated_data['last_name'],
+                'password': make_password(plain_password),
+            },
+        )
+        return pending
 
 
 # ============================================================================
@@ -1279,17 +1241,23 @@ class SignupVerifyOTPSerializer(serializers.Serializer):
     def validate_email(self, value):
         email = value.lower()
         try:
-            user = User.objects.get(
+            self.pending = PendingFleetOwnerSignup.objects.get(email=email)
+            self.legacy_user = None
+            return email
+        except PendingFleetOwnerSignup.DoesNotExist:
+            pass
+        try:
+            self.legacy_user = User.objects.get(
                 email=email,
                 role=User.Role.FLEET_OWNER,
                 is_verified=False,
             )
+            self.pending = None
+            return email
         except User.DoesNotExist:
             raise serializers.ValidationError(
-                'No pending signup found for this email. It may already be verified.'
+                'No pending signup found for this email. It may already be verified.',
             )
-        self.user = user
-        return email
 
     def validate_otp(self, value):
         if not value.isdigit():
@@ -1297,17 +1265,36 @@ class SignupVerifyOTPSerializer(serializers.Serializer):
         return value
 
     def validate(self, data):
-        ok, err = auth_codes.verify_code(
-            self.user,
-            EmailAuthCode.Purpose.SIGNUP_VERIFY,
-            data['otp'],
-        )
+        if self.pending is not None:
+            ok, err = pending_signup.verify_code(self.pending, data['otp'])
+        else:
+            ok, err = auth_codes.verify_code(
+                self.legacy_user,
+                EmailAuthCode.Purpose.SIGNUP_VERIFY,
+                data['otp'],
+            )
         if not ok:
             raise serializers.ValidationError({'otp': err})
         return data
 
     def save(self):
-        user = self.user
+        if self.pending is not None:
+            pending = self.pending
+            user = User(
+                email=pending.email,
+                phone_number=pending.phone_number,
+                first_name=pending.first_name,
+                last_name=pending.last_name,
+                role=User.Role.FLEET_OWNER,
+                is_active=True,
+                is_verified=True,
+            )
+            user.password = pending.password
+            user.save()
+            pending.delete()
+            return user
+
+        user = self.legacy_user
         user.is_active = True
         user.is_verified = True
         user.save(update_fields=['is_active', 'is_verified'])
@@ -1321,22 +1308,35 @@ class SignupResendOTPSerializer(serializers.Serializer):
     def validate_email(self, value):
         email = value.lower()
         try:
-            user = User.objects.get(
+            self.pending = PendingFleetOwnerSignup.objects.get(email=email)
+            self.legacy_user = None
+            return email
+        except PendingFleetOwnerSignup.DoesNotExist:
+            pass
+        try:
+            self.legacy_user = User.objects.get(
                 email=email,
                 role=User.Role.FLEET_OWNER,
                 is_verified=False,
             )
+            self.pending = None
+            return email
         except User.DoesNotExist:
-            raise serializers.ValidationError(
-                'No pending signup found for this email.'
-            )
-        self.user = user
-        return email
+            raise serializers.ValidationError('No pending signup found for this email.')
 
     def validate(self, data):
-        if not auth_codes.can_resend(self.user, EmailAuthCode.Purpose.SIGNUP_VERIFY):
+        if self.pending is not None:
+            if not pending_signup.can_resend(self.pending):
+                remaining = pending_signup.resend_cooldown_remaining(self.pending)
+                raise serializers.ValidationError({
+                    'non_field_errors': [
+                        f'Please wait {remaining} seconds before requesting another OTP.',
+                    ],
+                    'cooldown_seconds': remaining,
+                })
+        elif not auth_codes.can_resend(self.legacy_user, EmailAuthCode.Purpose.SIGNUP_VERIFY):
             remaining = auth_codes.resend_cooldown_remaining(
-                self.user, EmailAuthCode.Purpose.SIGNUP_VERIFY
+                self.legacy_user, EmailAuthCode.Purpose.SIGNUP_VERIFY,
             )
             raise serializers.ValidationError({
                 'non_field_errors': [
@@ -1347,9 +1347,17 @@ class SignupResendOTPSerializer(serializers.Serializer):
         return data
 
     def save(self):
-        plain = auth_codes.issue_code(self.user, EmailAuthCode.Purpose.SIGNUP_VERIFY)
-        self.user._issued_otp = plain
-        return self.user
+        if self.pending is not None:
+            plain = pending_signup.issue_code(self.pending)
+            self._issued_otp = plain
+            self._recipient_email = self.pending.email
+            self._first_name = self.pending.first_name
+            return self.pending
+        plain = auth_codes.issue_code(self.legacy_user, EmailAuthCode.Purpose.SIGNUP_VERIFY)
+        self._issued_otp = plain
+        self._recipient_email = self.legacy_user.email
+        self._first_name = self.legacy_user.first_name
+        return self.legacy_user
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):

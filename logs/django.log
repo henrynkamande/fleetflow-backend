@@ -3743,3 +3743,71 @@
 [INFO] 2026-06-01 06:22:20,962 autoreload 10527 130297691353600 Watching for file changes with StatReloader
 [INFO] 2026-06-01 06:30:22,304 log 10527 130296957630144 "GET /content/api/posts/?status=published&limit=24&page=1 HTTP/1.1" 200 24
 [INFO] 2026-06-01 06:30:22,304 log 10527 130296957630144 "GET /content/api/posts/?status=published&limit=24&page=1 HTTP/1.1" 200 24
+[INFO] 2026-06-01 06:40:09,735 log 10527 130296957630144 "OPTIONS /users/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-06-01 06:40:09,735 log 10527 130296957630144 "OPTIONS /users/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-06-01 06:40:12,615 views 10527 130296957630144 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-06-01 06:40:12,615 views 10527 130296957630144 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-06-01 06:40:14,490 log 10527 130296957630144 "POST /users/api/auth/login/ HTTP/1.1" 200 2795
+[INFO] 2026-06-01 06:40:14,490 log 10527 130296957630144 "POST /users/api/auth/login/ HTTP/1.1" 200 2795
+[INFO] 2026-06-01 06:44:55,587 log 10527 130296949237440 "GET /content/api/posts/?status=published&limit=24&page=1 HTTP/1.1" 200 24
+[INFO] 2026-06-01 06:44:55,587 log 10527 130296949237440 "GET /content/api/posts/?status=published&limit=24&page=1 HTTP/1.1" 200 24
+[INFO] 2026-06-01 06:46:43,692 log 10527 130296957630144 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-06-01 06:46:43,694 log 10527 130296949237440 "OPTIONS /reports/api/overview/?period=30d HTTP/1.1" 200 0
+[INFO] 2026-06-01 06:46:43,695 log 10527 130296940844736 "OPTIONS /users/api/profile/ HTTP/1.1" 200 0
+[INFO] 2026-06-01 06:46:43,692 log 10527 130296957630144 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-06-01 06:46:43,694 log 10527 130296949237440 "OPTIONS /reports/api/overview/?period=30d HTTP/1.1" 200 0
+[INFO] 2026-06-01 06:46:43,695 log 10527 130296940844736 "OPTIONS /users/api/profile/ HTTP/1.1" 200 0
+[INFO] 2026-06-01 06:46:46,497 log 10527 130296949237440 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 1051
+[INFO] 2026-06-01 06:46:46,497 log 10527 130296949237440 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 1051
+[INFO] 2026-06-01 06:46:47,177 log 10527 130296957630144 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-06-01 06:46:47,177 log 10527 130296957630144 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-06-01 06:46:47,533 log 10527 130296940844736 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-01 06:46:47,533 log 10527 130296940844736 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-01 06:58:48,639 log 10527 130296957630144 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-06-01 06:58:48,639 log 10527 130296957630144 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-06-01 07:01:10,002 log 10527 130296940844736 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-06-01 07:01:10,341 log 10527 130296957630144 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-01 07:01:10,002 log 10527 130296940844736 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-06-01 07:01:10,341 log 10527 130296957630144 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-01 07:01:27,624 log 10527 130296957630144 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-06-01 07:01:27,624 log 10527 130296957630144 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-06-01 07:01:27,950 log 10527 130296940844736 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-01 07:01:27,950 log 10527 130296940844736 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-01 07:01:30,460 log 10527 130296957630144 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 1051
+[INFO] 2026-06-01 07:01:30,460 log 10527 130296957630144 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 1051
+[INFO] 2026-06-01 07:04:14,844 log 10527 130296949237440 "GET /content/api/posts/?status=published&limit=24&page=1 HTTP/1.1" 200 24
+[INFO] 2026-06-01 07:04:14,844 log 10527 130296949237440 "GET /content/api/posts/?status=published&limit=24&page=1 HTTP/1.1" 200 24
+[INFO] 2026-06-01 07:06:04,342 log 10527 130296957630144 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-06-01 07:06:04,342 log 10527 130296957630144 "GET /users/api/profile/ HTTP/1.1" 200 505
+[INFO] 2026-06-01 07:12:25,278 autoreload 10527 130297691353600 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/email_utils.py changed, reloading.
+[INFO] 2026-06-01 07:12:25,278 autoreload 10527 130297691353600 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/email_utils.py changed, reloading.
+[INFO] 2026-06-01 07:12:35,490 autoreload 17394 136619308569088 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:12:35,490 autoreload 17394 136619308569088 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:12:43,009 autoreload 17394 136619308569088 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-06-01 07:12:43,009 autoreload 17394 136619308569088 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-06-01 07:12:45,415 autoreload 17613 132731900920320 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:12:45,415 autoreload 17613 132731900920320 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:12:52,032 autoreload 17613 132731900920320 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-06-01 07:12:52,032 autoreload 17613 132731900920320 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-06-01 07:12:54,796 autoreload 17828 138746359988736 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:12:54,796 autoreload 17828 138746359988736 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:12:57,820 autoreload 17828 138746359988736 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-01 07:12:57,820 autoreload 17828 138746359988736 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-01 07:13:00,338 autoreload 18033 133907806749184 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:13:00,338 autoreload 18033 133907806749184 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:13:06,745 autoreload 18033 133907806749184 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-01 07:13:06,745 autoreload 18033 133907806749184 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-01 07:13:09,114 autoreload 18247 137386527887872 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:13:09,114 autoreload 18247 137386527887872 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:13:13,148 autoreload 18247 137386527887872 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-01 07:13:13,148 autoreload 18247 137386527887872 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-01 07:13:15,658 autoreload 18451 129648264458752 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:13:15,658 autoreload 18451 129648264458752 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:13:19,626 autoreload 18451 129648264458752 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-01 07:13:19,626 autoreload 18451 129648264458752 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-01 07:13:22,416 autoreload 18658 127723494171136 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:13:22,416 autoreload 18658 127723494171136 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:13:39,640 autoreload 18658 127723494171136 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-06-01 07:13:39,640 autoreload 18658 127723494171136 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/views.py changed, reloading.
+[INFO] 2026-06-01 07:13:43,113 autoreload 18925 136417696379392 Watching for file changes with StatReloader
+[INFO] 2026-06-01 07:13:43,113 autoreload 18925 136417696379392 Watching for file changes with StatReloader
