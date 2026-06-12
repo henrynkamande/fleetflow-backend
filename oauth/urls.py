@@ -45,16 +45,6 @@ urlpatterns = [
     path('users/<uuid:user_id>/deactivate/', views.deactivate_user, name='deactivate-user'),
     path('users/<uuid:user_id>/activate/', views.activate_user, name='activate-user'),
     
-    # KYC documents
-    path('kyc/', views.list_kyc_documents, name='list-kyc-documents'),
-    path('kyc/upload/', views.upload_kyc_document, name='upload-kyc-document'),
-    path('kyc/pending/', views.get_pending_kyc_documents, name='get-pending-kyc-documents'),
-    path('kyc/expired/', views.get_expired_kyc_documents, name='get-expired-kyc-documents'),
-    path('kyc/<uuid:document_id>/', views.get_kyc_document, name='get-kyc-document'),
-    path('kyc/<uuid:document_id>/update/', views.update_kyc_document, name='update-kyc-document'),
-    path('kyc/<uuid:document_id>/delete/', views.delete_kyc_document, name='delete-kyc-document'),
-    path('kyc/<uuid:document_id>/verify/', views.verify_kyc_document, name='verify-kyc-document'),
-    
     # Dashboards
     path('dashboard/fleet-owner/', views.fleet_owner_dashboard, name='fleet-owner-dashboard'),
     path('dashboard/driver/', views.driver_dashboard, name='driver-dashboard'),

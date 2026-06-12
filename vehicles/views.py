@@ -5,19 +5,33 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.db.models import Q
 import logging
 
-from oauth.fleet_workspace import ensure_fleet_owner_company
-from fleetflow.pagination import paginate_queryset
+from fleetflow.pagination import paginate_queryset, parse_page_params
+from .services import queue_vehicle_write_followups
 
-from .models import Vehicle, VehicleDocument, VehicleServiceRecord, VehicleExpense, FuelLog
-from .serializers import (
-    VehicleSerializer, VehicleDocumentSerializer,
-    VehicleServiceRecordSerializer, VehicleExpenseSerializer,
-    FuelLogSerializer
-)
+from .models import Vehicle
+from .serializers import VehicleSerializer, VehicleListSerializer
 
 logger = logging.getLogger(__name__)
+
+
+def _fleet_owner_for_user(user):
+    if user.is_fleet_owner:
+        return user
+    return getattr(user, 'fleet_owner', None) or getattr(getattr(user, 'driver_profile', None), 'fleet_owner', None)
+
+
+def _parse_bool_param(value):
+    if value is None:
+        return None
+    normalized = str(value).strip().lower()
+    if normalized in ('true', '1', 'yes'):
+        return True
+    if normalized in ('false', '0', 'no'):
+        return False
+    return None
 
 
 # ============================================================================
@@ -30,31 +44,71 @@ def list_vehicles(request):
     """List all vehicles in the fleet owner's company."""
     user = request.user
 
-    if user.is_fleet_owner:
-        company = ensure_fleet_owner_company(user)
-    else:
-        company = user.company
+    fleet_owner = _fleet_owner_for_user(user)
 
-    if not company:
-        return Response({'count': 0, 'vehicles': []}, status=status.HTTP_200_OK)
+    if not fleet_owner:
+        page, page_size = parse_page_params(request)
+        return Response(
+            {
+                'count': 0,
+                'page': page,
+                'page_size': page_size,
+                'total_pages': 0,
+                'vehicles': [],
+            },
+            status=status.HTTP_200_OK,
+        )
 
     # Filter by query params
-    vehicles = Vehicle.objects.filter(company=company)
+    vehicles = Vehicle.objects.filter(fleet_owner=fleet_owner)
     
     status_filter = request.query_params.get('status', None)
     type_filter = request.query_params.get('vehicle_type', None)
     driver_id = request.query_params.get('assigned_driver', None)
+    search = (request.query_params.get('search') or '').strip()
+    is_active = _parse_bool_param(request.query_params.get('is_active'))
+    make = (request.query_params.get('make') or '').strip()
+    model = (request.query_params.get('model') or '').strip()
+    year = request.query_params.get('year', None)
     
     if status_filter:
         vehicles = vehicles.filter(status=status_filter)
     if type_filter:
         vehicles = vehicles.filter(vehicle_type=type_filter)
     if driver_id:
-        vehicles = vehicles.filter(assigned_driver_id=driver_id)
+        if driver_id == 'unassigned':
+            vehicles = vehicles.filter(assigned_driver__isnull=True)
+        else:
+            vehicles = vehicles.filter(assigned_driver_id=driver_id)
+    if is_active is not None:
+        vehicles = vehicles.filter(is_active=is_active)
+    if make:
+        vehicles = vehicles.filter(make__icontains=make)
+    if model:
+        vehicles = vehicles.filter(model__icontains=model)
+    if year:
+        try:
+            vehicles = vehicles.filter(year=int(year))
+        except (TypeError, ValueError):
+            vehicles = vehicles.none()
+    if search:
+        vehicles = vehicles.filter(
+            Q(registration_number__icontains=search)
+            | Q(make__icontains=search)
+            | Q(model__icontains=search)
+            | Q(assigned_driver__user__first_name__icontains=search)
+            | Q(assigned_driver__user__last_name__icontains=search)
+            | Q(assigned_driver__user__email__icontains=search)
+        )
 
-    vehicles = vehicles.select_related('assigned_driver', 'assigned_driver__user', 'company').order_by('-created_at')
+    vehicles = vehicles.select_related('assigned_driver', 'assigned_driver__user', 'fleet_owner').order_by('-created_at')
     page_obj, meta = paginate_queryset(request, vehicles)
-    serializer = VehicleSerializer(page_obj.object_list, many=True, context={'request': request})
+    serializer = VehicleListSerializer(
+        page_obj.object_list,
+        many=True,
+        context={'request': request},
+        fields=request.query_params.get('fields'),
+    )
 
     return Response({
         **meta,
@@ -73,40 +127,30 @@ def create_vehicle(request):
             'error': 'Only fleet owners can add vehicles.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    company = ensure_fleet_owner_company(user)
-    if not company:
-        return Response({'error': 'Unable to create fleet workspace.'}, status=status.HTTP_400_BAD_REQUEST)
+    from billing.access import allow_trial_without_payment, owner_has_platform_access
+    if not owner_has_platform_access(user):
+        if allow_trial_without_payment():
+            from billing.stripe_service import start_local_trial
 
-    from billing.access import company_has_platform_access
-    if not company_has_platform_access(company):
-        return Response(
-            {
-                'error': 'Active trial or subscription required.',
-                'code': 'billing_required',
-            },
-            status=status.HTTP_402_PAYMENT_REQUIRED,
-        )
+            start_local_trial(user)
+        else:
+            return Response(
+                {
+                    'error': 'Active trial or subscription required.',
+                    'code': 'billing_required',
+                },
+                status=status.HTTP_402_PAYMENT_REQUIRED,
+            )
 
-    serializer = VehicleSerializer(data=request.data, context={'request': request})
+    serializer = VehicleSerializer(data=request.data, context={'request': request, 'fleet_owner': user})
     
     if serializer.is_valid():
         vehicle = serializer.save(
-            company=company,
+            fleet_owner=user,
             created_by=user
         )
 
-        # Update fleet owner's total vehicles count
-        fleet_owner_profile = user.fleet_owner_profile
-        fleet_owner_profile.total_vehicles = Vehicle.objects.filter(
-            company=company
-        ).count()
-        fleet_owner_profile.save(update_fields=['total_vehicles'])
-
-        try:
-            from billing.stripe_service import sync_subscription_quantity
-            sync_subscription_quantity(company)
-        except Exception:
-            logger.exception('Failed to sync Stripe subscription quantity after vehicle create')
+        queue_vehicle_write_followups(fleet_owner_id=user.id)
         
         logger.info(f"Vehicle added by {user.email}: {vehicle.registration_number}")
         
@@ -123,7 +167,8 @@ def create_vehicle(request):
 def get_vehicle(request, vehicle_id):
     """Get a specific vehicle's details."""
     user = request.user
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id, company=user.company)
+    fleet_owner = _fleet_owner_for_user(user)
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id, fleet_owner=fleet_owner)
     
     serializer = VehicleSerializer(vehicle, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -140,12 +185,13 @@ def update_vehicle(request, vehicle_id):
             'error': 'Only fleet owners can update vehicles.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id, company=user.company)
+    fleet_owner = user
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id, fleet_owner=fleet_owner)
     serializer = VehicleSerializer(
         vehicle,
         data=request.data,
         partial=request.method == 'PATCH',
-        context={'request': request}
+        context={'request': request, 'fleet_owner': fleet_owner}
     )
     
     if serializer.is_valid():
@@ -170,21 +216,31 @@ def delete_vehicle(request, vehicle_id):
             'error': 'Only fleet owners can delete vehicles.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    company = ensure_fleet_owner_company(user)
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id, company=company)
-    reg_number = vehicle.registration_number
-    vehicle.delete()
+    from django.db.models.deletion import ProtectedError
 
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id, fleet_owner=user)
+    reg_number = vehicle.registration_number
+    vehicle_data = VehicleSerializer(vehicle, context={'request': request}).data
     try:
-        from billing.stripe_service import sync_subscription_quantity
-        sync_subscription_quantity(company)
-    except Exception:
-        logger.exception('Failed to sync Stripe subscription quantity after vehicle delete')
+        vehicle.delete()
+    except ProtectedError:
+        return Response(
+            {
+                'error': (
+                    'This vehicle cannot be deleted because it is linked to existing trips. '
+                    'Remove or reassign those trips first.'
+                ),
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    queue_vehicle_write_followups(fleet_owner_id=user.id)
     
     logger.info(f"Vehicle deleted by {user.email}: {reg_number}")
     
     return Response({
-        'message': f'Vehicle {reg_number} has been deleted.'
+        'message': f'Vehicle {reg_number} has been deleted.',
+        'vehicle': vehicle_data,
     }, status=status.HTTP_200_OK)
 
 
@@ -199,7 +255,7 @@ def assign_driver(request, vehicle_id):
             'error': 'Only fleet owners can assign drivers.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id, company=user.company)
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id, fleet_owner=user)
     driver_id = request.data.get('driver_id')
     
     if not driver_id:
@@ -208,7 +264,7 @@ def assign_driver(request, vehicle_id):
         }, status=status.HTTP_400_BAD_REQUEST)
     
     from oauth.models import DriverProfile
-    driver = get_object_or_404(DriverProfile, pk=driver_id, user__company=user.company)
+    driver = get_object_or_404(DriverProfile, pk=driver_id, fleet_owner=user)
     
     vehicle.assigned_driver = driver
     vehicle.save(update_fields=['assigned_driver'])
@@ -232,7 +288,7 @@ def unassign_driver(request, vehicle_id):
             'error': 'Only fleet owners can unassign drivers.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id, company=user.company)
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id, fleet_owner=user)
     vehicle.assigned_driver = None
     vehicle.save(update_fields=['assigned_driver'])
     

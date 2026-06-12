@@ -1,4 +1,5 @@
 asgiref==3.11.1
+Brotli
 certifi>=2024.0.0
 Django==6.0.5
 django-cors-headers==4.9.0

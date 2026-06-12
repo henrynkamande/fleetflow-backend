@@ -26,6 +26,13 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
+JWT_SECRET = os.environ.get('JWT_SECRET', '').strip()
+if not JWT_SECRET and not DEBUG:
+    raise ImproperlyConfigured(
+        'JWT_SECRET is required in production. Set a long, random secret in the environment.'
+    )
+JWT_SIGNING_KEY = JWT_SECRET or SECRET_KEY
+
 # Host validation: explicit ALLOWED_HOSTS in production; local names when DEBUG.
 _DEFAULT_ALLOWED_HOSTS = 'fleetflow-backend-zr0z.onrender.com'
 _LOCAL_DEV_HOSTS = ('localhost', '127.0.0.1', '[::1]')
@@ -57,6 +64,7 @@ INSTALLED_APPS = [
     'trips',
     'reports',
     'billing',
+    'expenses',
     'platform_api',
     'content',
 ]
@@ -64,10 +72,14 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
+    'fleetflow.compression.BrotliMiddleware',
+    'fleetflow.timing.RequestTimingMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'content.middleware.BlogCoverUploadMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -234,7 +246,7 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': True,
 
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
+    'SIGNING_KEY': JWT_SIGNING_KEY,
     'VERIFYING_KEY': None,
     'AUDIENCE': None,
     'ISSUER': 'fleet_flow',
@@ -324,6 +336,7 @@ MEDIA_DIRS = [
     MEDIA_ROOT / 'avatars',
     MEDIA_ROOT / 'kyc_documents',
     MEDIA_ROOT / 'company_logos',
+    MEDIA_ROOT / 'blog_covers',
 ]
 
 for media_dir in MEDIA_DIRS:
@@ -343,6 +356,16 @@ FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', '').strip()
 EMAIL_CONSOLE = os.environ.get('EMAIL_CONSOLE', '').lower() in ('true', '1', 'yes')
 APP_BRAND_NAME = os.environ.get('APP_BRAND_NAME', 'FleetVault')
+# Temporarily disable outbound emails while keeping all email/OTP logic in place.
+EMAIL_DELIVERY_ENABLED = os.environ.get(
+    'EMAIL_DELIVERY_ENABLED',
+    'False',
+).lower() in ('true', '1', 'yes')
+# Temporarily bypass signup OTP email while keeping the OTP code paths available.
+SIGNUP_EMAIL_VERIFICATION_ENABLED = os.environ.get(
+    'SIGNUP_EMAIL_VERIFICATION_ENABLED',
+    'False',
+).lower() in ('true', '1', 'yes')
 
 # Prefer SendGrid when configured (even in DEBUG) so OTP/reset codes reach real inboxes.
 if SENDGRID_API_KEY and not EMAIL_CONSOLE:
@@ -372,8 +395,8 @@ if not _USE_SENDGRID:
 # Keep below Gunicorn worker timeout so a stuck SMTP connect does not kill the worker.
 EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', 10))
 
-# Fail fast in production when outbound email is not configured.
-if not DEBUG and not EMAIL_CONSOLE:
+# Fail fast in production when outbound email is enabled but not configured.
+if EMAIL_DELIVERY_ENABLED and not DEBUG and not EMAIL_CONSOLE:
     if _USE_SENDGRID:
         if not SENDGRID_API_KEY:
             raise ImproperlyConfigured(
@@ -558,6 +581,8 @@ FLEET_FLOW = {
     'FREE_PLAN_MAX_DRIVERS': 5,
     'FREE_PLAN_MAX_VEHICLES': 3,
 }
+
+REQUEST_TIMING_SLOW_MS = int(os.environ.get('REQUEST_TIMING_SLOW_MS', 750))
 
 # Frontend URL (for email links and redirects)
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')

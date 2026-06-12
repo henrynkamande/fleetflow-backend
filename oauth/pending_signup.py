@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.hashers import check_password
+from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils import timezone
 
 from . import auth_codes
@@ -12,11 +13,27 @@ from .models import PendingFleetOwnerSignup
 CODE_EXPIRY_SECONDS = auth_codes.CODE_EXPIRY_SECONDS
 RESEND_COOLDOWN_SECONDS = auth_codes.RESEND_COOLDOWN_SECONDS
 MAX_VERIFY_ATTEMPTS = auth_codes.MAX_VERIFY_ATTEMPTS
+_HMAC_PREFIX = 'hmac$'
+
+
+def _hash_code(plain_code: str) -> str:
+    digest = salted_hmac(
+        'pending-fleet-owner-signup-code',
+        plain_code.strip(),
+    ).hexdigest()
+    return f'{_HMAC_PREFIX}{digest}'
+
+
+def _check_code(plain_code: str, encoded: str) -> bool:
+    if encoded.startswith(_HMAC_PREFIX):
+        return constant_time_compare(_hash_code(plain_code), encoded)
+    # Backward compatibility for pending signups issued before the fast hash.
+    return check_password(plain_code.strip(), encoded)
 
 
 def issue_code(pending: PendingFleetOwnerSignup) -> str:
     plain = auth_codes.generate_numeric_code()
-    pending.code_hash = make_password(plain)
+    pending.code_hash = _hash_code(plain)
     pending.code_expires_at = timezone.now() + timedelta(seconds=CODE_EXPIRY_SECONDS)
     pending.code_sent_at = timezone.now()
     pending.code_attempts = 0
@@ -52,7 +69,7 @@ def verify_code(pending: PendingFleetOwnerSignup, plain_code: str) -> tuple[bool
         return False, 'This code has expired. Please request a new one.'
     if pending.code_attempts >= MAX_VERIFY_ATTEMPTS:
         return False, 'Too many failed attempts. Please request a new code.'
-    if not check_password(plain_code.strip(), pending.code_hash):
+    if not _check_code(plain_code, pending.code_hash):
         pending.code_attempts += 1
         pending.save(update_fields=['code_attempts', 'updated_at'])
         remaining = max(0, MAX_VERIFY_ATTEMPTS - pending.code_attempts)

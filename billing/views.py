@@ -7,11 +7,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from oauth.fleet_workspace import ensure_fleet_owner_company
-from oauth.models import Company
-
 from . import conf
-from .access import allow_trial_without_payment, company_has_platform_access, company_requires_checkout
+from .access import allow_trial_without_payment, owner_has_platform_access, owner_requires_checkout
 from .stripe_service import (
     billable_vehicle_count,
     confirm_checkout_session,
@@ -59,19 +56,15 @@ def billing_status(request):
     if not user.is_fleet_owner:
         return Response({'detail': 'Only fleet owners manage billing.'}, status=status.HTTP_403_FORBIDDEN)
 
-    company = ensure_fleet_owner_company(user)
-    if not company:
-        return Response({'detail': 'No company workspace.'}, status=status.HTTP_400_BAD_REQUEST)
-
     return Response(
         {
-            'billing_status': company.billing_status,
-            'subscription_plan': company.subscription_plan,
-            'trial_ends_at': company.trial_ends_at,
-            'vehicle_count': billable_vehicle_count(company),
-            'billing_quantity': company.billing_quantity,
-            'has_access': company_has_platform_access(company),
-            'requires_checkout': company_requires_checkout(company),
+            'billing_status': user.billing_status,
+            'subscription_plan': user.subscription_plan,
+            'trial_ends_at': user.trial_ends_at,
+            'vehicle_count': billable_vehicle_count(user),
+            'billing_quantity': user.billing_quantity,
+            'has_access': owner_has_platform_access(user),
+            'requires_checkout': owner_requires_checkout(user),
             'stripe_configured': stripe_configured(),
         }
     )
@@ -86,16 +79,11 @@ def create_checkout_session(request):
     if not stripe_configured():
         return Response({'detail': 'Billing is not configured.'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-    company = ensure_fleet_owner_company(user)
-    if not company:
-        return Response({'detail': 'No company workspace.'}, status=status.HTTP_400_BAD_REQUEST)
-
     success_url = request.data.get('success_url') or f'{conf.frontend_base_url()}/onboarding/billing-success?session_id={{CHECKOUT_SESSION_ID}}'
     cancel_url = request.data.get('cancel_url') or f'{conf.frontend_base_url()}/onboarding/start-trial'
 
     try:
         session = create_trial_checkout_session(
-            company,
             user,
             success_url=success_url,
             cancel_url=cancel_url,
@@ -122,17 +110,13 @@ def start_trial_without_payment(request):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    company = ensure_fleet_owner_company(user)
-    if not company:
-        return Response({'detail': 'No company workspace.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    company = start_local_trial(company)
+    user = start_local_trial(user)
     return Response(
         {
-            'billing_status': company.billing_status,
-            'trial_ends_at': company.trial_ends_at,
-            'has_access': company_has_platform_access(company),
-            'requires_checkout': company_requires_checkout(company),
+            'billing_status': user.billing_status,
+            'trial_ends_at': user.trial_ends_at,
+            'has_access': owner_has_platform_access(user),
+            'requires_checkout': owner_requires_checkout(user),
         }
     )
 
@@ -150,12 +134,8 @@ def confirm_checkout(request):
     if not session_id:
         return Response({'detail': 'session_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    company = ensure_fleet_owner_company(user)
-    if not company:
-        return Response({'detail': 'No company workspace.'}, status=status.HTTP_400_BAD_REQUEST)
-
     try:
-        company = confirm_checkout_session(company, session_id)
+        user = confirm_checkout_session(user, session_id)
     except PermissionError:
         return Response({'detail': 'Invalid checkout session.'}, status=status.HTTP_403_FORBIDDEN)
     except ValueError as exc:
@@ -166,9 +146,9 @@ def confirm_checkout(request):
 
     return Response(
         {
-            'billing_status': company.billing_status,
-            'has_access': company_has_platform_access(company),
-            'requires_checkout': company_requires_checkout(company),
+            'billing_status': user.billing_status,
+            'has_access': owner_has_platform_access(user),
+            'requires_checkout': owner_requires_checkout(user),
         }
     )
 
@@ -182,13 +162,12 @@ def create_portal_session(request):
     if not stripe_configured():
         return Response({'detail': 'Billing is not configured.'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-    company = ensure_fleet_owner_company(user)
-    if not company or not company.stripe_customer_id:
+    if not user.stripe_customer_id:
         return Response({'detail': 'Complete trial checkout first.'}, status=status.HTTP_400_BAD_REQUEST)
 
     return_url = request.data.get('return_url') or f'{conf.frontend_base_url()}/dashboard/settings'
     try:
-        portal = create_billing_portal_session(company, return_url=return_url)
+        portal = create_billing_portal_session(user, return_url=return_url)
     except Exception as exc:
         logger.exception('Failed to create billing portal session')
         return Response({'detail': str(exc)}, status=status.HTTP_502_BAD_GATEWAY)

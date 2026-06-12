@@ -34,12 +34,12 @@ class Trip(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
-    # Company Ownership
-    company = models.ForeignKey(
-        'oauth.Company',
+    # Fleet ownership
+    fleet_owner = models.ForeignKey(
+        'oauth.User',
         on_delete=models.CASCADE,
         related_name='trips',
-        help_text="Company that owns this trip"
+        help_text="Fleet owner that owns this trip"
     )
     
     # Vehicle Assignment (Required - each trip must have a vehicle)
@@ -205,6 +205,14 @@ class Trip(models.Model):
         default=Decimal('0.00'),
         help_text="Toll charges"
     )
+
+    driver_payment = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text="Driver payment for this trip"
+    )
+
     other_expenses = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -300,8 +308,12 @@ class Trip(models.Model):
         verbose_name = 'Trip'
         verbose_name_plural = 'Trips'
         indexes = [
-            models.Index(fields=['company', 'status']),
-            models.Index(fields=['company', 'planned_departure_time']),
+            models.Index(fields=['fleet_owner', 'status']),
+            models.Index(fields=['fleet_owner', '-created_at']),
+            models.Index(fields=['fleet_owner', 'planned_departure_time']),
+            models.Index(fields=['fleet_owner', 'vehicle']),
+            models.Index(fields=['fleet_owner', 'driver']),
+            models.Index(fields=['status']),
             models.Index(fields=['vehicle', 'status']),
             models.Index(fields=['driver', 'status']),
             models.Index(fields=['trip_number']),
@@ -385,18 +397,24 @@ class Trip(models.Model):
     @property
     def total_expenses(self):
         """Calculate total trip expenses"""
-        return self.fuel_cost + self.toll_cost + self.other_expenses
+        return (
+            (self.fuel_cost or Decimal('0.00'))
+            + (self.driver_payment or Decimal('0.00'))
+            + (self.toll_cost or Decimal('0.00'))
+            + (self.other_expenses or Decimal('0.00'))
+        )
     
     @property
     def profit(self):
         """Calculate trip profit"""
-        return self.revenue_amount - self.total_expenses
+        return (self.revenue_amount or Decimal('0.00')) - self.total_expenses
     
     @property
     def profit_margin(self):
         """Calculate profit margin percentage"""
-        if self.revenue_amount > 0:
-            return round((self.profit / self.revenue_amount) * 100, 2)
+        revenue = self.revenue_amount or Decimal('0.00')
+        if revenue > 0:
+            return round((self.profit / revenue) * 100, 2)
         return None
     
     @property
@@ -404,7 +422,7 @@ class Trip(models.Model):
         """Calculate revenue per kilometer"""
         distance = self.distance_km
         if distance and distance > 0:
-            return round(self.revenue_amount / distance, 2)
+            return round((self.revenue_amount or Decimal('0.00')) / distance, 2)
         return None
     
     @property
@@ -463,155 +481,3 @@ class Trip(models.Model):
         self.is_flagged = False
         self.status = self.TripStatus.COMPLETED
         self.save()
-
-# More than 2000km in a single trip
-class TripStop(models.Model):
-    """Individual stop/delivery point within a trip"""
-    
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    trip = models.ForeignKey(
-        Trip,
-        on_delete=models.CASCADE,
-        related_name='stops'
-    )
-    
-    # Stop Details
-    stop_number = models.PositiveIntegerField(
-        help_text="Order of this stop in the trip"
-    )
-    location = models.CharField(
-        max_length=500,
-        help_text="Stop location/address"
-    )
-    contact_person = models.CharField(
-        max_length=200,
-        null=True,
-        blank=True
-    )
-    contact_phone = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True
-    )
-    
-    # Stop Status
-    is_completed = models.BooleanField(default=False)
-    arrival_time = models.DateTimeField(null=True, blank=True)
-    departure_time = models.DateTimeField(null=True, blank=True)
-    odometer_reading = models.PositiveIntegerField(null=True, blank=True)
-    
-    # Delivery Details
-    items_delivered = models.TextField(
-        null=True,
-        blank=True,
-        help_text="Description of items delivered at this stop"
-    )
-
-    delivery_proof_photo = models.ImageField(
-        upload_to=f'trips/{uuid.uuid4()}/delivery_proofs/',
-        validators=[FileExtensionValidator(['jpg', 'jpeg', 'png'])],
-        null=True,
-        blank=True,
-        help_text="Photo proof of delivery"
-    )
-    
-    recipient_signature = models.CharField(
-        max_length=200,
-        null=True,
-        blank=True,
-        help_text="Name of person who received delivery"
-    )
-    
-    # Notes
-    notes = models.TextField(null=True, blank=True)
-    
-    class Meta:
-        db_table = 'trip_stops'
-        ordering = ['trip', 'stop_number']
-        unique_together = ['trip', 'stop_number']
-    
-    def __str__(self):
-        return f"Stop {self.stop_number} - {self.trip.trip_number}"
-
-
-class TripExpense(models.Model):
-    """Detailed expense tracking for trips"""
-    
-    class ExpenseType(models.TextChoices):
-        FUEL = 'FUEL', 'Fuel'
-        TOLL = 'TOLL', 'Toll'
-        PARKING = 'PARKING', 'Parking'
-        LOADING = 'LOADING', 'Loading/Unloading'
-        MEALS = 'MEALS', 'Meals & Refreshments'
-        ACCOMMODATION = 'ACCOMMODATION', 'Accommodation'
-        REPAIRS = 'REPAIRS', 'Emergency Repairs'
-        OTHER = 'OTHER', 'Other'
-    
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    trip = models.ForeignKey(
-        Trip,
-        on_delete=models.CASCADE,
-        related_name='detailed_expenses'
-    )
-    expense_type = models.CharField(
-        max_length=20,
-        choices=ExpenseType.choices
-    )
-    amount = models.DecimalField(
-        max_digits=10,
-        decimal_places=2
-    )
-    description = models.CharField(
-        max_length=500,
-        help_text="Description of the expense"
-    )
-    expense_date = models.DateTimeField(default=timezone.now)
-    location = models.CharField(
-        max_length=300,
-        null=True,
-        blank=True,
-        help_text="Where the expense occurred"
-    )
-    
-    # Receipt
-    receipt = models.ImageField(
-        upload_to=f'trips/{uuid.uuid4()}/expense_receipts/',
-        validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'pdf'])],
-        null=True,
-        blank=True,
-        help_text="Receipt photo/scan"
-    )
-    
-    # Verification
-    is_verified = models.BooleanField(
-        default=False,
-        help_text="Verified by fleet manager"
-    )
-    verified_by = models.ForeignKey(
-        'oauth.User',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='verified_trip_expenses'
-    )
-    
-    # Metadata
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(
-        'oauth.User',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='created_trip_expenses'
-    )
-    
-    class Meta:
-        db_table = 'trip_expenses'
-        ordering = ['-expense_date']
-        indexes = [
-            models.Index(fields=['trip', 'expense_type']),
-            models.Index(fields=['is_verified']),
-        ]
-    
-    def __str__(self):
-        return f"{self.expense_type} - {self.trip.trip_number} ({self.amount})"

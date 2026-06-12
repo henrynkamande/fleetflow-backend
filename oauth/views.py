@@ -1,10 +1,11 @@
 # views.py
+import time
+
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status, serializers
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
-from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
@@ -13,12 +14,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 import logging
 
-from .models import User, DriverProfile, FleetOwnerProfile, KYCDocument, Company, EmailAuthCode
+from .models import User, DriverProfile, FleetOwnerProfile, EmailAuthCode
 from . import auth_codes, pending_signup
-from .email_utils import deliver_auth_email, schedule_auth_email
+from .email_utils import schedule_auth_email
 from fleetflow.pagination import paginate_queryset
+from .services import queue_driver_write_followups
 
-from .fleet_workspace import ensure_fleet_owner_company, resolve_user_company, company_members_queryset
 from .serializers import (
     FleetOwnerRegistrationSerializer,
     CompanyRegistrationSerializer,
@@ -30,12 +31,11 @@ from .serializers import (
     DriverOTPVerificationSerializer,
     FleetOwnerLoginSerializer,
     UserSerializer,
+    UserListSerializer,
     UserUpdateSerializer,
     DriverProfileSerializer,
     DriverProfileUpdateSerializer,
     FleetOwnerProfileSerializer,
-    KYCDocumentSerializer,
-    KYCDocumentVerificationSerializer,
     PasswordChangeSerializer,
     PasswordResetRequestSerializer,
     PasswordResetVerifySerializer,
@@ -97,7 +97,8 @@ def send_welcome_email(user):
         ],
         security_note="If you did not create this account, please contact support immediately.",
     )
-    return deliver_auth_email(subject, message, user.email)
+    schedule_auth_email(subject, message, user.email)
+    return True
 
 
 def send_company_registration_email(user, company):
@@ -112,12 +113,14 @@ def send_company_registration_email(user, company):
             "- Start tracking operations from your dashboard.",
         ],
     )
-    return deliver_auth_email(subject, message, user.email)
+    schedule_auth_email(subject, message, user.email)
+    return True
 
 
 def send_onboarding_email(driver, password=None, otp=None):
     """Send onboarding email with credentials and OTP."""
-    company_name = driver.company.name if driver.company else "Fleet Flow"
+    owner = getattr(driver, 'fleet_owner', None) or getattr(driver, 'invited_by', None)
+    company_name = owner.get_full_name() if owner else "Fleet Flow"
     invited_by_name = driver.invited_by.full_name if driver.invited_by else "Fleet Flow"
 
     subject = f"Welcome to {company_name} - Verify Your Account"
@@ -157,12 +160,14 @@ def send_onboarding_email(driver, password=None, otp=None):
         action_lines=actions,
         security_note="If this invitation is unexpected, please contact your fleet administrator.",
     )
-    return deliver_auth_email(subject, message, driver.email)
+    schedule_auth_email(subject, message, driver.email)
+    return True
 
 
 def send_otp_resend_email(driver, otp):
     """Send OTP resend email."""
-    company_name = driver.company.name if driver.company else "Fleet Flow"
+    owner = getattr(driver, 'fleet_owner', None) or getattr(driver, 'invited_by', None)
+    company_name = owner.get_full_name() if owner else "Fleet Flow"
 
     subject = f"{company_name} - New Verification Code"
     message = _format_transactional_email(
@@ -176,7 +181,8 @@ def send_otp_resend_email(driver, otp):
         action_lines=["- Enter this OTP in the verification screen to continue."],
         security_note="If you did not request this code, please secure your account immediately.",
     )
-    return deliver_auth_email(subject, message, driver.email)
+    schedule_auth_email(subject, message, driver.email)
+    return True
 
 
 def send_signup_otp_email(user, otp):
@@ -205,7 +211,8 @@ def _signup_otp_email_content(*, first_name: str, otp: str) -> tuple[str, str]:
 
 def send_signup_otp_email_to(*, recipient_email: str, first_name: str, otp: str) -> bool:
     subject, message = _signup_otp_email_content(first_name=first_name, otp=otp)
-    return deliver_auth_email(subject, message, recipient_email)
+    schedule_auth_email(subject, message, recipient_email)
+    return True
 
 
 def schedule_signup_otp_email_to(*, recipient_email: str, first_name: str, otp: str) -> None:
@@ -226,7 +233,8 @@ def send_password_reset_code_email(user, code):
         action_lines=["- Enter this code in the password reset flow to set a new password."],
         security_note="If you did not request a password reset, no action is required.",
     )
-    return deliver_auth_email(subject, message, user.email)
+    schedule_auth_email(subject, message, user.email)
+    return True
 
 
 def send_verification_confirmation(user):
@@ -237,7 +245,8 @@ def send_verification_confirmation(user):
         intro="Your Fleet Flow account has been verified successfully.",
         action_lines=["- Sign in to continue setting up and managing your fleet operations."],
     )
-    return deliver_auth_email(subject, message, user.email)
+    schedule_auth_email(subject, message, user.email)
+    return True
 
 
 def get_tokens_for_user(user):
@@ -250,9 +259,8 @@ def get_tokens_for_user(user):
     refresh['is_verified'] = user.is_verified
     refresh['full_name'] = user.full_name
     
-    if user.company:
-        refresh['company_id'] = str(user.company.id)
-        refresh['company_name'] = user.company.name
+    if user.fleet_owner_id:
+        refresh['fleet_owner_id'] = str(user.fleet_owner_id)
     
     return {
         'refresh': str(refresh),
@@ -268,19 +276,64 @@ def get_tokens_for_user(user):
 @permission_classes([AllowAny])
 def register_fleet_owner(request):
     """
-    Step 1: Register a fleet owner account.
-    After registration, fleet owner may register a company (optional).
+    Register a vehicle owner account.
+    Signup OTP email remains available behind SIGNUP_EMAIL_VERIFICATION_ENABLED.
     """
+    started = time.perf_counter()
     serializer = FleetOwnerRegistrationSerializer(data=request.data)
     
     if serializer.is_valid():
+        validated_at = time.perf_counter()
         pending = serializer.save()
+        saved_at = time.perf_counter()
+
+        if not getattr(settings, 'SIGNUP_EMAIL_VERIFICATION_ENABLED', True):
+            user = User(
+                email=pending.email,
+                phone_number=pending.phone_number,
+                first_name=pending.first_name,
+                last_name=pending.last_name,
+                role=User.Role.FLEET_OWNER,
+                is_active=True,
+                is_verified=True,
+            )
+            user.password = pending.password
+            user.save()
+            pending.delete()
+            from billing.access import owner_has_platform_access, owner_requires_checkout
+
+            tokens = get_tokens_for_user(user)
+            logger.info('Vehicle owner signup completed without OTP: %s', user.email)
+            logger.info(
+                'signup_timing mode=no_otp email=%s validate_ms=%.1f save_ms=%.1f total_ms=%.1f',
+                user.email,
+                (validated_at - started) * 1000,
+                (saved_at - validated_at) * 1000,
+                (time.perf_counter() - started) * 1000,
+            )
+            return Response(
+                {
+                    'message': 'Account created successfully. Start your free trial to unlock your fleet workspace.',
+                    'email': user.email,
+                    'requires_verification': False,
+                    'email_sent': False,
+                    'user': UserSerializer(user, context={'request': request}).data,
+                    'tokens': tokens,
+                    'billing_status': user.billing_status,
+                    'requires_billing_checkout': owner_requires_checkout(user),
+                    'has_billing_access': owner_has_platform_access(user),
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
         otp = pending_signup.issue_code(pending)
+        otp_at = time.perf_counter()
         email_sent = send_signup_otp_email_to(
             recipient_email=pending.email,
             first_name=pending.first_name,
             otp=otp,
         )
+        email_at = time.perf_counter()
 
         if not email_sent:
             failed_email = pending.email
@@ -298,6 +351,15 @@ def register_fleet_owner(request):
             )
 
         logger.info('Fleet owner signup pending OTP: %s', pending.email)
+        logger.info(
+            'signup_timing mode=otp email=%s validate_ms=%.1f save_ms=%.1f otp_ms=%.1f queue_email_ms=%.1f total_ms=%.1f',
+            pending.email,
+            (validated_at - started) * 1000,
+            (saved_at - validated_at) * 1000,
+            (otp_at - saved_at) * 1000,
+            (email_at - otp_at) * 1000,
+            (time.perf_counter() - started) * 1000,
+        )
 
         return Response(
             {
@@ -342,22 +404,13 @@ def login(request):
     }
 
     if user.is_fleet_owner:
-        from billing.access import company_has_platform_access, company_requires_checkout
-        from oauth.fleet_workspace import ensure_fleet_owner_company
+        from billing.access import owner_has_platform_access, owner_requires_checkout
 
-        company = resolve_user_company(user) or ensure_fleet_owner_company(user)
         response_data['redirect_url'] = '/fleet-owner/dashboard'
-        if not user.company and company and not company.registration_number:
-            response_data['requires_company'] = False
-            response_data['next_step'] = 'register_company'
-        if company:
-            response_data['company'] = CompanySerializer(
-                company, context={'request': request}
-            ).data
-        if company:
-            response_data['billing_status'] = company.billing_status
-            response_data['requires_billing_checkout'] = company_requires_checkout(company)
-            response_data['has_billing_access'] = company_has_platform_access(company)
+        response_data['company'] = CompanySerializer(user, context={'request': request}).data
+        response_data['billing_status'] = user.billing_status
+        response_data['requires_billing_checkout'] = owner_requires_checkout(user)
+        response_data['has_billing_access'] = owner_has_platform_access(user)
     elif user.is_driver:
         if not user.is_verified:
             response_data['redirect_url'] = '/driver/verify'
@@ -409,16 +462,25 @@ def logout(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_signup_otp(request):
-    """Verify fleet owner signup OTP; activate account (login separately)."""
+    """Verify fleet owner signup OTP and return a session for trial checkout."""
     serializer = SignupVerifyOTPSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
+        from billing.access import owner_has_platform_access, owner_requires_checkout
+
+        tokens = get_tokens_for_user(user)
         send_welcome_email(user)
         send_verification_confirmation(user)
         logger.info(f'Fleet owner email verified: {user.email}')
         return Response({
-            'message': 'Email verified successfully. You can now sign in.',
+            'message': 'Email verified successfully. Start your free trial to unlock your fleet workspace.',
             'email': user.email,
+            'user': UserSerializer(user, context={'request': request}).data,
+            'tokens': tokens,
+            'requires_verification': False,
+            'billing_status': user.billing_status,
+            'requires_billing_checkout': owner_requires_checkout(user),
+            'has_billing_access': owner_has_platform_access(user),
         }, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -598,33 +660,18 @@ def register_company(request):
             'error': 'Only fleet owners can register a company.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    if user.company:
-        serializer = CompanyRegistrationSerializer(
-            user.company,
-            data=request.data,
-            partial=True,
-            context={'request': request},
-        )
-    else:
-        serializer = CompanyRegistrationSerializer(
-            data=request.data,
-            context={'request': request},
-        )
+    serializer = CompanyRegistrationSerializer(data=request.data, context={'request': request})
 
     if serializer.is_valid():
-        company = serializer.save()
+        serializer.save()
         
-        # Send confirmation email
-        send_company_registration_email(user, company)
-        
-        # Generate fresh tokens with company info
         tokens = get_tokens_for_user(user)
         
-        logger.info(f"Company registered by {user.email}: {company.name}")
+        logger.info(f"Fleet business details saved by {user.email}")
         
         return Response({
-            'message': 'Company registered successfully. You can now onboard drivers.',
-            'company': CompanySerializer(company, context={'request': request}).data,
+            'message': 'Fleet details saved successfully. You can now onboard drivers.',
+            'company': CompanySerializer(user, context={'request': request}).data,
             'tokens': tokens,
             'next_step': 'onboard_drivers'
         }, status=status.HTTP_201_CREATED)
@@ -638,18 +685,14 @@ def view_company(request):
     """View current user's company details."""
     user = request.user
 
-    if user.is_fleet_owner:
-        company = resolve_user_company(user) or ensure_fleet_owner_company(user)
-    else:
-        company = resolve_user_company(user)
-
-    if not company:
+    owner = user if user.is_fleet_owner else getattr(user, 'fleet_owner', None)
+    if not owner:
         return Response(
-            {'error': 'No company found.'},
+            {'error': 'No fleet owner found.'},
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    serializer = CompanySerializer(company, context={'request': request})
+    serializer = CompanySerializer(owner, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -664,15 +707,7 @@ def update_company(request):
             'error': 'Only fleet owners can update company details.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    company = resolve_user_company(user) or ensure_fleet_owner_company(user)
-    if not company:
-        return Response({
-            'error': 'No company found. Please register your company first.',
-            'requires_company': True
-        }, status=status.HTTP_404_NOT_FOUND)
-
     serializer = CompanyUpdateSerializer(
-        company,
         data=request.data,
         partial=request.method == 'PATCH',
         context={'request': request}
@@ -680,10 +715,10 @@ def update_company(request):
     
     if serializer.is_valid():
         serializer.save()
-        logger.info(f"Company updated by {user.email}: {company.name}")
+        logger.info(f"Fleet business details updated by {user.email}")
         return Response({
-            'message': 'Company updated successfully.',
-            'company': CompanySerializer(company, context={'request': request}).data
+            'message': 'Fleet details updated successfully.',
+            'company': CompanySerializer(user, context={'request': request}).data
         }, status=status.HTTP_200_OK)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -692,7 +727,7 @@ def update_company(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def check_company_status(request):
-    """Check if the logged-in fleet owner has registered a company."""
+    """Check the logged-in fleet owner's internal fleet workspace."""
     user = request.user
     
     if not user.is_fleet_owner:
@@ -700,17 +735,11 @@ def check_company_status(request):
             'error': 'This endpoint is for fleet owners only.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    if user.company:
-        return Response({
-            'has_company': True,
-            'company': CompanySerializer(user.company, context={'request': request}).data
-        }, status=status.HTTP_200_OK)
-    
     return Response({
-        'has_company': False,
-        'message': 'Company registration is optional. Add your business details anytime.',
+        'has_company': True,
+        'company': CompanySerializer(user, context={'request': request}).data,
+        'message': 'Fleet workspace is ready.',
         'requires_company': False,
-        'next_step': 'register_company',
     }, status=status.HTTP_200_OK)
 
 
@@ -730,17 +759,9 @@ def create_driver(request):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    # Informal fleets: auto-create a workspace company; no separate registration step.
-    company = ensure_fleet_owner_company(user)
-    if not company:
-        return Response(
-            {'error': 'Could not set up your fleet workspace. Try again or contact support.'},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
     serializer = DriverCreateSerializer(
         data=request.data,
-        context={'request': request, 'company': company},
+        context={'request': request},
     )
 
     if serializer.is_valid():
@@ -758,20 +779,10 @@ def create_driver(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        try:
-            fleet_owner_profile, _ = FleetOwnerProfile.objects.get_or_create(user=user)
-            fleet_owner_profile.active_drivers = User.objects.filter(
-                company=company,
-                role=User.Role.DRIVER,
-                is_active=True,
-            ).count()
-            fleet_owner_profile.save(update_fields=['active_drivers'])
-        except Exception:
-            logger.exception('Failed to update fleet owner active_drivers after driver create')
+        queue_driver_write_followups(fleet_owner_id=user.id)
 
         logger.info(
-            f"Driver added by {user.email}: {driver_user.get_full_name()} "
-            f"for company {company.name}"
+            f"Driver added by {user.email}: {driver_user.get_full_name()}"
         )
 
         return Response(
@@ -793,8 +804,7 @@ def create_driver(request):
 @permission_classes([IsAuthenticated])
 def onboard_driver(request):
     """
-    Step 3: Fleet owner onboards a new driver under their company.
-    Requires fleet owner to have a registered company first.
+    Fleet owner onboards a new driver under their fleet workspace.
     """
     user = request.user
     
@@ -809,12 +819,6 @@ def onboard_driver(request):
             'error': 'Your account must be verified to onboard drivers.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    from oauth.fleet_workspace import ensure_fleet_owner_company
-
-    company = ensure_fleet_owner_company(user)
-    if not company:
-        return Response({'error': 'Unable to create fleet workspace.'}, status=status.HTTP_400_BAD_REQUEST)
-
     serializer = DriverOnboardingSerializer(
         data=request.data,
         context={'request': request}
@@ -823,31 +827,23 @@ def onboard_driver(request):
     if serializer.is_valid():
         driver = serializer.save()
         
-        # Send onboarding email with both OTP and temp password
+        # Queue onboarding email with both OTP and temp password.
         send_onboarding_email(
             driver,
             driver._generated_password,
             driver._generated_otp
         )
         
-        # Update fleet owner's active driver count
-        fleet_owner_profile = user.fleet_owner_profile
-        fleet_owner_profile.active_drivers = User.objects.filter(
-            company=user.company,
-            role=User.Role.DRIVER,
-            is_active=True
-        ).count()
-        fleet_owner_profile.save(update_fields=['active_drivers'])
+        queue_driver_write_followups(fleet_owner_id=user.id)
         
         logger.info(
-            f"Driver onboarded by {user.email}: {driver.email} "
-            f"for company {user.company.name}"
+            f"Driver onboarded by {user.email}: {driver.email}"
         )
         
         response_data = {
             'message': 'Driver onboarded successfully. Verification email sent.',
             'driver': UserSerializer(driver, context={'request': request}).data,
-            'company': CompanySerializer(user.company, context={'request': request}).data,
+            'company': CompanySerializer(user, context={'request': request}).data,
         }
         
         # Only include dev credentials in DEBUG mode
@@ -1045,15 +1041,11 @@ def list_company_users(request):
             'error': 'Only fleet owners can view company users.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    company = ensure_fleet_owner_company(user)
-    if not company:
-        return Response({'count': 0, 'users': []}, status=status.HTTP_200_OK)
-
     # Get filters from query params
     role_filter = request.query_params.get('role', None)
     is_active_filter = request.query_params.get('is_active', None)
     
-    users = company_members_queryset(user, company).select_related('company')
+    users = User.objects.filter(fleet_owner=user).select_related('fleet_owner', 'driver_profile')
     
     if role_filter:
         users = users.filter(role=role_filter)
@@ -1063,7 +1055,7 @@ def list_company_users(request):
 
     users = users.order_by('-date_joined')
     page_obj, meta = paginate_queryset(request, users)
-    serializer = UserSerializer(page_obj.object_list, many=True, context={'request': request})
+    serializer = UserListSerializer(page_obj.object_list, many=True, context={'request': request})
 
     return Response({
         **meta,
@@ -1083,21 +1075,17 @@ def list_company_drivers(request):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    company = ensure_fleet_owner_company(user)
-    if not company:
-        return Response({'count': 0, 'drivers': []}, status=status.HTTP_200_OK)
-
     is_active_filter = request.query_params.get('is_active', None)
-    drivers = company_members_queryset(user, company).filter(
+    drivers = User.objects.filter(fleet_owner=user).filter(
         role=User.Role.DRIVER,
-    ).select_related('company', 'driver_profile')
+    ).select_related('fleet_owner', 'driver_profile')
     if is_active_filter is not None:
         is_active = is_active_filter.lower() == 'true'
         drivers = drivers.filter(is_active=is_active)
 
     drivers = drivers.order_by('-date_joined')
     page_obj, meta = paginate_queryset(request, drivers)
-    serializer = UserSerializer(page_obj.object_list, many=True, context={'request': request})
+    serializer = UserListSerializer(page_obj.object_list, many=True, context={'request': request})
     return Response({**meta, 'drivers': serializer.data}, status=status.HTTP_200_OK)
 
 
@@ -1113,7 +1101,7 @@ def get_user_detail(request, user_id):
         }, status=status.HTTP_403_FORBIDDEN)
     
     target_user = get_object_or_404(
-        User.objects.filter(company__owner=user),
+        User.objects.filter(fleet_owner=user),
         id=user_id
     )
     
@@ -1133,7 +1121,7 @@ def deactivate_user(request, user_id):
         }, status=status.HTTP_403_FORBIDDEN)
     
     target_user = get_object_or_404(
-        User.objects.filter(company__owner=user),
+        User.objects.filter(fleet_owner=user),
         id=user_id
     )
     
@@ -1170,7 +1158,7 @@ def activate_user(request, user_id):
         }, status=status.HTTP_403_FORBIDDEN)
     
     target_user = get_object_or_404(
-        User.objects.filter(company__owner=user),
+        User.objects.filter(fleet_owner=user),
         id=user_id
     )
     
@@ -1491,49 +1479,26 @@ def fleet_owner_dashboard(request):
             'error': 'Only fleet owners can access this dashboard.'
         }, status=status.HTTP_403_FORBIDDEN)
     
-    if not user.company:
-        return Response({
-            'company': None,
-            'stats': {
-                'total_drivers': 0,
-                'active_drivers': 0,
-                'pending_kyc_documents': 0,
-                'expired_documents': 0,
-            },
-        }, status=status.HTTP_200_OK)
-
-    company = user.company
-
     # Get counts
     total_drivers = User.objects.filter(
-        company=company,
+        fleet_owner=user,
         role=User.Role.DRIVER
     ).count()
     
     active_drivers = User.objects.filter(
-        company=company,
+        fleet_owner=user,
         role=User.Role.DRIVER,
         is_active=True,
         is_verified=True
     ).count()
     
-    pending_kyc = KYCDocument.objects.filter(
-        driver__user__company__owner=user,
-        verification_status=KYCDocument.VerificationStatus.PENDING
-    ).count()
-    
-    expired_docs = KYCDocument.objects.filter(
-        driver__user__company__owner=user,
-        expiry_date__lt=timezone.now().date()
-    ).count()
-    
     return Response({
-        'company': CompanySerializer(company, context={'request': request}).data,
+        'company': CompanySerializer(user, context={'request': request}).data,
         'stats': {
             'total_drivers': total_drivers,
             'active_drivers': active_drivers,
-            'pending_kyc_documents': pending_kyc,
-            'expired_documents': expired_docs,
+            'pending_kyc_documents': 0,
+            'expired_documents': 0,
         }
     }, status=status.HTTP_200_OK)
 
@@ -1550,10 +1515,6 @@ def driver_dashboard(request):
         }, status=status.HTTP_403_FORBIDDEN)
     
     driver_profile = user.driver_profile
-    pending_kyc = KYCDocument.objects.filter(
-        driver=driver_profile,
-        verification_status=KYCDocument.VerificationStatus.PENDING
-    ).count()
     
     return Response({
         'user': UserSerializer(user, context={'request': request}).data,
@@ -1564,7 +1525,7 @@ def driver_dashboard(request):
             'completion_rate': driver_profile.completion_rate,
             'on_time_percentage': float(driver_profile.on_time_percentage),
             'average_rating': float(driver_profile.average_rating),
-            'pending_kyc_documents': pending_kyc,
+            'pending_kyc_documents': 0,
         }
     }, status=status.HTTP_200_OK)
 

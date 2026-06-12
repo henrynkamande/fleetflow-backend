@@ -3,8 +3,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from oauth.fleet_workspace import ensure_fleet_owner_company
-
 from .finance_service import (
     FinanceFilters,
     build_expenses_payload,
@@ -21,23 +19,17 @@ def _require_fleet_owner(user):
             {'error': 'Only fleet owners can access financial reports.'},
             status=status.HTTP_403_FORBIDDEN,
         )
-    company = ensure_fleet_owner_company(user)
-    if not company:
-        return None, Response(
-            {'error': 'Unable to resolve fleet company.'},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-    return company, None
+    return user, None
 
 
-def _filters_from_request(request, company) -> FinanceFilters:
+def _filters_from_request(request, fleet_owner) -> FinanceFilters:
     start, end = parse_period(
         request.query_params.get('date_from'),
         request.query_params.get('date_to'),
         request.query_params.get('period'),
     )
     return FinanceFilters(
-        company_id=company.id,
+        fleet_owner_id=fleet_owner.id,
         start=start,
         end=end,
         vehicle_id=request.query_params.get('vehicle') or None,

@@ -48,6 +48,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         FLEET_OWNER = 'FLEET_OWNER', 'Fleet Owner'
         DRIVER = 'DRIVER', 'Driver'
         PLATFORM_ADMIN = 'PLATFORM_ADMIN', 'Platform Admin'
+
+    class BillingStatus(models.TextChoices):
+        NOT_STARTED = 'NOT_STARTED', 'Not started'
+        TRIALING = 'TRIALING', 'Trialing'
+        ACTIVE = 'ACTIVE', 'Active'
+        PAST_DUE = 'PAST_DUE', 'Past due'
+        CANCELED = 'CANCELED', 'Canceled'
+        INCOMPLETE = 'INCOMPLETE', 'Incomplete'
     
     # Basic Information
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -85,15 +93,28 @@ class User(AbstractBaseUser, PermissionsMixin):
         related_name='invited_users'
     )
     invitation_accepted = models.BooleanField(default=False)
-    
-    # Multi-tenant support
-    company = models.ForeignKey(
-        'Company',
+
+    # Fleet ownership boundary. Drivers are managed by a fleet owner; fleet owners own themselves.
+    fleet_owner = models.ForeignKey(
+        'self',
         on_delete=models.CASCADE,
-        related_name='users',
+        related_name='managed_users',
         null=True,
-        blank=True
+        blank=True,
     )
+
+    # Billing lives on the fleet-owner account; no separate company table is needed.
+    subscription_plan = models.CharField(max_length=50, default='free')
+    billing_status = models.CharField(
+        max_length=20,
+        choices=BillingStatus.choices,
+        default=BillingStatus.NOT_STARTED,
+        db_index=True,
+    )
+    stripe_customer_id = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    stripe_subscription_id = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    trial_ends_at = models.DateTimeField(null=True, blank=True)
+    billing_quantity = models.PositiveIntegerField(default=0, help_text='Last synced billable vehicle count')
     
     objects = UserManager()
     
@@ -106,6 +127,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         indexes = [
             models.Index(fields=['email', 'role']),
             models.Index(fields=['phone_number']),
+            models.Index(fields=['fleet_owner', 'role']),
+            models.Index(fields=['billing_status']),
         ]
     
     def __str__(self):
@@ -157,66 +180,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.save()
 
 
-class Company(models.Model):
-    """Company/Multi-tenant model"""
-    
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=200)
-    logo = models.ImageField(
-        upload_to='company_logos/%Y/%m/',
-        validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'svg', 'webp'])],
-        null=True,
-        blank=True,
-        help_text="Company logo"
-    )
-    registration_number = models.CharField(max_length=100, unique=True, null=True, blank=True)
-    address = models.TextField(null=True, blank=True)
-    contact_email = models.EmailField(null=True, blank=True)
-    contact_phone = models.CharField(max_length=20, null=True, blank=True)
-    
-    # Subscription/Status
-    is_active = models.BooleanField(default=True)
-    subscription_plan = models.CharField(max_length=50, default='free')
-
-    class BillingStatus(models.TextChoices):
-        NOT_STARTED = 'NOT_STARTED', 'Not started'
-        TRIALING = 'TRIALING', 'Trialing'
-        ACTIVE = 'ACTIVE', 'Active'
-        PAST_DUE = 'PAST_DUE', 'Past due'
-        CANCELED = 'CANCELED', 'Canceled'
-        INCOMPLETE = 'INCOMPLETE', 'Incomplete'
-
-    billing_status = models.CharField(
-        max_length=20,
-        choices=BillingStatus.choices,
-        default=BillingStatus.NOT_STARTED,
-        db_index=True,
-    )
-    stripe_customer_id = models.CharField(max_length=255, null=True, blank=True, db_index=True)
-    stripe_subscription_id = models.CharField(max_length=255, null=True, blank=True, db_index=True)
-    trial_ends_at = models.DateTimeField(null=True, blank=True)
-    billing_quantity = models.PositiveIntegerField(default=0, help_text='Last synced billable vehicle count')
-    
-    # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    # Owner relationship
-    owner = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='owned_companies'
-    )
-    
-    class Meta:
-        db_table = 'companies'
-        verbose_name_plural = 'Companies'
-        ordering = ['-created_at']
-    
-    def __str__(self):
-        return self.name
-
-
 class DriverProfile(models.Model):
     """Extended profile for drivers"""
     
@@ -237,6 +200,14 @@ class DriverProfile(models.Model):
         on_delete=models.CASCADE,
         related_name='driver_profile',
         primary_key=True
+    )
+    fleet_owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='driver_profiles',
+        null=True,
+        blank=True,
+        limit_choices_to={'role': User.Role.FLEET_OWNER},
     )
     
     # Personal Information
@@ -333,6 +304,7 @@ class DriverProfile(models.Model):
     class Meta:
         db_table = 'driver_profiles'
         indexes = [
+            models.Index(fields=['fleet_owner', 'is_active']),
             models.Index(fields=['otp_secret']),
             models.Index(fields=['temp_password_expires_at']),
         ]
@@ -494,110 +466,15 @@ class EmailAuthCode(models.Model):
         return f'{self.purpose} code for {self.user.email}'
 
 
-class KYCDocument(models.Model):
-    """KYC (Know Your Customer) documents for drivers"""
-    
-    class DocumentType(models.TextChoices):
-        DRIVERS_LICENSE = 'DRIVERS_LICENSE', "Driver's License"
-        PASSPORT = 'PASSPORT', 'Passport'
-        NATIONAL_ID = 'NATIONAL_ID', 'National ID'
-        MEDICAL_CERTIFICATE = 'MEDICAL_CERTIFICATE', 'Medical Certificate'
-        BACKGROUND_CHECK = 'BACKGROUND_CHECK', 'Background Check'
-    
-    class VerificationStatus(models.TextChoices):
-        PENDING = 'PENDING', 'Pending Review'
-        VERIFIED = 'VERIFIED', 'Verified'
-        REJECTED = 'REJECTED', 'Rejected'
-        EXPIRED = 'EXPIRED', 'Expired'
-    
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    driver = models.ForeignKey(
-        DriverProfile,
-        on_delete=models.CASCADE,
-        related_name='kyc_documents'
-    )
-    
-    # Document Details
-    document_type = models.CharField(max_length=30, choices=DocumentType.choices)
-    document_number = models.CharField(max_length=100, null=True, blank=True)
-    issuing_country = models.CharField(max_length=100, null=True, blank=True)
-    issuing_authority = models.CharField(max_length=200, null=True, blank=True)
-    
-    # Document Files
-    front_image = models.ImageField(
-        upload_to='kyc_documents/%Y/%m/',
-        validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'pdf'])],
-        null=True,
-        blank=True
-    )
-    back_image = models.ImageField(
-        upload_to='kyc_documents/%Y/%m/',
-        validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'pdf'])],
-        null=True,
-        blank=True
-    )
-    
-    # Dates
-    issue_date = models.DateField(null=True, blank=True)
-    expiry_date = models.DateField(null=True, blank=True)
-    
-    # Verification
-    verification_status = models.CharField(
-        max_length=20,
-        choices=VerificationStatus.choices,
-        default=VerificationStatus.PENDING
-    )
-    verified_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='verified_documents'
-    )
-    verification_date = models.DateTimeField(null=True, blank=True)
-    rejection_reason = models.TextField(null=True, blank=True)
-    
-    # Metadata
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        db_table = 'kyc_documents'
-        ordering = ['-uploaded_at']
-        indexes = [
-            models.Index(fields=['driver', 'document_type']),
-            models.Index(fields=['verification_status']),
-        ]
-    
-    def __str__(self):
-        return f"{self.document_type} - {self.driver.user.full_name}"
-    
-    @property
-    def is_expired(self):
-        if self.expiry_date:
-            return self.expiry_date < timezone.now().date()
-        return False
-    
-    def mark_as_verified(self, verified_by):
-        self.verification_status = self.VerificationStatus.VERIFIED
-        self.verified_by = verified_by
-        self.verification_date = timezone.now()
-        self.save()
-    
-    def mark_as_rejected(self, verified_by, reason):
-        self.verification_status = self.VerificationStatus.REJECTED
-        self.verified_by = verified_by
-        self.verification_date = timezone.now()
-        self.rejection_reason = reason
-        self.save()
-
-
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     """Automatically create profile when user is created"""
     if created:
         if instance.role == User.Role.DRIVER:
-            DriverProfile.objects.get_or_create(user=instance)
+            DriverProfile.objects.get_or_create(
+                user=instance,
+                defaults={'fleet_owner': instance.fleet_owner or instance.invited_by},
+            )
         elif instance.role == User.Role.FLEET_OWNER:
             FleetOwnerProfile.objects.get_or_create(user=instance)
 

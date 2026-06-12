@@ -1,4 +1,6 @@
 from django.db.models import Q, Sum
+from django.core.cache import cache
+from django.utils.crypto import salted_hmac
 from django.utils import timezone
 
 from .models import Trip
@@ -6,6 +8,15 @@ from .models import Trip
 
 def build_trip_list_stats(queryset) -> dict:
     """Aggregate stats for the filtered trip queryset (not limited to the current page)."""
+    sql, params = queryset.query.sql_with_params()
+    cache_key = 'trip-list-stats:' + salted_hmac(
+        'trip-list-stats',
+        f'{sql}:{params}',
+    ).hexdigest()
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
     today = timezone.localdate()
     active = queryset.filter(
         status__in=(Trip.TripStatus.ONGOING, Trip.TripStatus.DELAYED),
@@ -26,9 +37,11 @@ def build_trip_list_stats(queryset) -> dict:
         ).aggregate(total=Sum('revenue_amount'))['total']
         or 0
     )
-    return {
+    stats = {
         'active': active,
         'completed_today': completed_today,
         'flagged': flagged,
         'open_revenue': str(open_revenue),
     }
+    cache.set(cache_key, stats, 60)
+    return stats
