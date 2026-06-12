@@ -35,7 +35,6 @@ class Command(BaseCommand):
         user.is_verified = True
         user.is_staff = True
         user.is_active = True
-        user.company = None
         user.set_password(password)
         user.save()
         verb = 'Created' if created else 'Updated'

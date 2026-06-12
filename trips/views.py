@@ -9,31 +9,31 @@ from django.utils import timezone
 import logging
 import uuid as uuid_lib
 
-from oauth.fleet_workspace import ensure_fleet_owner_company
 from fleetflow.pagination import paginate_queryset
 
 from .list_stats import build_trip_list_stats
-from .models import Trip, TripStop, TripExpense
+from .models import Trip
+from .services import build_trip_list_queryset
 from .serializers import (
-    TripSerializer, TripStopSerializer, TripExpenseSerializer,
+    TripSerializer, TripListSerializer,
     TripStartSerializer, TripCompleteSerializer, TripApproveSerializer
 )
 
 logger = logging.getLogger(__name__)
 
 
-def _company_for_user(user):
+def _fleet_owner_for_user(user):
     if user.is_fleet_owner:
-        return ensure_fleet_owner_company(user)
-    return user.company
+        return user
+    return getattr(user, 'fleet_owner', None) or getattr(getattr(user, 'driver_profile', None), 'fleet_owner', None)
 
 
 def _resolve_trip(user, trip_ref: str) -> Trip:
     """Look up a trip by UUID primary key or human-readable trip_number."""
-    company = _company_for_user(user)
-    if not company:
+    fleet_owner = _fleet_owner_for_user(user)
+    if not fleet_owner:
         raise Http404
-    qs = Trip.objects.filter(company=company)
+    qs = Trip.objects.filter(fleet_owner=fleet_owner)
     try:
         uid = uuid_lib.UUID(str(trip_ref))
         return get_object_or_404(qs, id=uid)
@@ -51,49 +51,16 @@ def list_trips(request):
     """List all trips for the company."""
     user = request.user
 
-    if user.is_fleet_owner:
-        company = ensure_fleet_owner_company(user)
-    else:
-        company = user.company
-
-    if not company:
+    fleet_owner, trips = build_trip_list_queryset(user, request.query_params)
+    if not fleet_owner:
         return Response({'count': 0, 'trips': []}, status=status.HTTP_200_OK)
-
-    trips = Trip.objects.filter(company=company)
-    
-    # Filters
-    status_filter = request.query_params.get('status', None)
-    vehicle_id = request.query_params.get('vehicle', None)
-    driver_id = request.query_params.get('driver', None)
-    is_flagged = request.query_params.get('is_flagged', None)
-    date_from = request.query_params.get('date_from', None)
-    date_to = request.query_params.get('date_to', None)
-    
-    if status_filter:
-        trips = trips.filter(status=status_filter)
-    if vehicle_id:
-        trips = trips.filter(vehicle_id=vehicle_id)
-    if driver_id:
-        trips = trips.filter(driver_id=driver_id)
-    if is_flagged is not None:
-        trips = trips.filter(is_flagged=is_flagged.lower() == 'true')
-    if date_from:
-        trips = trips.filter(planned_departure_time__date__gte=date_from)
-    if date_to:
-        trips = trips.filter(planned_departure_time__date__lte=date_to)
-    
-    # Drivers can only see their own trips
-    if user.is_driver:
-        trips = trips.filter(driver=user.driver_profile)
-
-    trips = trips.select_related('vehicle', 'driver', 'driver__user').order_by('-planned_departure_time')
 
     stats = None
     if request.query_params.get('include_stats', '').lower() in ('1', 'true', 'yes'):
         stats = build_trip_list_stats(trips)
 
     page_obj, meta = paginate_queryset(request, trips)
-    serializer = TripSerializer(page_obj.object_list, many=True, context={'request': request})
+    serializer = TripListSerializer(page_obj.object_list, many=True, context={'request': request})
 
     payload = {
         **meta,
@@ -113,23 +80,19 @@ def create_trip(request):
     if not user.is_fleet_owner:
         return Response({'error': 'Only fleet owners can create trips.'}, status=status.HTTP_403_FORBIDDEN)
     
-    company = ensure_fleet_owner_company(user)
-    if not company:
-        return Response({'error': 'Unable to create fleet workspace.'}, status=status.HTTP_400_BAD_REQUEST)
-
     serializer = TripSerializer(data=request.data, context={'request': request})
     
     if serializer.is_valid():
-        # Validate vehicle belongs to company
+        # Validate vehicle belongs to fleet owner.
         vehicle = serializer.validated_data.get('vehicle')
-        if vehicle.company_id != company.id:
-            return Response({'error': 'Vehicle does not belong to your company.'}, status=status.HTTP_403_FORBIDDEN)
+        if vehicle.fleet_owner_id != user.id:
+            return Response({'error': 'Vehicle does not belong to your fleet.'}, status=status.HTTP_403_FORBIDDEN)
 
         driver = serializer.validated_data.get('driver')
-        if driver is not None and driver.user.company_id != company.id:
-            return Response({'error': 'Driver does not belong to your company.'}, status=status.HTTP_403_FORBIDDEN)
+        if driver is not None and driver.fleet_owner_id != user.id:
+            return Response({'error': 'Driver does not belong to your fleet.'}, status=status.HTTP_403_FORBIDDEN)
 
-        trip = serializer.save(company=company, created_by=user)
+        trip = serializer.save(fleet_owner=user, created_by=user)
         
         logger.info(f"Trip created by {user.email}: {trip.trip_number}")
         
@@ -174,19 +137,19 @@ def update_trip(request, trip_ref):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    company = _company_for_user(user)
+    fleet_owner = _fleet_owner_for_user(user)
     serializer = TripSerializer(
         trip, data=request.data, partial=request.method == 'PATCH',
-        context={'request': request, 'company': company},
+        context={'request': request, 'fleet_owner': fleet_owner},
     )
 
     if serializer.is_valid():
         vehicle = serializer.validated_data.get('vehicle')
-        if vehicle and company and vehicle.company_id != company.id:
-            return Response({'error': 'Vehicle does not belong to your company.'}, status=status.HTTP_403_FORBIDDEN)
+        if vehicle and fleet_owner and vehicle.fleet_owner_id != fleet_owner.id:
+            return Response({'error': 'Vehicle does not belong to your fleet.'}, status=status.HTTP_403_FORBIDDEN)
         driver = serializer.validated_data.get('driver')
-        if driver is not None and company and driver.user.company_id != company.id:
-            return Response({'error': 'Driver does not belong to your company.'}, status=status.HTTP_403_FORBIDDEN)
+        if driver is not None and fleet_owner and driver.fleet_owner_id != fleet_owner.id:
+            return Response({'error': 'Driver does not belong to your fleet.'}, status=status.HTTP_403_FORBIDDEN)
 
         serializer.save()
         logger.info(f"Trip updated by {user.email}: {trip.trip_number}")
@@ -255,6 +218,34 @@ def complete_trip(request, trip_id):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_trip(request, trip_ref):
+    """Permanently remove a trip (fleet owner). Ongoing trips must be completed or cancelled first."""
+    user = request.user
+
+    if not user.is_fleet_owner:
+        return Response({'error': 'Only fleet owners can delete trips.'}, status=status.HTTP_403_FORBIDDEN)
+
+    trip = _resolve_trip(user, trip_ref)
+
+    if trip.status == Trip.TripStatus.ONGOING:
+        return Response(
+            {'error': 'Complete or cancel this trip before deleting it.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    trip_number = trip.trip_number
+    trip.delete()
+
+    logger.info(f"Trip deleted by {user.email}: {trip_number}")
+
+    return Response(
+        {'message': f'Trip {trip_number} has been deleted.'},
+        status=status.HTTP_200_OK,
+    )
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def cancel_trip(request, trip_ref):
@@ -292,7 +283,7 @@ def approve_trip(request, trip_id):
     if not user.is_fleet_owner:
         return Response({'error': 'Only fleet owners can approve trips.'}, status=status.HTTP_403_FORBIDDEN)
     
-    trip = get_object_or_404(Trip, id=trip_id, company=user.company, is_flagged=True)
+    trip = get_object_or_404(Trip, id=trip_id, fleet_owner=user, is_flagged=True)
     
     serializer = TripApproveSerializer(data=request.data)
     if serializer.is_valid():

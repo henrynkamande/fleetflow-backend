@@ -23,8 +23,8 @@ def _decimal(value) -> Decimal:
     return Decimal(str(value))
 
 
-def _money_float(value: Decimal) -> float:
-    return float(value.quantize(Decimal('0.01')))
+def _money_float(value: Decimal | int | float) -> float:
+    return float(_decimal(value).quantize(Decimal('0.01')))
 
 
 def parse_period(
@@ -59,7 +59,7 @@ def previous_period(start: date, end: date) -> tuple[date, date]:
 
 @dataclass
 class FinanceFilters:
-    company_id: Any
+    fleet_owner_id: Any
     start: date
     end: date
     vehicle_id: str | None = None
@@ -68,7 +68,7 @@ class FinanceFilters:
 
 def base_trips(filters: FinanceFilters):
     qs = (
-        Trip.objects.filter(company_id=filters.company_id)
+        Trip.objects.filter(fleet_owner_id=filters.fleet_owner_id)
         .exclude(status=Trip.TripStatus.CANCELLED)
         .select_related('vehicle', 'driver', 'driver__user')
     )
@@ -127,7 +127,12 @@ def sum_trip_financials(trips) -> dict[str, Decimal]:
     expenses = Decimal('0')
     for trip in trips:
         revenue += _decimal(trip.revenue_amount)
-        expenses += _decimal(trip.fuel_cost) + _decimal(trip.toll_cost) + _decimal(trip.other_expenses)
+        expenses += (
+            _decimal(trip.fuel_cost)
+            + _decimal(trip.driver_payment)
+            + _decimal(trip.toll_cost)
+            + _decimal(trip.other_expenses)
+        )
     profit = revenue - expenses
     return {'revenue': revenue, 'expenses': expenses, 'profit': profit}
 
@@ -175,7 +180,7 @@ def build_summary(filters: FinanceFilters, prev_filters: FinanceFilters) -> dict
 def build_income_payload(filters: FinanceFilters, granularity: str = 'monthly') -> dict:
     trips = list(base_trips(filters))
     summary = build_summary(filters, FinanceFilters(
-        company_id=filters.company_id,
+        fleet_owner_id=filters.fleet_owner_id,
         start=previous_period(filters.start, filters.end)[0],
         end=previous_period(filters.start, filters.end)[1],
         vehicle_id=filters.vehicle_id,
@@ -232,7 +237,7 @@ def build_expenses_payload(filters: FinanceFilters, granularity: str = 'monthly'
     trips = list(base_trips(filters))
     prev_start, prev_end = previous_period(filters.start, filters.end)
     prev_filters = FinanceFilters(
-        company_id=filters.company_id,
+        fleet_owner_id=filters.fleet_owner_id,
         start=prev_start,
         end=prev_end,
         vehicle_id=filters.vehicle_id,
@@ -242,6 +247,7 @@ def build_expenses_payload(filters: FinanceFilters, granularity: str = 'monthly'
 
     category_totals = {
         'Fuel': Decimal('0'),
+        'Driver payment': Decimal('0'),
         'Tolls': Decimal('0'),
         'Other': Decimal('0'),
     }
@@ -250,10 +256,12 @@ def build_expenses_payload(filters: FinanceFilters, granularity: str = 'monthly'
 
     for trip in trips:
         fuel = _decimal(trip.fuel_cost)
+        driver_payment = _decimal(trip.driver_payment)
         toll = _decimal(trip.toll_cost)
         other = _decimal(trip.other_expenses)
-        total = fuel + toll + other
+        total = fuel + driver_payment + toll + other
         category_totals['Fuel'] += fuel
+        category_totals['Driver payment'] += driver_payment
         category_totals['Tolls'] += toll
         category_totals['Other'] += other
 
@@ -277,6 +285,7 @@ def build_expenses_payload(filters: FinanceFilters, granularity: str = 'monthly'
             })
 
         add_line('Fuel', fuel)
+        add_line('Driver payment', driver_payment)
         add_line('Tolls', toll)
         add_line('Other', other)
 
@@ -303,7 +312,7 @@ def build_pl_payload(filters: FinanceFilters, granularity: str = 'monthly') -> d
     trips = list(base_trips(filters))
     prev_start, prev_end = previous_period(filters.start, filters.end)
     prev_filters = FinanceFilters(
-        company_id=filters.company_id,
+        fleet_owner_id=filters.fleet_owner_id,
         start=prev_start,
         end=prev_end,
         vehicle_id=filters.vehicle_id,
@@ -320,7 +329,12 @@ def build_pl_payload(filters: FinanceFilters, granularity: str = 'monthly') -> d
 
     for trip in trips:
         rev = _decimal(trip.revenue_amount)
-        exp = _decimal(trip.fuel_cost) + _decimal(trip.toll_cost) + _decimal(trip.other_expenses)
+        exp = (
+            _decimal(trip.fuel_cost)
+            + _decimal(trip.driver_payment)
+            + _decimal(trip.toll_cost)
+            + _decimal(trip.other_expenses)
+        )
         trip_revenue += rev
         trip_expenses += exp
         dt = trip.planned_departure_time
@@ -341,16 +355,18 @@ def build_pl_payload(filters: FinanceFilters, granularity: str = 'monthly') -> d
     ]
 
     revenue_total = trip_revenue if trip_revenue > 0 else Decimal('1')
-    fuel_sum = sum(_decimal(t.fuel_cost) for t in trips)
-    toll_sum = sum(_decimal(t.toll_cost) for t in trips)
-    other_sum = sum(_decimal(t.other_expenses) for t in trips)
+    fuel_sum = sum((_decimal(t.fuel_cost) for t in trips), Decimal('0'))
+    driver_payment_sum = sum((_decimal(t.driver_payment) for t in trips), Decimal('0'))
+    toll_sum = sum((_decimal(t.toll_cost) for t in trips), Decimal('0'))
+    other_sum = sum((_decimal(t.other_expenses) for t in trips), Decimal('0'))
 
     def pct(part: Decimal) -> float:
-        return _money_float(part / revenue_total * 100)
+        return _money_float(part / revenue_total * Decimal('100'))
 
     statement = [
         {'section': 'Income', 'account': 'Trip revenue', 'amount': _money_float(trip_revenue), 'percent_of_revenue': 100.0 if trip_revenue > 0 else 0.0},
         {'section': 'Expenses', 'account': 'Fuel', 'amount': _money_float(fuel_sum), 'percent_of_revenue': pct(fuel_sum)},
+        {'section': 'Expenses', 'account': 'Driver payment', 'amount': _money_float(driver_payment_sum), 'percent_of_revenue': pct(driver_payment_sum)},
         {'section': 'Expenses', 'account': 'Tolls', 'amount': _money_float(toll_sum), 'percent_of_revenue': pct(toll_sum)},
         {'section': 'Expenses', 'account': 'Other trip costs', 'amount': _money_float(other_sum), 'percent_of_revenue': pct(other_sum)},
     ]
@@ -382,7 +398,7 @@ def build_overview_payload(filters: FinanceFilters) -> dict:
     """Single payload for fleet owner dashboard (KPIs, active trips, P&L slice, leaderboards)."""
     prev_start, prev_end = previous_period(filters.start, filters.end)
     prev_filters = FinanceFilters(
-        company_id=filters.company_id,
+        fleet_owner_id=filters.fleet_owner_id,
         start=prev_start,
         end=prev_end,
         vehicle_id=filters.vehicle_id,
@@ -392,8 +408,10 @@ def build_overview_payload(filters: FinanceFilters) -> dict:
     current_trips = list(base_trips(filters))
     prev_trip_count = base_trips(prev_filters).count()
 
+    active_trips_qs = Trip.objects.filter(fleet_owner_id=filters.fleet_owner_id, status__in=_ACTIVE_TRIP_STATUSES)
+    active_trip_count = active_trips_qs.count()
     ongoing_qs = (
-        Trip.objects.filter(company_id=filters.company_id, status__in=_ACTIVE_TRIP_STATUSES)
+        active_trips_qs
         .select_related('vehicle', 'driver', 'driver__user')
         .order_by('-planned_departure_time')[:12]
     )
@@ -411,21 +429,24 @@ def build_overview_payload(filters: FinanceFilters) -> dict:
         })
 
     fuel_sum = Decimal('0')
+    driver_payment_sum = Decimal('0')
     toll_sum = Decimal('0')
     other_sum = Decimal('0')
     for trip in current_trips:
         fuel_sum += _decimal(trip.fuel_cost)
+        driver_payment_sum += _decimal(trip.driver_payment)
         toll_sum += _decimal(trip.toll_cost)
         other_sum += _decimal(trip.other_expenses)
 
-    expense_total = fuel_sum + toll_sum + other_sum
-    max_expense = max(fuel_sum, toll_sum, other_sum, Decimal('1'))
+    expense_total = fuel_sum + driver_payment_sum + toll_sum + other_sum
+    max_expense = max(fuel_sum, driver_payment_sum, toll_sum, other_sum, Decimal('1'))
 
     def expense_ratio(part: Decimal) -> float:
-        return float((part / max_expense * 100).quantize(Decimal('0.1')))
+        return float((part / max_expense * Decimal('100')).quantize(Decimal('0.1')))
 
     expense_breakdown = [
         {'label': 'Fuel Costs', 'amount': _money_float(fuel_sum), 'ratio': expense_ratio(fuel_sum), 'tone': 'warning'},
+        {'label': 'Driver Payments', 'amount': _money_float(driver_payment_sum), 'ratio': expense_ratio(driver_payment_sum), 'tone': 'negative'},
         {'label': 'Tolls', 'amount': _money_float(toll_sum), 'ratio': expense_ratio(toll_sum), 'tone': 'negative'},
         {
             'label': 'Maintenance & Other',
@@ -462,7 +483,12 @@ def build_overview_payload(filters: FinanceFilters) -> dict:
             continue
         key = trip.vehicle_id
         rev = _decimal(trip.revenue_amount)
-        exp = _decimal(trip.fuel_cost) + _decimal(trip.toll_cost) + _decimal(trip.other_expenses)
+        exp = (
+            _decimal(trip.fuel_cost)
+            + _decimal(trip.driver_payment)
+            + _decimal(trip.toll_cost)
+            + _decimal(trip.other_expenses)
+        )
         profit = rev - exp
         dist = trip.distance_km or trip.planned_distance_km or 0
         if key not in vehicle_stats:
@@ -476,20 +502,30 @@ def build_overview_payload(filters: FinanceFilters) -> dict:
         vehicle_stats[key]['distance_km'] += int(dist or 0)
         vehicle_stats[key]['net_profit'] += profit
 
-    top_vehicles = sorted(
+    sorted_vehicles = sorted(
         vehicle_stats.values(),
         key=lambda v: v['net_profit'],
         reverse=True,
-    )[:3]
+    )
+    top_vehicles = sorted_vehicles[:3]
     for v in top_vehicles:
         v['net_profit'] = _money_float(v['net_profit'])
+    most_profitable_vehicle = sorted_vehicles[0].copy() if sorted_vehicles else None
+    worst_performing_vehicle = sorted_vehicles[-1].copy() if sorted_vehicles else None
+    if most_profitable_vehicle:
+        most_profitable_vehicle['net_profit'] = _money_float(most_profitable_vehicle['net_profit'])
+    if worst_performing_vehicle:
+        worst_performing_vehicle['net_profit'] = _money_float(worst_performing_vehicle['net_profit'])
 
     return {
         'summary': summary,
         'trip_count_change': summary['trip_count'] - prev_trip_count,
+        'active_trip_count': active_trip_count,
         'ongoing_trips': ongoing_trips,
         'expense_breakdown': expense_breakdown,
         'expense_total': _money_float(expense_total),
         'top_drivers': top_drivers,
         'top_vehicles': top_vehicles,
+        'most_profitable_vehicle': most_profitable_vehicle,
+        'worst_performing_vehicle': worst_performing_vehicle,
     }

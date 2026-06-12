@@ -1,4 +1,4 @@
-from oauth.models import Company
+from oauth.models import User
 
 from . import conf
 
@@ -13,25 +13,29 @@ def allow_trial_without_payment() -> bool:
     return False
 
 
-def company_has_platform_access(company: Company | None) -> bool:
-    if company is None:
+def owner_has_platform_access(owner: User | None) -> bool:
+    if owner is None:
         return False
     if not conf.BILLING_ENFORCE or not conf.stripe_configured():
         return True
-    return company.billing_status in (
-        Company.BillingStatus.TRIALING,
-        Company.BillingStatus.ACTIVE,
+    return owner.billing_status in (
+        User.BillingStatus.TRIALING,
+        User.BillingStatus.ACTIVE,
     )
 
 
-def company_requires_checkout(company: Company | None) -> bool:
-    if company is None:
+def owner_requires_checkout(owner: User | None) -> bool:
+    if owner is None:
         return True
     if not conf.BILLING_ENFORCE or not conf.stripe_configured():
         return False
-    return company.billing_status in (
-        Company.BillingStatus.NOT_STARTED,
-        Company.BillingStatus.INCOMPLETE,
-        Company.BillingStatus.CANCELED,
-        Company.BillingStatus.PAST_DUE,
+    return owner.billing_status in (
+        User.BillingStatus.NOT_STARTED,
+        User.BillingStatus.INCOMPLETE,
+        User.BillingStatus.CANCELED,
+        User.BillingStatus.PAST_DUE,
     )
+
+
+company_has_platform_access = owner_has_platform_access
+company_requires_checkout = owner_requires_checkout

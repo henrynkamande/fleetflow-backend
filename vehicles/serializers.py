@@ -1,12 +1,33 @@
 # vehicles/serializers.py
 from rest_framework import serializers
-from .models import Vehicle, VehicleDocument, VehicleServiceRecord, VehicleExpense, FuelLog
+from .models import Vehicle
+
+
+class FieldSelectionMixin:
+    """Allow list endpoints to request a whitelisted subset via ?fields=a,b."""
+
+    selectable_fields = None
+
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop('fields', None)
+        super().__init__(*args, **kwargs)
+
+        if not fields:
+            return
+
+        allowed = set(self.selectable_fields or self.fields.keys())
+        requested = {field.strip() for field in fields.split(',') if field.strip()}
+        selected = requested & allowed
+        if not selected:
+            return
+
+        for field_name in set(self.fields) - selected:
+            self.fields.pop(field_name)
 
 
 class VehicleSerializer(serializers.ModelSerializer):
     """Serializer for Vehicle"""
     
-    company_name = serializers.CharField(source='company.name', read_only=True)
     assigned_driver_name = serializers.CharField(source='assigned_driver.user.full_name', read_only=True)
     is_insurance_expired = serializers.BooleanField(read_only=True)
     is_registration_expired = serializers.BooleanField(read_only=True)
@@ -17,7 +38,7 @@ class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehicle
         fields = [
-            'id', 'company', 'company_name', 'assigned_driver', 'assigned_driver_name',
+            'id', 'fleet_owner', 'assigned_driver', 'assigned_driver_name',
             'registration_number', 'make', 'model', 'year', 'color',
             'vehicle_type', 'vin', 'engine_number',
             'load_capacity', 'seating_capacity', 'fuel_type', 'fuel_tank_capacity',
@@ -33,108 +54,76 @@ class VehicleSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at', 'created_by', 'created_by_name',
         ]
         read_only_fields = [
-            'id', 'company', 'company_name', 'assigned_driver_name', 'created_by_name',
+            'id', 'fleet_owner', 'assigned_driver_name', 'created_by_name',
             'created_by',
             'is_insurance_expired', 'is_registration_expired',
             'is_service_due', 'age_years', 'created_at', 'updated_at',
         ]
+
+    def _fleet_owner_for_validation(self):
+        if self.instance:
+            return self.instance.fleet_owner
+        fleet_owner = self.context.get('fleet_owner')
+        if fleet_owner:
+            return fleet_owner
+        request = self.context.get('request')
+        if request and request.user:
+            return request.user if request.user.is_fleet_owner else getattr(request.user, 'fleet_owner', None)
+        return None
     
     def validate_registration_number(self, value):
-        """Validate registration number uniqueness"""
+        """Normalize and validate registration number uniqueness within the fleet."""
+        value = value.strip().upper()
+        fleet_owner = self._fleet_owner_for_validation()
+        queryset = Vehicle.objects.filter(registration_number__iexact=value)
+        if fleet_owner:
+            queryset = queryset.filter(fleet_owner=fleet_owner)
         if self.instance:
-            if Vehicle.objects.filter(registration_number=value).exclude(id=self.instance.id).exists():
-                raise serializers.ValidationError("A vehicle with this registration number already exists.")
-        else:
-            if Vehicle.objects.filter(registration_number=value).exists():
-                raise serializers.ValidationError("A vehicle with this registration number already exists.")
+            queryset = queryset.exclude(id=self.instance.id)
+        if queryset.exists():
+            raise serializers.ValidationError("A vehicle with this registration number already exists in your fleet.")
+        return value
+
+    def validate_vin(self, value):
+        """VIN is optional, but must be unique when provided."""
+        if not value:
+            return value
+
+        value = value.strip().upper()
+        queryset = Vehicle.objects.filter(vin__iexact=value)
+        if self.instance:
+            queryset = queryset.exclude(id=self.instance.id)
+        if queryset.exists():
+            raise serializers.ValidationError("A vehicle with this VIN already exists.")
         return value
     
     def validate_assigned_driver(self, value):
-        """Validate that the assigned driver belongs to the same company"""
+        """Validate that the assigned driver belongs to the same fleet owner."""
         request = self.context.get('request')
         if request and request.user and value:
-            if value.user.company != request.user.company:
-                raise serializers.ValidationError("Driver must belong to your company.")
+            if value.fleet_owner_id != request.user.id:
+                raise serializers.ValidationError("Driver must belong to your fleet.")
         return value
 
 
-class VehicleDocumentSerializer(serializers.ModelSerializer):
-    """Serializer for Vehicle Documents"""
-    
-    vehicle_registration = serializers.CharField(source='vehicle.registration_number', read_only=True)
-    uploaded_by_name = serializers.CharField(source='uploaded_by.full_name', read_only=True)
-    is_expired = serializers.BooleanField(read_only=True)
-    
+class VehicleListSerializer(FieldSelectionMixin, serializers.ModelSerializer):
+    """Compact vehicle row for list pages."""
+
+    assigned_driver_name = serializers.CharField(source='assigned_driver.user.full_name', read_only=True)
+
+    selectable_fields = {
+        'id', 'registration_number', 'make', 'model', 'year', 'color',
+        'vehicle_type', 'status', 'current_odometer', 'assigned_driver',
+        'assigned_driver_name', 'is_active', 'created_at',
+        'updated_at',
+    }
+
     class Meta:
-        model = VehicleDocument
+        model = Vehicle
         fields = [
-            'id', 'vehicle', 'vehicle_registration',
-            'document_type', 'title', 'document_number',
-            'file', 'issue_date', 'expiry_date', 'notes',
-            'is_expired', 'uploaded_at', 'uploaded_by', 'uploaded_by_name',
+            'id', 'registration_number', 'make', 'model', 'year', 'color',
+            'vehicle_type', 'status', 'current_odometer', 'assigned_driver',
+            'assigned_driver_name', 'is_active', 'created_at',
+            'updated_at',
         ]
-        read_only_fields = [
-            'id', 'vehicle_registration', 'uploaded_by_name',
-            'is_expired', 'uploaded_at',
-        ]
-
-
-class VehicleServiceRecordSerializer(serializers.ModelSerializer):
-    """Serializer for Vehicle Service Records"""
-    
-    vehicle_registration = serializers.CharField(source='vehicle.registration_number', read_only=True)
-    created_by_name = serializers.CharField(source='created_by.full_name', read_only=True)
-    
-    class Meta:
-        model = VehicleServiceRecord
-        fields = [
-            'id', 'vehicle', 'vehicle_registration',
-            'service_type', 'service_date', 'odometer_reading',
-            'service_provider', 'description', 'cost',
-            'parts_replaced', 'next_service_date', 'next_service_odometer',
-            'receipt', 'created_at', 'created_by', 'created_by_name',
-        ]
-        read_only_fields = [
-            'id', 'vehicle_registration', 'created_by_name', 'created_at',
-        ]
-
-
-class VehicleExpenseSerializer(serializers.ModelSerializer):
-    """Serializer for Vehicle Expenses"""
-    
-    vehicle_registration = serializers.CharField(source='vehicle.registration_number', read_only=True)
-    created_by_name = serializers.CharField(source='created_by.full_name', read_only=True)
-    
-    class Meta:
-        model = VehicleExpense
-        fields = [
-            'id', 'vehicle', 'vehicle_registration',
-            'expense_type', 'amount', 'description',
-            'expense_date', 'odometer_reading',
-            'receipt', 'created_at', 'created_by', 'created_by_name',
-        ]
-        read_only_fields = [
-            'id', 'vehicle_registration', 'created_by_name', 'created_at',
-        ]
-
-
-class FuelLogSerializer(serializers.ModelSerializer):
-    """Serializer for Fuel Logs"""
-    
-    vehicle_registration = serializers.CharField(source='vehicle.registration_number', read_only=True)
-    created_by_name = serializers.CharField(source='created_by.full_name', read_only=True)
-    cost_per_km = serializers.FloatField(read_only=True)
-    
-    class Meta:
-        model = FuelLog
-        fields = [
-            'id', 'vehicle', 'vehicle_registration',
-            'fill_date', 'odometer_reading', 'liters',
-            'price_per_liter', 'total_cost', 'fuel_station',
-            'is_full_tank', 'notes', 'cost_per_km',
-            'created_at', 'created_by', 'created_by_name',
-        ]
-        read_only_fields = [
-            'id', 'vehicle_registration', 'created_by_name',
-            'cost_per_km', 'created_at',
-        ]
+        read_only_fields = fields

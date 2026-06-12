@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from datetime import timedelta
+from django.core.paginator import Paginator
+from django.db.models import Count
 
-from django.db.models import Count, Q
-from django.utils import timezone
-
-from oauth.models import Company, KYCDocument, User
-from reports.finance_service import parse_period, previous_period, sum_trip_financials
-from trips.models import Trip
+from oauth.models import User
+from platform_api.services.platform_finance import (
+    fleet_operations_finance_for_period,
+    platform_finance_for_period,
+)
 from vehicles.models import Vehicle
+from reports.finance_service import parse_period, previous_period
 
 
 def _money(value) -> float:
@@ -24,77 +25,35 @@ def _money(value) -> float:
 def build_platform_overview(period: str | None) -> dict:
     start, end = parse_period(None, None, period)
     prev_start, prev_end = previous_period(start, end)
-    companies_qs = Company.objects.all()
-    total_companies = companies_qs.count()
-    new_companies = companies_qs.filter(created_at__date__gte=start, created_at__date__lte=end).count()
+    owners_qs = User.objects.filter(role=User.Role.FLEET_OWNER)
+    total_companies = owners_qs.count()
+    new_companies = owners_qs.filter(date_joined__date__gte=start, date_joined__date__lte=end).count()
 
-    billing_breakdown = {status: 0 for status, _ in Company.BillingStatus.choices}
-    for row in companies_qs.values('billing_status').annotate(count=Count('id')):
+    billing_breakdown = {status: 0 for status, _ in User.BillingStatus.choices}
+    for row in owners_qs.values('billing_status').annotate(count=Count('id')):
         billing_breakdown[row['billing_status']] = row['count']
 
-    users_qs = User.objects.exclude(role=User.Role.PLATFORM_ADMIN)
-    total_users = users_qs.count()
-    active_users_qs = users_qs.filter(is_active=True)
+    active_users_qs = User.objects.exclude(role=User.Role.PLATFORM_ADMIN).filter(is_active=True)
     fleet_owners = active_users_qs.filter(role=User.Role.FLEET_OWNER).count()
     drivers_total = active_users_qs.filter(role=User.Role.DRIVER).count()
     drivers_verified = active_users_qs.filter(role=User.Role.DRIVER, is_verified=True).count()
     drivers_unverified = drivers_total - drivers_verified
 
     vehicles_total = Vehicle.objects.count()
-    trips_total = Trip.objects.exclude(status=Trip.TripStatus.CANCELLED).count()
-    trips_in_period = Trip.objects.filter(
-        planned_departure_time__date__gte=start,
-        planned_departure_time__date__lte=end,
-    ).exclude(status=Trip.TripStatus.CANCELLED)
-    trip_count = trips_in_period.count()
 
-    all_period_trips = list(
-        Trip.objects.filter(
-            planned_departure_time__date__gte=start,
-            planned_departure_time__date__lte=end,
-        ).exclude(status=Trip.TripStatus.CANCELLED)
-    )
-    # Platform-wide trip financials (all companies)
-    cur_fin = sum_trip_financials(all_period_trips)
-    prev_fin = sum_trip_financials(
-        list(
-            Trip.objects.filter(
-                planned_departure_time__date__gte=prev_start,
-                planned_departure_time__date__lte=prev_end,
-            ).exclude(status=Trip.TripStatus.CANCELLED)
-        )
-    )
-
-    kyc_pending = KYCDocument.objects.filter(
-        verification_status=KYCDocument.VerificationStatus.PENDING
-    ).count()
-
-    recent_signups = []
-    for company in (
-        companies_qs.select_related('owner')
-        .order_by('-created_at')[:10]
-    ):
-        owner = company.owner
-        recent_signups.append(
-            {
-                'id': str(company.id),
-                'name': company.name,
-                'owner_email': owner.email if owner else None,
-                'subscription_plan': company.subscription_plan,
-                'billing_status': company.billing_status,
-                'created_at': company.created_at.isoformat(),
-            }
-        )
+    cur_fin = fleet_operations_finance_for_period(start, end)
+    prev_fin = fleet_operations_finance_for_period(prev_start, prev_end)
+    cur_platform_fin = platform_finance_for_period(start, end)
 
     from billing import conf as billing_conf
 
     unit_cents = billing_conf.BILLING_UNIT_AMOUNT_CENTS
-    active_subs = companies_qs.filter(billing_status=Company.BillingStatus.ACTIVE)
-    trialing_subs = companies_qs.filter(billing_status=Company.BillingStatus.TRIALING)
-    pending_payment = companies_qs.filter(
+    active_subs = owners_qs.filter(billing_status=User.BillingStatus.ACTIVE)
+    trialing_subs = owners_qs.filter(billing_status=User.BillingStatus.TRIALING)
+    pending_payment = owners_qs.filter(
         billing_status__in=[
-            Company.BillingStatus.INCOMPLETE,
-            Company.BillingStatus.PAST_DUE,
+            User.BillingStatus.INCOMPLETE,
+            User.BillingStatus.PAST_DUE,
         ]
     )
     mrr_cents = 0
@@ -106,33 +65,6 @@ def build_platform_overview(period: str | None) -> dict:
         qty = row.get('billing_quantity') or 0
         outstanding_cents += int(qty) * unit_cents
 
-    recent_activity = []
-    for user in User.objects.exclude(role=User.Role.PLATFORM_ADMIN).order_by('-date_joined')[:8]:
-        recent_activity.append(
-            {
-                'type': 'user_joined',
-                'at': user.date_joined.isoformat(),
-                'title': user.get_full_name(),
-                'detail': f'{user.role} · {user.email}',
-            }
-        )
-
-    attention = []
-    trial_cutoff = timezone.now() + timedelta(days=7)
-    for company in companies_qs.select_related('owner').filter(
-        Q(billing_status__in=[Company.BillingStatus.PAST_DUE, Company.BillingStatus.INCOMPLETE])
-        | Q(billing_status=Company.BillingStatus.TRIALING, trial_ends_at__lte=trial_cutoff)
-    )[:15]:
-        attention.append(
-            {
-                'id': str(company.id),
-                'name': company.name,
-                'billing_status': company.billing_status,
-                'trial_ends_at': company.trial_ends_at.isoformat() if company.trial_ends_at else None,
-                'owner_email': company.owner.email if company.owner_id else None,
-            }
-        )
-
     return {
         'period': {'start': start.isoformat(), 'end': end.isoformat(), 'preset': period or '30d'},
         'companies': {
@@ -141,7 +73,7 @@ def build_platform_overview(period: str | None) -> dict:
             'billing_breakdown': billing_breakdown,
         },
         'users': {
-            'total': total_users,
+            'total': fleet_owners + drivers_total,
             'fleet_owners': fleet_owners,
             'drivers': drivers_total,
             'drivers_verified': drivers_verified,
@@ -149,12 +81,13 @@ def build_platform_overview(period: str | None) -> dict:
         },
         'fleet_ops': {
             'vehicles': vehicles_total,
-            'trips_total': trips_total,
-            'trips_in_period': trip_count,
             'revenue': _money(cur_fin['revenue']),
             'expenses': _money(cur_fin['expenses']),
             'profit': _money(cur_fin['profit']),
             'revenue_previous': _money(prev_fin['revenue']),
+            'trip_count': cur_fin['trip_count'],
+            'platform_system_expenses': _money(cur_platform_fin['expenses']),
+            'subscription_revenue_estimate': _money(cur_platform_fin['revenue']),
         },
         'subscriptions': {
             'active': active_subs.count(),
@@ -163,35 +96,78 @@ def build_platform_overview(period: str | None) -> dict:
             'mrr': _money(mrr_cents / 100),
             'outstanding_revenue': _money(outstanding_cents / 100),
         },
-        'recent_activity': recent_activity,
-        'risk': {
-            'kyc_pending': kyc_pending,
-        },
-        'recent_signups': recent_signups,
-        'companies_needing_attention': attention,
+    }
+
+
+def paginate_recent_signups(page: int, page_size: int) -> dict:
+    qs = User.objects.filter(role=User.Role.FLEET_OWNER).order_by('-date_joined')
+    paginator = Paginator(qs, page_size)
+    page_obj = paginator.get_page(page)
+    results = []
+    for owner in page_obj.object_list:
+        results.append(
+            {
+                'id': str(owner.id),
+                'name': owner.get_full_name(),
+                'owner_email': owner.email if owner else None,
+                'subscription_plan': owner.subscription_plan,
+                'billing_status': owner.billing_status,
+                'created_at': owner.date_joined.isoformat(),
+            }
+        )
+    return {
+        'count': paginator.count,
+        'page': page,
+        'page_size': page_size,
+        'results': results,
+    }
+
+
+def paginate_recent_activity(page: int, page_size: int) -> dict:
+    qs = User.objects.exclude(role=User.Role.PLATFORM_ADMIN).order_by('-date_joined')
+    paginator = Paginator(qs, page_size)
+    page_obj = paginator.get_page(page)
+    results = []
+    for user in page_obj.object_list:
+        name = (user.get_full_name() or '').strip()
+        if not name:
+            name = user.first_name or user.last_name or 'User'
+        results.append(
+            {
+                'id': str(user.id),
+                'type': 'user_joined',
+                'at': user.date_joined.isoformat(),
+                'title': name,
+                'role': user.role,
+            }
+        )
+    return {
+        'count': paginator.count,
+        'page': page,
+        'page_size': page_size,
+        'results': results,
     }
 
 
 def annotate_companies_queryset(qs):
     return qs.annotate(
-        driver_count=Count('users', filter=Q(users__role=User.Role.DRIVER), distinct=True),
+        driver_count=Count('managed_users', distinct=True),
         vehicle_count=Count('vehicles', distinct=True),
         trip_count=Count('trips', distinct=True),
-    ).select_related('owner')
+    )
 
 
-def serialize_company_list_item(company) -> dict:
-    owner = company.owner
+def serialize_company_list_item(owner) -> dict:
     return {
-        'id': str(company.id),
-        'name': company.name,
+        'id': str(owner.id),
+        'name': owner.get_full_name(),
         'owner_email': owner.email if owner else None,
         'owner_name': owner.get_full_name() if owner else None,
-        'subscription_plan': company.subscription_plan,
-        'billing_status': company.billing_status,
-        'driver_count': getattr(company, 'driver_count', 0),
-        'vehicle_count': getattr(company, 'vehicle_count', 0),
-        'trip_count': getattr(company, 'trip_count', 0),
-        'created_at': company.created_at.isoformat(),
-        'is_active': company.is_active,
+        'subscription_plan': owner.subscription_plan,
+        'billing_status': owner.billing_status,
+        'driver_count': getattr(owner, 'driver_count', 0),
+        'vehicle_count': getattr(owner, 'vehicle_count', 0),
+        'trip_count': getattr(owner, 'trip_count', 0),
+        'created_at': owner.date_joined.isoformat(),
+        'is_active': owner.is_active,
     }

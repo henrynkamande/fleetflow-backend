@@ -48,7 +48,6 @@ class PlatformAdminRegistrationSerializer(serializers.ModelSerializer):
             is_active=True,
             is_verified=True,
             is_staff=True,
-            company=None,
         )
 
 

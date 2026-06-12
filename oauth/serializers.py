@@ -12,8 +12,8 @@ from django.contrib.auth import authenticate
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from .models import (
-    User, Company, DriverProfile, FleetOwnerProfile,
-    KYCDocument, EmailAuthCode, PendingFleetOwnerSignup,
+    User, DriverProfile, FleetOwnerProfile,
+    EmailAuthCode, PendingFleetOwnerSignup,
 )
 from . import pending_signup
 from . import auth_codes
@@ -52,7 +52,7 @@ class PasswordGenerationMixin:
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """Custom JWT token serializer with role and company claims."""
+    """Custom JWT token serializer with role and fleet-owner claims."""
     
     @classmethod
     def get_token(cls, user):
@@ -64,9 +64,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['is_verified'] = user.is_verified
         token['full_name'] = user.full_name
         
-        if user.company:
-            token['company_id'] = str(user.company.id)
-            token['company_name'] = user.company.name
+        if user.fleet_owner_id:
+            token['fleet_owner_id'] = str(user.fleet_owner_id)
         
         return token
     
@@ -78,17 +77,11 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['role'] = self.user.role
         data['is_verified'] = self.user.is_verified
         
-        # Determine redirect URL based on role and company status
+        # Determine redirect URL based on role.
         if self.user.is_platform_admin:
             data['redirect_url'] = '/dashboard'
         elif self.user.is_fleet_owner:
-            if self.user.company:
-                data['redirect_url'] = '/fleet-owner/dashboard'
-                data['company'] = CompanySerializer(self.user.company, context={'request': self.context.get('request')}).data
-            else:
-                data['redirect_url'] = '/fleet-owner/dashboard'
-                data['requires_company'] = False
-                data['next_step'] = 'register_company'
+            data['redirect_url'] = '/fleet-owner/dashboard'
         else:
             data['redirect_url'] = '/driver/dashboard'
         
@@ -173,89 +166,39 @@ class FleetOwnerRegistrationSerializer(serializers.ModelSerializer):
 # COMPANY REGISTRATION (Step 2 - After Fleet Owner Account)
 # ============================================================================
 
-class CompanyRegistrationSerializer(serializers.ModelSerializer):
-    """
-    Step 2: Fleet owner creates their company after account registration.
-    """
-    
-    class Meta:
-        model = Company
-        fields = [
-            'name', 'registration_number', 'address',
-            'contact_email', 'contact_phone', 'logo'
-        ]
-        extra_kwargs = {
-            'registration_number': {'required': False},
-            'address': {'required': False},
-            'contact_email': {'required': False},
-            'contact_phone': {'required': False},
-            'logo': {'required': False},
+class CompanyRegistrationSerializer(serializers.Serializer):
+    """Compatibility serializer: stores fleet business details on FleetOwnerProfile."""
+
+    name = serializers.CharField(max_length=200)
+    registration_number = serializers.CharField(required=False, allow_blank=True)
+    address = serializers.CharField(required=False, allow_blank=True)
+    contact_email = serializers.EmailField(required=False, allow_blank=True)
+    contact_phone = serializers.CharField(required=False, allow_blank=True)
+    logo = serializers.ImageField(required=False)
+
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        profile, _ = FleetOwnerProfile.objects.get_or_create(user=user)
+        data = self.validated_data
+        profile.company_name = data.get('name', profile.company_name)
+        profile.business_registration_number = data.get('registration_number', '') or ''
+        profile.business_address = data.get('address', '') or ''
+        profile.business_phone = data.get('contact_phone', '') or ''
+        profile.save()
+        user._profile_company_payload = {
+            'id': str(user.id),
+            'name': profile.company_name,
+            'registration_number': profile.business_registration_number,
+            'address': profile.business_address,
+            'contact_email': data.get('contact_email') or user.email,
+            'contact_phone': profile.business_phone,
+            'owner': str(user.id),
         }
-    
-    def validate_name(self, value):
-        """Validate company name on create (updates may keep the same name)."""
-        request = self.context.get('request')
-        if request and request.user and not self.instance:
-            if Company.objects.filter(owner=request.user).exists():
-                raise serializers.ValidationError("You have already registered a company.")
-        return value
-
-    def update(self, instance, validated_data):
-        request = self.context.get('request')
-        user = request.user
-        for attr, val in validated_data.items():
-            setattr(instance, attr, val)
-        instance.save()
-        if user.company_id != instance.id:
-            user.company = instance
-            user.save(update_fields=['company'])
-        fleet_owner_profile = user.fleet_owner_profile
-        if 'name' in validated_data:
-            fleet_owner_profile.company_name = validated_data['name']
-        if 'registration_number' in validated_data:
-            fleet_owner_profile.business_registration_number = validated_data.get('registration_number') or ''
-        if 'address' in validated_data:
-            fleet_owner_profile.business_address = validated_data.get('address') or ''
-        if 'contact_phone' in validated_data:
-            fleet_owner_profile.business_phone = validated_data.get('contact_phone') or ''
-        fleet_owner_profile.save()
-        return instance
-
-    def create(self, validated_data):
-        """Create company and link to fleet owner"""
-        request = self.context.get('request')
-        user = request.user
-        
-        # Create company with owner
-        company = Company.objects.create(
-            owner=user,
-            **validated_data
-        )
-        
-        # Link user to company
-        user.company = company
-        user.save(update_fields=['company'])
-        
-        # Update fleet owner profile with company details
-        fleet_owner_profile = user.fleet_owner_profile
-        fleet_owner_profile.company_name = validated_data.get('name')
-        fleet_owner_profile.business_registration_number = validated_data.get('registration_number', '')
-        fleet_owner_profile.business_address = validated_data.get('address', '')
-        fleet_owner_profile.business_phone = validated_data.get('contact_phone', '')
-        fleet_owner_profile.save()
-        
-        return company
+        return user
 
 
-class CompanyUpdateSerializer(serializers.ModelSerializer):
-    """Update company details."""
-    
-    class Meta:
-        model = Company
-        fields = [
-            'name', 'registration_number', 'address',
-            'contact_email', 'contact_phone', 'logo'
-        ]
+class CompanyUpdateSerializer(CompanyRegistrationSerializer):
+    name = serializers.CharField(max_length=200, required=False)
 
 
 # ============================================================================
@@ -343,7 +286,7 @@ class DriverOnboardingSerializer(serializers.ModelSerializer, PasswordGeneration
         otp_secret = self.generate_otp_secret()
         otp = self.generate_otp(otp_secret)
         
-        # Create user linked to fleet owner's company
+        # Create user linked to fleet owner.
         user = User.objects.create_user(
             email=validated_data['email'],
             phone_number=validated_data['phone_number'],
@@ -351,7 +294,7 @@ class DriverOnboardingSerializer(serializers.ModelSerializer, PasswordGeneration
             last_name=validated_data['last_name'],
             password=password,  # This becomes the temporary password
             role=User.Role.DRIVER,
-            company=fleet_owner.company,
+            fleet_owner=fleet_owner,
             is_active=False,  # Must verify via OTP or temp login
             is_verified=False,
             invited_by=fleet_owner,
@@ -360,6 +303,7 @@ class DriverOnboardingSerializer(serializers.ModelSerializer, PasswordGeneration
         
         # Update driver profile with OTP and temp password info
         driver_profile = user.driver_profile
+        driver_profile.fleet_owner = fleet_owner
         for field, value in profile_fields.items():
             if value is not None:
                 setattr(driver_profile, field, value)
@@ -392,14 +336,14 @@ class DriverOnboardingSerializer(serializers.ModelSerializer, PasswordGeneration
         return data
 
 
-def _placeholder_driver_email(company_id, phone_number: str) -> str:
+def _placeholder_driver_email(fleet_owner_id, phone_number: str) -> str:
     """Internal-only email when fleet owner adds a driver without an address."""
     digits = ''.join(c for c in phone_number if c.isdigit()) or uuid.uuid4().hex[:10]
-    candidate = f'driver.{company_id}.{digits}@fleetvault.internal'
+    candidate = f'driver.{fleet_owner_id}.{digits}@fleetvault.internal'
     n = 0
     while User.objects.filter(email=candidate).exists():
         n += 1
-        candidate = f'driver.{company_id}.{digits}.{n}@fleetvault.internal'
+        candidate = f'driver.{fleet_owner_id}.{digits}.{n}@fleetvault.internal'
     return candidate
 
 
@@ -421,36 +365,23 @@ class DriverCreateSerializer(serializers.Serializer):
         required=False,
     )
 
-    def _resolve_company(self):
-        """Auto workspace company — no formal business registration required."""
-        company = self.context.get('company')
-        if company is not None:
-            return company
-        request = self.context.get('request')
-        if request and getattr(request.user, 'is_fleet_owner', False):
-            from .fleet_workspace import ensure_fleet_owner_company
-
-            company = ensure_fleet_owner_company(request.user)
-            if company is not None:
-                self.context['company'] = company
-        return company
-
     def validate_phone_number(self, value):
-        company = self._resolve_company()
+        request = self.context.get('request')
+        fleet_owner = request.user if request else None
         normalized = normalize_phone_number(value)
         variants = phone_number_lookup_variants(value)
         existing = User.objects.filter(phone_number__in=variants).first()
         if not existing:
             return normalized
 
-        if existing.role == User.Role.DRIVER and existing.company_id is None:
+        if existing.role == User.Role.DRIVER and existing.fleet_owner_id is None:
             self._claim_existing_user = existing
             return normalized
 
         if (
             existing.role == User.Role.DRIVER
-            and company is not None
-            and existing.company_id == company.id
+            and fleet_owner is not None
+            and existing.fleet_owner_id == fleet_owner.id
         ):
             raise serializers.ValidationError('This driver is already in your fleet.')
 
@@ -468,14 +399,15 @@ class DriverCreateSerializer(serializers.Serializer):
         if not value or not str(value).strip():
             return None
         license_number = value.strip()
-        company = self._resolve_company()
+        request = self.context.get('request')
+        fleet_owner = request.user if request else None
         qs = DriverProfile.objects.filter(drivers_license_number=license_number)
         claim_user = getattr(self, '_claim_existing_user', None)
         if claim_user:
             qs = qs.exclude(user_id=claim_user.id)
         if not qs.exists():
             return license_number
-        if company and qs.filter(user__company=company).exists():
+        if fleet_owner and qs.filter(fleet_owner=fleet_owner).exists():
             raise serializers.ValidationError(
                 'A driver with this license number already exists in your fleet.'
             )
@@ -487,16 +419,11 @@ class DriverCreateSerializer(serializers.Serializer):
     def create(self, validated_data):
         request = self.context['request']
         fleet_owner = request.user
-        company = self._resolve_company()
-        if company is None:
-            from .fleet_workspace import ensure_fleet_owner_company
-
-            company = ensure_fleet_owner_company(fleet_owner)
 
         claim_user = getattr(self, '_claim_existing_user', None)
         if claim_user:
             user = claim_user
-            user.company = company
+            user.fleet_owner = fleet_owner
             user.first_name = validated_data['first_name']
             user.last_name = validated_data['last_name']
             user.phone_number = validated_data['phone_number']
@@ -506,7 +433,7 @@ class DriverCreateSerializer(serializers.Serializer):
             user.invitation_accepted = True
             user.save(
                 update_fields=[
-                    'company',
+                    'fleet_owner',
                     'first_name',
                     'last_name',
                     'phone_number',
@@ -519,25 +446,25 @@ class DriverCreateSerializer(serializers.Serializer):
         else:
             email = validated_data.get('email') or ''
             if not email:
-                email = _placeholder_driver_email(company.id, validated_data['phone_number'])
+                email = _placeholder_driver_email(fleet_owner.id, validated_data['phone_number'])
 
-            user = User.objects.create_user(
+            user = User(
                 email=email,
                 phone_number=validated_data['phone_number'],
                 first_name=validated_data['first_name'],
                 last_name=validated_data['last_name'],
-                password=get_random_string(48),
                 role=User.Role.DRIVER,
-                company=company,
+                fleet_owner=fleet_owner,
                 is_active=True,
                 is_verified=True,
                 invited_by=fleet_owner,
                 invitation_accepted=True,
             )
             user.set_unusable_password()
-            user.save(update_fields=['password'])
+            user.save()
 
         profile = user.driver_profile
+        profile.fleet_owner = fleet_owner
         license_number = validated_data.get('drivers_license_number')
         if license_number:
             profile.drivers_license_number = license_number
@@ -797,9 +724,8 @@ class DriverOTPVerificationSerializer(serializers.Serializer):
         refresh['is_verified'] = user.is_verified
         refresh['full_name'] = user.full_name
         
-        if user.company:
-            refresh['company_id'] = str(user.company.id)
-            refresh['company_name'] = user.company.name
+        if user.fleet_owner_id:
+            refresh['fleet_owner_id'] = str(user.fleet_owner_id)
         
         user._tokens = {
             'refresh': str(refresh),
@@ -873,9 +799,8 @@ class UserLoginSerializer(serializers.Serializer):
             refresh['is_verified'] = user.is_verified
             refresh['full_name'] = user.full_name
             
-            if user.company:
-                refresh['company_id'] = str(user.company.id)
-                refresh['company_name'] = user.company.name
+            if user.fleet_owner_id:
+                refresh['fleet_owner_id'] = str(user.fleet_owner_id)
             
             self.user = user
             self._tokens = {
@@ -909,13 +834,15 @@ class FleetOwnerLoginSerializer(UserLoginSerializer):
 # ============================================================================
 
 def serialize_user_for_api(user: User, request=None) -> dict:
-    """Build a JSON-safe user dict (MongoDB-tolerant avatar / company fields)."""
-    company_name = None
-    if user.company_id:
+    """Build a JSON-safe user dict."""
+    fleet_owner_id = user.id if user.is_fleet_owner else user.fleet_owner_id
+    business_name = None
+    owner = user if user.is_fleet_owner else getattr(user, 'fleet_owner', None)
+    if owner:
         try:
-            company_name = user.company.name
-        except (ObjectDoesNotExist, AttributeError, Company.DoesNotExist):
-            company_name = Company.objects.filter(pk=user.company_id).values_list('name', flat=True).first()
+            business_name = owner.fleet_owner_profile.company_name
+        except (ObjectDoesNotExist, AttributeError, FleetOwnerProfile.DoesNotExist):
+            business_name = owner.get_full_name()
 
     avatar_value = None
     if user.avatar and str(user.avatar).strip():
@@ -946,12 +873,10 @@ def serialize_user_for_api(user: User, request=None) -> dict:
         'is_active': user.is_active,
         'date_joined': user.date_joined.isoformat() if user.date_joined else None,
         'last_login': user.last_login.isoformat() if user.last_login else None,
-        'company_id': str(user.company_id) if user.company_id else None,
-        'company_name': company_name,
-        'has_company': bool(user.company_id)
-        or (
-            user.role == User.Role.FLEET_OWNER and Company.objects.filter(owner=user).exists()
-        ),
+        'fleet_owner_id': str(fleet_owner_id) if fleet_owner_id else None,
+        'company_id': str(fleet_owner_id) if fleet_owner_id else None,
+        'company_name': business_name,
+        'has_company': bool(fleet_owner_id),
         'driver_profile_id': driver_profile_id,
     }
 
@@ -995,22 +920,20 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.get_avatar_url(self.context.get('request'))
     
     def get_company_id(self, obj):
-        return str(obj.company_id) if obj.company_id else None
+        owner_id = obj.id if obj.is_fleet_owner else obj.fleet_owner_id
+        return str(owner_id) if owner_id else None
 
     def get_company_name(self, obj):
-        if not obj.company_id:
+        owner = obj if obj.is_fleet_owner else getattr(obj, 'fleet_owner', None)
+        if not owner:
             return None
         try:
-            return obj.company.name
-        except (ObjectDoesNotExist, AttributeError, Company.DoesNotExist):
-            return Company.objects.filter(pk=obj.company_id).values_list('name', flat=True).first()
+            return owner.fleet_owner_profile.company_name or owner.get_full_name()
+        except (ObjectDoesNotExist, AttributeError, FleetOwnerProfile.DoesNotExist):
+            return owner.get_full_name()
 
     def get_has_company(self, obj):
-        if obj.company_id:
-            return True
-        if obj.role == obj.Role.FLEET_OWNER:
-            return Company.objects.filter(owner=obj).exists()
-        return False
+        return bool(obj.is_fleet_owner or obj.fleet_owner_id)
 
     def get_driver_profile_id(self, obj):
         if obj.role != obj.Role.DRIVER:
@@ -1019,6 +942,45 @@ class UserSerializer(serializers.ModelSerializer):
             return str(obj.driver_profile.id)
         except (ObjectDoesNotExist, AttributeError, DriverProfile.DoesNotExist):
             return str(obj.pk)
+
+
+class UserListSerializer(serializers.Serializer):
+    """Compact user row for owner/admin list pages."""
+
+    def to_representation(self, user):
+        owner = user if user.is_fleet_owner else getattr(user, 'fleet_owner', None)
+        company_name = None
+        if owner:
+            try:
+                company_name = owner.fleet_owner_profile.company_name or owner.get_full_name()
+            except (ObjectDoesNotExist, AttributeError, FleetOwnerProfile.DoesNotExist):
+                company_name = owner.get_full_name()
+        driver_profile_id = None
+        if user.role == User.Role.DRIVER:
+            try:
+                driver_profile_id = str(user.driver_profile.id)
+            except (ObjectDoesNotExist, AttributeError, DriverProfile.DoesNotExist):
+                driver_profile_id = str(user.pk)
+
+        return {
+            'id': str(user.pk),
+            'email': user.email,
+            'phone_number': user.phone_number,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'full_name': user.get_full_name(),
+            'role': user.role,
+            'avatar': None,
+            'avatar_url': None,
+            'is_verified': user.is_verified,
+            'is_active': user.is_active,
+            'date_joined': user.date_joined.isoformat() if user.date_joined else None,
+            'last_login': user.last_login.isoformat() if user.last_login else None,
+            'company_id': str(owner.id) if owner else None,
+            'company_name': company_name,
+            'has_company': bool(owner),
+            'driver_profile_id': driver_profile_id,
+        }
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -1120,85 +1082,32 @@ class FleetOwnerProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ['user', 'total_vehicles', 'active_drivers']
 
 
-# ============================================================================
-# KYC DOCUMENTS
-# ============================================================================
+class CompanySerializer(serializers.Serializer):
+    """Compatibility shape backed by FleetOwnerProfile, not a companies table."""
 
-class KYCDocumentSerializer(serializers.ModelSerializer):
-    """Serializer for KYC documents"""
-    
-    driver_name = serializers.CharField(source='driver.user.full_name', read_only=True)
-    verified_by_name = serializers.CharField(source='verified_by.full_name', read_only=True)
-    is_expired = serializers.BooleanField(read_only=True)
-    
-    class Meta:
-        model = KYCDocument
-        fields = [
-            'id', 'driver', 'driver_name', 'document_type',
-            'document_number', 'issuing_country', 'issuing_authority',
-            'front_image', 'back_image', 'issue_date', 'expiry_date',
-            'verification_status', 'verified_by', 'verified_by_name',
-            'verification_date', 'rejection_reason',
-            'uploaded_at', 'updated_at', 'is_expired'
-        ]
-        read_only_fields = [
-            'id', 'driver_name', 'verification_status',
-            'verified_by', 'verified_by_name', 'verification_date',
-            'uploaded_at', 'updated_at', 'is_expired'
-        ]
-    
-    def validate_front_image(self, value):
-        if value and value.size > 10 * 1024 * 1024:
-            raise serializers.ValidationError("File size cannot exceed 10MB.")
-        return value
-    
-    def validate_back_image(self, value):
-        if value and value.size > 10 * 1024 * 1024:
-            raise serializers.ValidationError("File size cannot exceed 10MB.")
-        return value
-
-
-class KYCDocumentVerificationSerializer(serializers.Serializer):
-    """Serializer for KYC document verification"""
-    
-    verification_status = serializers.ChoiceField(choices=['VERIFIED', 'REJECTED'])
-    rejection_reason = serializers.CharField(required=False, allow_blank=True)
-    
-    def validate(self, data):
-        if data['verification_status'] == 'REJECTED' and not data.get('rejection_reason'):
-            raise serializers.ValidationError({
-                "rejection_reason": "Rejection reason is required when rejecting."
-            })
-        return data
-
-
-class CompanySerializer(serializers.ModelSerializer):
-    """Serializer for company"""
-    
-    owner = UserSerializer(read_only=True)
-    total_drivers = serializers.SerializerMethodField()
-    total_vehicles = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = Company
-        fields = [
-            'id', 'name', 'logo', 'registration_number',
-            'address', 'contact_email', 'contact_phone',
-            'is_active', 'subscription_plan', 'owner',
-            'billing_status', 'trial_ends_at', 'billing_quantity',
-            'total_drivers', 'total_vehicles',
-            'created_at', 'updated_at'
-        ]
-        read_only_fields = [
-            'id', 'owner', 'created_at', 'updated_at',
-            'billing_status', 'trial_ends_at', 'billing_quantity',
-        ]
-    
-    def get_total_drivers(self, obj):
-        return obj.users.filter(role=User.Role.DRIVER).count()
-    
-    def get_total_vehicles(self, obj):
-        return obj.vehicles.count() if hasattr(obj, 'vehicles') else 0
+    def to_representation(self, owner):
+        if hasattr(owner, '_profile_company_payload'):
+            return owner._profile_company_payload
+        profile, _ = FleetOwnerProfile.objects.get_or_create(user=owner)
+        return {
+            'id': str(owner.id),
+            'name': profile.company_name or owner.get_full_name(),
+            'logo': None,
+            'registration_number': profile.business_registration_number,
+            'address': profile.business_address,
+            'contact_email': owner.email,
+            'contact_phone': profile.business_phone or owner.phone_number,
+            'is_active': owner.is_active,
+            'subscription_plan': owner.subscription_plan,
+            'owner': UserSerializer(owner).data,
+            'billing_status': owner.billing_status,
+            'trial_ends_at': owner.trial_ends_at,
+            'billing_quantity': owner.billing_quantity,
+            'total_drivers': owner.driver_profiles.count(),
+            'total_vehicles': owner.vehicles.count(),
+            'created_at': owner.date_joined,
+            'updated_at': owner.updated_at,
+        }
 
 
 class PasswordChangeSerializer(serializers.Serializer):

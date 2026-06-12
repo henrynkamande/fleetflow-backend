@@ -27,7 +27,7 @@ BILLING_ENFORCE = _env_bool('BILLING_ENFORCE', default=True)
 # Dev/local: start trial in-app without Stripe Checkout (no card collected).
 BILLING_ALLOW_TRIAL_WITHOUT_PAYMENT = _env_bool(
     'BILLING_ALLOW_TRIAL_WITHOUT_PAYMENT',
-    default=False,
+    default=settings.DEBUG,
 )
 
 STRIPE_API_VERSION = os.environ.get('STRIPE_API_VERSION', '2026-04-22.dahlia')
