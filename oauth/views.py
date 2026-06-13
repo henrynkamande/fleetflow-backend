@@ -299,6 +299,10 @@ def register_fleet_owner(request):
             )
             user.password = pending.password
             user.save()
+            FleetOwnerProfile.objects.update_or_create(
+                user=user,
+                defaults={'preferred_currency': pending.preferred_currency},
+            )
             pending.delete()
             from billing.access import owner_has_platform_access, owner_requires_checkout
 

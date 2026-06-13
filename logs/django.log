@@ -9988,3 +9988,410 @@ TypeError: unsupported operand type(s) for +: 'decimal.Decimal' and 'NoneType'
 [INFO] 2026-06-12 07:38:13,392 timing 14870 139894802347712 request_timing method=HEAD path=/trips/api/ status=401 duration_ms=0.9
 [WARNING] 2026-06-12 07:38:13,393 log 14870 139894802347712 "HEAD /trips/api/ HTTP/1.1" 401 0
 [WARNING] 2026-06-12 07:38:13,393 log 14870 139894802347712 "HEAD /trips/api/ HTTP/1.1" 401 0
+[INFO] 2026-06-13 07:04:06,365 apps 6597 126347541262848 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:04:06,365 apps 6597 126347541262848 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:04:07,528 apps 6796 123276810985984 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:04:07,528 apps 6796 123276810985984 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:04:07,532 autoreload 6796 123276810985984 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:04:07,532 autoreload 6796 123276810985984 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:06:13,104 autoreload 6796 123276810985984 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/migrations/0008_remove_company_table.py changed, reloading.
+[INFO] 2026-06-13 07:06:13,104 autoreload 6796 123276810985984 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/migrations/0008_remove_company_table.py changed, reloading.
+[INFO] 2026-06-13 07:06:15,700 apps 8434 123153891103232 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:06:15,700 apps 8434 123153891103232 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:06:15,704 autoreload 8434 123153891103232 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:06:15,704 autoreload 8434 123153891103232 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:09:39,202 autoreload 8434 123153891103232 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/models.py changed, reloading.
+[INFO] 2026-06-13 07:09:39,202 autoreload 8434 123153891103232 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/models.py changed, reloading.
+[INFO] 2026-06-13 07:09:41,388 apps 10107 134717383553536 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:09:41,388 apps 10107 134717383553536 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:09:41,393 autoreload 10107 134717383553536 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:09:41,393 autoreload 10107 134717383553536 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:09:48,184 autoreload 10107 134717383553536 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:09:48,184 autoreload 10107 134717383553536 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:09:50,549 apps 10313 125905953296896 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:09:50,549 apps 10313 125905953296896 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:09:50,556 autoreload 10313 125905953296896 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:09:50,556 autoreload 10313 125905953296896 Watching for file changes with StatReloader
+[WARNING] 2026-06-13 07:12:16,527 timing 10313 125905347274432 request_timing method=GET path=/content/api/posts/ status=200 duration_ms=813.1
+[INFO] 2026-06-13 07:12:16,570 log 10313 125905347274432 "GET /content/api/posts/?status=published&limit=6&page=1 HTTP/1.1" 200 477
+[INFO] 2026-06-13 07:12:16,570 log 10313 125905347274432 "GET /content/api/posts/?status=published&limit=6&page=1 HTTP/1.1" 200 477
+[INFO] 2026-06-13 07:12:16,980 timing 10313 125905322096320 request_timing method=GET path=/media/blog_covers/4ae0b8bcc5134d198945442f97fbddf7.jpeg status=304 duration_ms=8.6
+[INFO] 2026-06-13 07:12:16,982 log 10313 125905322096320 "GET /media/blog_covers/4ae0b8bcc5134d198945442f97fbddf7.jpeg HTTP/1.1" 304 0
+[INFO] 2026-06-13 07:12:16,982 log 10313 125905322096320 "GET /media/blog_covers/4ae0b8bcc5134d198945442f97fbddf7.jpeg HTTP/1.1" 304 0
+[INFO] 2026-06-13 07:12:17,044 timing 10313 125905330489024 request_timing method=GET path=/media/blog_covers/b7b4cab983fd443fb92545bc2ed74efc.png status=200 duration_ms=80.8
+[INFO] 2026-06-13 07:12:17,044 timing 10313 125905338881728 request_timing method=GET path=/media/blog_covers/8a37d90c7f694edc92dc57af3d5003df.jpg status=200 duration_ms=90.6
+[INFO] 2026-06-13 07:12:17,134 log 10313 125905338881728 "GET /media/blog_covers/8a37d90c7f694edc92dc57af3d5003df.jpg HTTP/1.1" 200 69152
+[INFO] 2026-06-13 07:12:17,134 log 10313 125905338881728 "GET /media/blog_covers/8a37d90c7f694edc92dc57af3d5003df.jpg HTTP/1.1" 200 69152
+[INFO] 2026-06-13 07:12:17,628 log 10313 125905330489024 "GET /media/blog_covers/b7b4cab983fd443fb92545bc2ed74efc.png HTTP/1.1" 200 2439807
+[INFO] 2026-06-13 07:12:17,628 log 10313 125905330489024 "GET /media/blog_covers/b7b4cab983fd443fb92545bc2ed74efc.png HTTP/1.1" 200 2439807
+[INFO] 2026-06-13 07:12:30,327 timing 10313 125905347274432 request_timing method=GET path=/content/api/posts/ status=200 duration_ms=717.8
+[INFO] 2026-06-13 07:12:30,329 log 10313 125905347274432 "GET /content/api/posts/?status=published&limit=6&page=1 HTTP/1.1" 200 460
+[INFO] 2026-06-13 07:12:30,329 log 10313 125905347274432 "GET /content/api/posts/?status=published&limit=6&page=1 HTTP/1.1" 200 460
+[INFO] 2026-06-13 07:15:07,977 autoreload 10313 125905953296896 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:15:07,977 autoreload 10313 125905953296896 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:15:10,897 apps 12929 138150162346496 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:15:10,897 apps 12929 138150162346496 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:15:10,904 autoreload 12929 138150162346496 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:15:10,904 autoreload 12929 138150162346496 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:15:20,747 autoreload 12929 138150162346496 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:15:20,747 autoreload 12929 138150162346496 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:15:22,997 apps 13133 138722333778432 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:15:22,997 apps 13133 138722333778432 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:15:23,002 autoreload 13133 138722333778432 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:15:23,002 autoreload 13133 138722333778432 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:18:37,898 autoreload 13133 138722333778432 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:18:37,898 autoreload 13133 138722333778432 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:18:40,321 apps 13651 127002259993088 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:18:40,321 apps 13651 127002259993088 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:18:40,327 autoreload 13651 127002259993088 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:18:40,327 autoreload 13651 127002259993088 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:20:51,088 log 13651 127001929160384 "OPTIONS /users/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:20:51,088 log 13651 127001929160384 "OPTIONS /users/api/auth/login/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:20:53,001 views 13651 127001929160384 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-06-13 07:20:53,001 views 13651 127001929160384 User logged in: josephwamiti8711@gmail.com
+[WARNING] 2026-06-13 07:20:54,431 timing 13651 127001929160384 request_timing method=POST path=/users/api/auth/login/ status=200 duration_ms=3335.0
+[INFO] 2026-06-13 07:20:54,433 log 13651 127001929160384 "POST /users/api/auth/login/ HTTP/1.1" 200 1203
+[INFO] 2026-06-13 07:20:54,433 log 13651 127001929160384 "POST /users/api/auth/login/ HTTP/1.1" 200 1203
+[INFO] 2026-06-13 07:20:57,766 log 13651 127001929160384 "OPTIONS /billing/api/config/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:20:57,766 log 13651 127001929160384 "OPTIONS /billing/api/config/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:20:57,775 log 13651 127001929160384 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:20:57,775 log 13651 127001929160384 "OPTIONS /billing/api/status/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:20:58,147 timing 13651 127001444742848 request_timing method=GET path=/billing/api/config/ status=200 duration_ms=358.0
+[INFO] 2026-06-13 07:20:58,148 log 13651 127001444742848 "GET /billing/api/config/ HTTP/1.1" 200 366
+[INFO] 2026-06-13 07:20:58,148 log 13651 127001444742848 "GET /billing/api/config/ HTTP/1.1" 200 366
+[WARNING] 2026-06-13 07:21:00,961 timing 13651 127001929160384 request_timing method=GET path=/billing/api/status/ status=200 duration_ms=3138.6
+[INFO] 2026-06-13 07:21:00,963 log 13651 127001929160384 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:21:00,963 log 13651 127001929160384 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:22:31,399 timing 13651 127001929160384 request_timing method=GET path=/billing/api/status/ status=200 duration_ms=719.1
+[INFO] 2026-06-13 07:22:31,400 log 13651 127001929160384 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:22:31,400 log 13651 127001929160384 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:23:37,683 timing 13651 127001929160384 request_timing method=GET path=/billing/api/status/ status=200 duration_ms=707.1
+[INFO] 2026-06-13 07:23:37,685 log 13651 127001929160384 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:23:37,685 log 13651 127001929160384 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:24:35,671 views 13651 127001929160384 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-06-13 07:24:35,671 views 13651 127001929160384 User logged in: josephwamiti8711@gmail.com
+[WARNING] 2026-06-13 07:24:37,713 timing 13651 127001929160384 request_timing method=POST path=/users/api/auth/login/ status=200 duration_ms=3827.3
+[INFO] 2026-06-13 07:24:37,715 log 13651 127001929160384 "POST /users/api/auth/login/ HTTP/1.1" 200 1252
+[INFO] 2026-06-13 07:24:37,715 log 13651 127001929160384 "POST /users/api/auth/login/ HTTP/1.1" 200 1252
+[INFO] 2026-06-13 07:24:38,436 timing 13651 127001929160384 request_timing method=GET path=/billing/api/config/ status=200 duration_ms=397.4
+[INFO] 2026-06-13 07:24:38,437 log 13651 127001929160384 "GET /billing/api/config/ HTTP/1.1" 200 421
+[INFO] 2026-06-13 07:24:38,437 log 13651 127001929160384 "GET /billing/api/config/ HTTP/1.1" 200 421
+[INFO] 2026-06-13 07:24:38,802 timing 13651 127001444742848 request_timing method=GET path=/billing/api/status/ status=200 duration_ms=735.6
+[INFO] 2026-06-13 07:24:38,803 log 13651 127001444742848 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:24:38,803 log 13651 127001444742848 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:26:16,328 views 13651 127001444742848 User logged in: josephwamiti8711@gmail.com
+[INFO] 2026-06-13 07:26:16,328 views 13651 127001444742848 User logged in: josephwamiti8711@gmail.com
+[WARNING] 2026-06-13 07:26:18,927 timing 13651 127001444742848 request_timing method=POST path=/users/api/auth/login/ status=200 duration_ms=4412.7
+[INFO] 2026-06-13 07:26:18,928 log 13651 127001444742848 "POST /users/api/auth/login/ HTTP/1.1" 200 1212
+[INFO] 2026-06-13 07:26:18,928 log 13651 127001444742848 "POST /users/api/auth/login/ HTTP/1.1" 200 1212
+[INFO] 2026-06-13 07:26:19,806 timing 13651 127001444742848 request_timing method=GET path=/billing/api/status/ status=200 duration_ms=705.7
+[INFO] 2026-06-13 07:26:19,807 log 13651 127001444742848 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:26:19,807 log 13651 127001444742848 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:29:11,767 apps 15230 135340258980352 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:29:11,767 apps 15230 135340258980352 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:30:42,571 timing 13651 127001444742848 request_timing method=GET path=/billing/api/status/ status=401 duration_ms=405.3
+[WARNING] 2026-06-13 07:30:42,573 log 13651 127001444742848 "GET /billing/api/status/ HTTP/1.1" 401 51
+[WARNING] 2026-06-13 07:30:42,573 log 13651 127001444742848 "GET /billing/api/status/ HTTP/1.1" 401 51
+[INFO] 2026-06-13 07:30:43,946 timing 13651 127001444742848 request_timing method=GET path=/billing/api/status/ status=401 duration_ms=361.9
+[WARNING] 2026-06-13 07:30:43,947 log 13651 127001444742848 "GET /billing/api/status/ HTTP/1.1" 401 51
+[WARNING] 2026-06-13 07:30:43,947 log 13651 127001444742848 "GET /billing/api/status/ HTTP/1.1" 401 51
+[INFO] 2026-06-13 07:31:14,376 log 13651 127001444742848 "OPTIONS /users/api/auth/register/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:31:14,376 log 13651 127001444742848 "OPTIONS /users/api/auth/register/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:31:19,819 views 13651 127001444742848 Vehicle owner signup completed without OTP: josephwamiti8711@gmail.com
+[INFO] 2026-06-13 07:31:19,819 views 13651 127001444742848 Vehicle owner signup completed without OTP: josephwamiti8711@gmail.com
+[INFO] 2026-06-13 07:31:19,819 views 13651 127001444742848 signup_timing mode=no_otp email=josephwamiti8711@gmail.com validate_ms=1104.3 save_ms=1795.4 total_ms=5433.4
+[INFO] 2026-06-13 07:31:19,819 views 13651 127001444742848 signup_timing mode=no_otp email=josephwamiti8711@gmail.com validate_ms=1104.3 save_ms=1795.4 total_ms=5433.4
+[WARNING] 2026-06-13 07:31:19,820 timing 13651 127001444742848 request_timing method=POST path=/users/api/auth/register/ status=201 duration_ms=5435.3
+[INFO] 2026-06-13 07:31:19,822 log 13651 127001444742848 "POST /users/api/auth/register/ HTTP/1.1" 201 1077
+[INFO] 2026-06-13 07:31:19,822 log 13651 127001444742848 "POST /users/api/auth/register/ HTTP/1.1" 201 1077
+[INFO] 2026-06-13 07:31:20,857 timing 13651 127001444742848 request_timing method=GET path=/billing/api/status/ status=200 duration_ms=715.2
+[INFO] 2026-06-13 07:31:20,858 log 13651 127001444742848 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:31:20,858 log 13651 127001444742848 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:31:22,687 log 13651 127001444742848 "OPTIONS /billing/api/checkout-session/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:31:22,687 log 13651 127001444742848 "OPTIONS /billing/api/checkout-session/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:31:23,057 _util 13651 127001444742848 message='Request to Stripe api' method=post url=https://api.stripe.com/v1/customers
+[INFO] 2026-06-13 07:31:24,162 _util 13651 127001444742848 message='Stripe API response' path=https://api.stripe.com/v1/customers response_code=200
+[INFO] 2026-06-13 07:31:24,894 _util 13651 127001444742848 message='Request to Stripe api' method=get url=https://api.stripe.com/v1/prices?lookup_keys[0]=fleetflow_per_vehicle_monthly&active=true&limit=1
+[INFO] 2026-06-13 07:31:25,677 _util 13651 127001444742848 message='Stripe API response' path=https://api.stripe.com/v1/prices?lookup_keys[0]=fleetflow_per_vehicle_monthly&active=true&limit=1 response_code=200
+[INFO] 2026-06-13 07:31:26,033 _util 13651 127001444742848 message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+[INFO] 2026-06-13 07:31:26,676 _util 13651 127001444742848 message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+[WARNING] 2026-06-13 07:31:26,682 timing 13651 127001444742848 request_timing method=POST path=/billing/api/checkout-session/ status=200 duration_ms=3985.8
+[INFO] 2026-06-13 07:31:26,683 log 13651 127001444742848 "POST /billing/api/checkout-session/ HTTP/1.1" 200 505
+[INFO] 2026-06-13 07:31:26,683 log 13651 127001444742848 "POST /billing/api/checkout-session/ HTTP/1.1" 200 505
+[INFO] 2026-06-13 07:31:42,811 log 13651 127001929160384 "OPTIONS /billing/api/confirm-checkout/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:31:42,811 log 13651 127001929160384 "OPTIONS /billing/api/confirm-checkout/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:31:43,176 _util 13651 127001929160384 message='Request to Stripe api' method=get url=https://api.stripe.com/v1/checkout/sessions/cs_test_a15Tm6butqoj04LJYYkqxCKE4auUvDFzh0UW6DOtnasJTUb4vgDusF8dyH
+[INFO] 2026-06-13 07:31:43,510 timing 13651 127001444742848 request_timing method=GET path=/billing/api/status/ status=200 duration_ms=704.0
+[INFO] 2026-06-13 07:31:43,510 log 13651 127001444742848 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:31:43,510 log 13651 127001444742848 "GET /billing/api/status/ HTTP/1.1" 200 188
+[INFO] 2026-06-13 07:31:43,960 _util 13651 127001929160384 message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions/cs_test_a15Tm6butqoj04LJYYkqxCKE4auUvDFzh0UW6DOtnasJTUb4vgDusF8dyH response_code=200
+[INFO] 2026-06-13 07:31:43,963 _util 13651 127001929160384 message='Request to Stripe api' method=get url=https://api.stripe.com/v1/subscriptions/sub_1Thm2XReX2UmkS1Xs79vbR3h
+[INFO] 2026-06-13 07:31:44,369 _util 13651 127001929160384 message='Stripe API response' path=https://api.stripe.com/v1/subscriptions/sub_1Thm2XReX2UmkS1Xs79vbR3h response_code=200
+[WARNING] 2026-06-13 07:31:45,437 timing 13651 127001929160384 request_timing method=POST path=/billing/api/confirm-checkout/ status=200 duration_ms=2616.1
+[INFO] 2026-06-13 07:31:45,438 log 13651 127001929160384 "POST /billing/api/confirm-checkout/ HTTP/1.1" 200 73
+[INFO] 2026-06-13 07:31:45,438 log 13651 127001929160384 "POST /billing/api/confirm-checkout/ HTTP/1.1" 200 73
+[INFO] 2026-06-13 07:31:46,193 timing 13651 127001929160384 request_timing method=GET path=/billing/api/status/ status=200 duration_ms=705.8
+[INFO] 2026-06-13 07:31:46,194 log 13651 127001929160384 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-13 07:31:46,194 log 13651 127001929160384 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-13 07:32:03,969 log 13651 127001929160384 "OPTIONS /users/api/profile/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:03,969 log 13651 127001929160384 "OPTIONS /users/api/profile/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:04,741 timing 13651 127001929160384 request_timing method=GET path=/users/api/profile/ status=200 duration_ms=719.8
+[INFO] 2026-06-13 07:32:04,742 log 13651 127001929160384 "GET /users/api/profile/ HTTP/1.1" 200 356
+[INFO] 2026-06-13 07:32:04,742 log 13651 127001929160384 "GET /users/api/profile/ HTTP/1.1" 200 356
+[INFO] 2026-06-13 07:32:05,736 log 13651 127001929160384 "OPTIONS /reports/api/overview/?period=30d HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:05,736 log 13651 127001929160384 "OPTIONS /reports/api/overview/?period=30d HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:06,703 log 13651 127001444742848 "OPTIONS /trips/api/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:06,703 log 13651 127001444742848 "OPTIONS /trips/api/ HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:07,502 timing 13651 127001444742848 request_timing method=GET path=/trips/api/ status=200 duration_ms=714.3
+[INFO] 2026-06-13 07:32:07,504 log 13651 127001444742848 "GET /trips/api/ HTTP/1.1" 200 62
+[INFO] 2026-06-13 07:32:07,504 log 13651 127001444742848 "GET /trips/api/ HTTP/1.1" 200 62
+[WARNING] 2026-06-13 07:32:08,448 timing 13651 127001929160384 request_timing method=GET path=/reports/api/overview/ status=200 duration_ms=2659.9
+[INFO] 2026-06-13 07:32:08,450 log 13651 127001929160384 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 383
+[INFO] 2026-06-13 07:32:08,450 log 13651 127001929160384 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 383
+[INFO] 2026-06-13 07:32:37,019 log 13651 127001929160384 "OPTIONS /reports/api/pl/?period=ytd HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:37,019 log 13651 127001929160384 "OPTIONS /reports/api/pl/?period=ytd HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:37,034 log 13651 127001929160384 "OPTIONS /reports/api/expenses/?period=90d&granularity=monthly HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:37,034 log 13651 127001929160384 "OPTIONS /reports/api/expenses/?period=90d&granularity=monthly HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:37,123 log 13651 127001436350144 "OPTIONS /reports/api/income/?period=90d HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:37,123 log 13651 127001436350144 "OPTIONS /reports/api/income/?period=90d HTTP/1.1" 200 0
+[WARNING] 2026-06-13 07:32:38,571 timing 13651 127001929160384 request_timing method=GET path=/reports/api/expenses/ status=200 duration_ms=1480.2
+[WARNING] 2026-06-13 07:32:38,574 timing 13651 127001444742848 request_timing method=GET path=/reports/api/pl/ status=200 duration_ms=1504.0
+[INFO] 2026-06-13 07:32:38,575 log 13651 127001929160384 "GET /reports/api/expenses/?period=90d&granularity=monthly HTTP/1.1" 200 230
+[INFO] 2026-06-13 07:32:38,575 log 13651 127001929160384 "GET /reports/api/expenses/?period=90d&granularity=monthly HTTP/1.1" 200 230
+[INFO] 2026-06-13 07:32:38,578 log 13651 127001444742848 "GET /reports/api/pl/?period=ytd HTTP/1.1" 200 327
+[INFO] 2026-06-13 07:32:38,578 log 13651 127001444742848 "GET /reports/api/pl/?period=ytd HTTP/1.1" 200 327
+[INFO] 2026-06-13 07:32:40,976 log 13651 127001444742848 "OPTIONS /vehicles/api/?fields=id,registration_number,make,model,year,color,vehicle_type,status,current_odometer,assigned_driver,assigned_driver_name,is_active,updated_at,created_at&page=1 HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:40,976 log 13651 127001444742848 "OPTIONS /vehicles/api/?fields=id,registration_number,make,model,year,color,vehicle_type,status,current_odometer,assigned_driver,assigned_driver_name,is_active,updated_at,created_at&page=1 HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:40,979 log 13651 127001929160384 "OPTIONS /users/api/users/?role=DRIVER HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:40,979 log 13651 127001929160384 "OPTIONS /users/api/users/?role=DRIVER HTTP/1.1" 200 0
+[WARNING] 2026-06-13 07:32:41,439 timing 13651 127001436350144 request_timing method=GET path=/reports/api/income/ status=200 duration_ms=4294.3
+[INFO] 2026-06-13 07:32:41,441 log 13651 127001436350144 "GET /reports/api/income/?period=90d HTTP/1.1" 200 216
+[INFO] 2026-06-13 07:32:41,441 log 13651 127001436350144 "GET /reports/api/income/?period=90d HTTP/1.1" 200 216
+[INFO] 2026-06-13 07:32:41,723 timing 13651 127001929160384 request_timing method=GET path=/users/api/users/ status=200 duration_ms=716.0
+[INFO] 2026-06-13 07:32:41,724 log 13651 127001929160384 "GET /users/api/users/?role=DRIVER HTTP/1.1" 200 62
+[INFO] 2026-06-13 07:32:41,724 log 13651 127001929160384 "GET /users/api/users/?role=DRIVER HTTP/1.1" 200 62
+[INFO] 2026-06-13 07:32:41,755 timing 13651 127001444742848 request_timing method=GET path=/vehicles/api/ status=200 duration_ms=709.4
+[INFO] 2026-06-13 07:32:41,757 log 13651 127001444742848 "GET /vehicles/api/?fields=id,registration_number,make,model,year,color,vehicle_type,status,current_odometer,assigned_driver,assigned_driver_name,is_active,updated_at,created_at&page=1 HTTP/1.1" 200 65
+[INFO] 2026-06-13 07:32:41,757 log 13651 127001444742848 "GET /vehicles/api/?fields=id,registration_number,make,model,year,color,vehicle_type,status,current_odometer,assigned_driver,assigned_driver_name,is_active,updated_at,created_at&page=1 HTTP/1.1" 200 65
+[INFO] 2026-06-13 07:32:51,186 log 13651 127001929160384 "OPTIONS /users/api/users/drivers/?is_active=true HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:51,186 log 13651 127001929160384 "OPTIONS /users/api/users/drivers/?is_active=true HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:51,193 log 13651 127001444742848 "OPTIONS /reports/api/income/?period=90d&granularity=monthly HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:51,193 log 13651 127001444742848 "OPTIONS /reports/api/income/?period=90d&granularity=monthly HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:32:52,106 timing 13651 127001444742848 request_timing method=GET path=/users/api/users/drivers/ status=200 duration_ms=749.5
+[INFO] 2026-06-13 07:32:52,115 log 13651 127001444742848 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 64
+[INFO] 2026-06-13 07:32:52,115 log 13651 127001444742848 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 64
+[WARNING] 2026-06-13 07:32:52,829 timing 13651 127001929160384 request_timing method=GET path=/reports/api/income/ status=200 duration_ms=1454.9
+[INFO] 2026-06-13 07:32:52,846 log 13651 127001929160384 "GET /reports/api/income/?period=90d&granularity=monthly HTTP/1.1" 200 210
+[INFO] 2026-06-13 07:32:52,846 log 13651 127001929160384 "GET /reports/api/income/?period=90d&granularity=monthly HTTP/1.1" 200 210
+[INFO] 2026-06-13 07:33:17,402 timing 13651 127001929160384 request_timing method=GET path=/billing/api/status/ status=200 duration_ms=707.8
+[INFO] 2026-06-13 07:33:17,404 log 13651 127001929160384 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-13 07:33:17,404 log 13651 127001929160384 "GET /billing/api/status/ HTTP/1.1" 200 204
+[WARNING] 2026-06-13 07:33:44,877 timing 13651 127001929160384 request_timing method=GET path=/reports/api/overview/ status=200 duration_ms=2515.1
+[INFO] 2026-06-13 07:33:44,879 log 13651 127001929160384 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 387
+[INFO] 2026-06-13 07:33:44,879 log 13651 127001929160384 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 387
+[INFO] 2026-06-13 07:37:07,978 autoreload 13651 127002259993088 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/models.py changed, reloading.
+[INFO] 2026-06-13 07:37:07,978 autoreload 13651 127002259993088 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/models.py changed, reloading.
+[INFO] 2026-06-13 07:37:14,110 apps 16636 127400247038464 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:37:14,110 apps 16636 127400247038464 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:37:14,252 autoreload 16636 127400247038464 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:37:14,252 autoreload 16636 127400247038464 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:37:40,653 autoreload 16636 127400247038464 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-06-13 07:37:40,653 autoreload 16636 127400247038464 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-06-13 07:37:42,736 apps 16856 133753899401728 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:37:42,736 apps 16856 133753899401728 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:37:42,740 autoreload 16856 133753899401728 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:37:42,740 autoreload 16856 133753899401728 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:37:51,637 autoreload 16856 133753899401728 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-06-13 07:37:51,637 autoreload 16856 133753899401728 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-06-13 07:37:53,775 apps 17060 133473492500992 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:37:53,775 apps 17060 133473492500992 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:37:53,780 autoreload 17060 133473492500992 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:37:53,780 autoreload 17060 133473492500992 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:38:08,893 autoreload 17060 133473492500992 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:38:08,893 autoreload 17060 133473492500992 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:38:10,971 apps 17279 135549421978112 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:38:10,971 apps 17279 135549421978112 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:38:10,975 autoreload 17279 135549421978112 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:38:10,975 autoreload 17279 135549421978112 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:38:32,136 autoreload 17279 135549421978112 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:38:32,136 autoreload 17279 135549421978112 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:38:34,240 apps 17496 123193795842560 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:38:34,240 apps 17496 123193795842560 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:38:34,246 autoreload 17496 123193795842560 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:38:34,246 autoreload 17496 123193795842560 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:39:07,903 autoreload 17496 123193795842560 /home/jowamupro/software/fleetflow/fleetflow-backend/reports/finance_service.py changed, reloading.
+[INFO] 2026-06-13 07:39:07,903 autoreload 17496 123193795842560 /home/jowamupro/software/fleetflow/fleetflow-backend/reports/finance_service.py changed, reloading.
+[INFO] 2026-06-13 07:39:10,052 apps 17747 130359687160320 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:39:10,052 apps 17747 130359687160320 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:39:10,056 autoreload 17747 130359687160320 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:39:10,056 autoreload 17747 130359687160320 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:42:55,225 autoreload 17747 130359687160320 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/views.py changed, reloading.
+[INFO] 2026-06-13 07:42:55,225 autoreload 17747 130359687160320 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/views.py changed, reloading.
+[INFO] 2026-06-13 07:42:57,674 apps 18469 139842872934912 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:42:57,674 apps 18469 139842872934912 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:42:57,679 autoreload 18469 139842872934912 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:42:57,679 autoreload 18469 139842872934912 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:44:05,557 autoreload 18469 139842872934912 /home/jowamupro/software/fleetflow/fleetflow-backend/expenses/models.py changed, reloading.
+[INFO] 2026-06-13 07:44:05,557 autoreload 18469 139842872934912 /home/jowamupro/software/fleetflow/fleetflow-backend/expenses/models.py changed, reloading.
+[INFO] 2026-06-13 07:44:08,466 apps 18737 124447032771072 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:44:08,466 apps 18737 124447032771072 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:44:08,470 autoreload 18737 124447032771072 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:44:08,470 autoreload 18737 124447032771072 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:44:14,110 autoreload 18737 124447032771072 /home/jowamupro/software/fleetflow/fleetflow-backend/expenses/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:44:14,110 autoreload 18737 124447032771072 /home/jowamupro/software/fleetflow/fleetflow-backend/expenses/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:44:16,135 apps 18952 129230766719488 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:44:16,135 apps 18952 129230766719488 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:44:16,140 autoreload 18952 129230766719488 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:44:16,140 autoreload 18952 129230766719488 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:47:51,416 autoreload 18952 129230766719488 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:47:51,416 autoreload 18952 129230766719488 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:47:53,472 apps 19561 138821549765120 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:47:53,472 apps 19561 138821549765120 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:47:53,478 autoreload 19561 138821549765120 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:47:53,478 autoreload 19561 138821549765120 Watching for file changes with StatReloader
+[WARNING] 2026-06-13 07:49:29,983 timing 19561 138821217789632 request_timing method=GET path=/billing/api/status/ status=200 duration_ms=1016.8
+[INFO] 2026-06-13 07:49:30,003 log 19561 138821217789632 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-13 07:49:30,003 log 19561 138821217789632 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-13 07:49:31,301 timing 19561 138821217789632 request_timing method=GET path=/trips/api/ status=200 duration_ms=744.3
+[INFO] 2026-06-13 07:49:31,303 log 19561 138821217789632 "GET /trips/api/ HTTP/1.1" 200 62
+[INFO] 2026-06-13 07:49:31,303 log 19561 138821217789632 "GET /trips/api/ HTTP/1.1" 200 62
+[INFO] 2026-06-13 07:49:32,131 timing 19561 138821217789632 request_timing method=GET path=/users/api/users/ status=200 duration_ms=728.8
+[INFO] 2026-06-13 07:49:32,140 log 19561 138821217789632 "GET /users/api/users/?role=DRIVER HTTP/1.1" 200 62
+[INFO] 2026-06-13 07:49:32,140 log 19561 138821217789632 "GET /users/api/users/?role=DRIVER HTTP/1.1" 200 62
+[WARNING] 2026-06-13 07:49:33,715 timing 19561 138821205550784 request_timing method=GET path=/reports/api/income/ status=200 duration_ms=3824.6
+[INFO] 2026-06-13 07:49:33,718 log 19561 138821205550784 "GET /reports/api/income/?period=90d HTTP/1.1" 200 195
+[INFO] 2026-06-13 07:49:33,718 log 19561 138821205550784 "GET /reports/api/income/?period=90d HTTP/1.1" 200 195
+[WARNING] 2026-06-13 07:49:33,949 timing 19561 138820657870528 request_timing method=GET path=/vehicles/api/ status=200 duration_ms=2540.8
+[INFO] 2026-06-13 07:49:33,950 log 19561 138820657870528 "GET /vehicles/api/?fields=id,registration_number,make,model,year,color,vehicle_type,status,current_odometer,assigned_driver,assigned_driver_name,is_active,updated_at,created_at&page=1 HTTP/1.1" 200 65
+[INFO] 2026-06-13 07:49:33,950 log 19561 138820657870528 "GET /vehicles/api/?fields=id,registration_number,make,model,year,color,vehicle_type,status,current_odometer,assigned_driver,assigned_driver_name,is_active,updated_at,created_at&page=1 HTTP/1.1" 200 65
+[WARNING] 2026-06-13 07:49:35,438 timing 19561 138820657870528 request_timing method=GET path=/users/api/profile/ status=200 duration_ms=771.5
+[INFO] 2026-06-13 07:49:35,440 log 19561 138820657870528 "GET /users/api/profile/ HTTP/1.1" 200 403
+[INFO] 2026-06-13 07:49:35,440 log 19561 138820657870528 "GET /users/api/profile/ HTTP/1.1" 200 403
+[INFO] 2026-06-13 07:49:36,862 timing 19561 138820657870528 request_timing method=GET path=/users/api/users/drivers/ status=200 duration_ms=723.0
+[INFO] 2026-06-13 07:49:36,864 log 19561 138820657870528 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 64
+[INFO] 2026-06-13 07:49:36,864 log 19561 138820657870528 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 64
+[WARNING] 2026-06-13 07:49:54,877 timing 19561 138820657870528 request_timing method=GET path=/reports/api/expenses/ status=200 duration_ms=2120.2
+[INFO] 2026-06-13 07:49:54,878 log 19561 138820657870528 "GET /reports/api/expenses/?period=90d&granularity=monthly HTTP/1.1" 200 272
+[INFO] 2026-06-13 07:49:54,878 log 19561 138820657870528 "GET /reports/api/expenses/?period=90d&granularity=monthly HTTP/1.1" 200 272
+[INFO] 2026-06-13 07:49:55,864 log 19561 138820657870528 "OPTIONS /vehicles/api/?is_active=true&page=1&page_size=100 HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:49:55,864 log 19561 138820657870528 "OPTIONS /vehicles/api/?is_active=true&page=1&page_size=100 HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:49:55,872 log 19561 138821205550784 "OPTIONS /expenses/api/?page=1&page_size=100&scope=FLEET HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:49:55,872 log 19561 138821205550784 "OPTIONS /expenses/api/?page=1&page_size=100&scope=FLEET HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:49:56,615 timing 19561 138821205550784 request_timing method=GET path=/vehicles/api/ status=200 duration_ms=718.0
+[INFO] 2026-06-13 07:49:56,616 log 19561 138821205550784 "GET /vehicles/api/?is_active=true&page=1&page_size=100 HTTP/1.1" 200 66
+[INFO] 2026-06-13 07:49:56,616 log 19561 138821205550784 "GET /vehicles/api/?is_active=true&page=1&page_size=100 HTTP/1.1" 200 66
+[INFO] 2026-06-13 07:49:56,631 timing 19561 138820657870528 request_timing method=GET path=/expenses/api/ status=200 duration_ms=728.2
+[INFO] 2026-06-13 07:49:56,633 log 19561 138820657870528 "GET /expenses/api/?page=1&page_size=100&scope=FLEET HTTP/1.1" 200 66
+[INFO] 2026-06-13 07:49:56,633 log 19561 138820657870528 "GET /expenses/api/?page=1&page_size=100&scope=FLEET HTTP/1.1" 200 66
+[WARNING] 2026-06-13 07:49:57,999 timing 19561 138821217789632 request_timing method=GET path=/reports/api/pl/ status=200 duration_ms=1466.5
+[INFO] 2026-06-13 07:49:58,001 log 19561 138821217789632 "GET /reports/api/pl/?period=ytd HTTP/1.1" 200 353
+[INFO] 2026-06-13 07:49:58,001 log 19561 138821217789632 "GET /reports/api/pl/?period=ytd HTTP/1.1" 200 353
+[INFO] 2026-06-13 07:50:07,035 log 19561 138821217789632 "OPTIONS /reports/api/pl/?period=ytd&granularity=quarterly HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:50:07,035 log 19561 138821217789632 "OPTIONS /reports/api/pl/?period=ytd&granularity=quarterly HTTP/1.1" 200 0
+[WARNING] 2026-06-13 07:50:08,613 timing 19561 138821217789632 request_timing method=GET path=/reports/api/pl/ status=200 duration_ms=1540.2
+[INFO] 2026-06-13 07:50:08,614 log 19561 138821217789632 "GET /reports/api/pl/?period=ytd&granularity=quarterly HTTP/1.1" 200 313
+[INFO] 2026-06-13 07:50:08,614 log 19561 138821217789632 "GET /reports/api/pl/?period=ytd&granularity=quarterly HTTP/1.1" 200 313
+[INFO] 2026-06-13 07:54:17,739 autoreload 19561 138821549765120 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-06-13 07:54:17,739 autoreload 19561 138821549765120 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-06-13 07:54:19,846 apps 20344 131950983352832 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:54:19,846 apps 20344 131950983352832 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:54:19,851 autoreload 20344 131950983352832 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:54:19,851 autoreload 20344 131950983352832 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:54:26,224 autoreload 20344 131950983352832 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-06-13 07:54:26,224 autoreload 20344 131950983352832 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/models.py changed, reloading.
+[INFO] 2026-06-13 07:54:28,065 apps 20543 135930053566976 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:54:28,065 apps 20543 135930053566976 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:54:28,070 autoreload 20543 135930053566976 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:54:28,070 autoreload 20543 135930053566976 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:54:38,852 autoreload 20543 135930053566976 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:54:38,852 autoreload 20543 135930053566976 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/serializers.py changed, reloading.
+[INFO] 2026-06-13 07:54:40,936 apps 20759 135306616304128 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:54:40,936 apps 20759 135306616304128 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:54:40,940 autoreload 20759 135306616304128 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:54:40,940 autoreload 20759 135306616304128 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:54:44,301 autoreload 20759 135306616304128 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/services.py changed, reloading.
+[INFO] 2026-06-13 07:54:44,301 autoreload 20759 135306616304128 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/services.py changed, reloading.
+[INFO] 2026-06-13 07:54:48,013 apps 20964 132160749519360 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:54:48,013 apps 20964 132160749519360 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:54:48,018 autoreload 20964 132160749519360 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:54:48,018 autoreload 20964 132160749519360 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:55:01,855 autoreload 20964 132160749519360 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/views.py changed, reloading.
+[INFO] 2026-06-13 07:55:01,855 autoreload 20964 132160749519360 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/views.py changed, reloading.
+[INFO] 2026-06-13 07:55:03,934 apps 21169 123552068772352 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:55:03,934 apps 21169 123552068772352 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:55:03,939 autoreload 21169 123552068772352 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:55:03,939 autoreload 21169 123552068772352 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:55:08,476 autoreload 21169 123552068772352 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/urls.py changed, reloading.
+[INFO] 2026-06-13 07:55:08,476 autoreload 21169 123552068772352 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/urls.py changed, reloading.
+[INFO] 2026-06-13 07:55:11,152 apps 21391 123647980642816 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:55:11,152 apps 21391 123647980642816 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:55:11,158 autoreload 21391 123647980642816 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:55:11,158 autoreload 21391 123647980642816 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:55:13,638 autoreload 21391 123647980642816 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/admin.py changed, reloading.
+[INFO] 2026-06-13 07:55:13,638 autoreload 21391 123647980642816 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/admin.py changed, reloading.
+[INFO] 2026-06-13 07:55:18,976 apps 21599 138113727427072 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:55:18,976 apps 21599 138113727427072 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 07:55:18,981 autoreload 21599 138113727427072 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:55:18,981 autoreload 21599 138113727427072 Watching for file changes with StatReloader
+[INFO] 2026-06-13 07:56:10,878 log 21599 138112981612224 "OPTIONS /vehicles/api/?page=1 HTTP/1.1" 200 0
+[INFO] 2026-06-13 07:56:10,878 log 21599 138112981612224 "OPTIONS /vehicles/api/?page=1 HTTP/1.1" 200 0
+[WARNING] 2026-06-13 07:56:11,594 timing 21599 138112993851072 request_timing method=GET path=/billing/api/status/ status=200 duration_ms=751.3
+[INFO] 2026-06-13 07:56:12,219 log 21599 138112993851072 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-13 07:56:12,219 log 21599 138112993851072 "GET /billing/api/status/ HTTP/1.1" 200 204
+[WARNING] 2026-06-13 07:56:12,327 timing 21599 138112981612224 request_timing method=GET path=/vehicles/api/ status=200 duration_ms=1086.1
+[INFO] 2026-06-13 07:56:12,328 log 21599 138112981612224 "GET /vehicles/api/?page=1 HTTP/1.1" 200 65
+[INFO] 2026-06-13 07:56:12,328 log 21599 138112981612224 "GET /vehicles/api/?page=1 HTTP/1.1" 200 65
+[WARNING] 2026-06-13 07:56:14,803 timing 21599 138112964826816 request_timing method=GET path=/reports/api/pl/ status=200 duration_ms=3936.0
+[INFO] 2026-06-13 07:56:14,804 log 21599 138112964826816 "GET /reports/api/pl/?period=ytd&granularity=quarterly HTTP/1.1" 200 326
+[INFO] 2026-06-13 07:56:14,804 log 21599 138112964826816 "GET /reports/api/pl/?period=ytd&granularity=quarterly HTTP/1.1" 200 326
+[WARNING] 2026-06-13 07:56:14,973 timing 21599 138112973219520 request_timing method=GET path=/users/api/users/drivers/ status=200 duration_ms=4104.3
+[INFO] 2026-06-13 07:56:14,974 log 21599 138112973219520 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 64
+[INFO] 2026-06-13 07:56:14,974 log 21599 138112973219520 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 64
+[WARNING] 2026-06-13 07:59:02,031 timing 21599 138112964826816 request_timing method=GET path=/users/api/users/drivers/ status=200 duration_ms=1320.1
+[INFO] 2026-06-13 07:59:02,453 log 21599 138112964826816 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 64
+[INFO] 2026-06-13 07:59:02,453 log 21599 138112964826816 "GET /users/api/users/drivers/?is_active=true HTTP/1.1" 200 64
+[WARNING] 2026-06-13 07:59:02,677 timing 21599 138112973219520 request_timing method=GET path=/vehicles/api/ status=200 duration_ms=1930.5
+[INFO] 2026-06-13 07:59:02,681 log 21599 138112973219520 "GET /vehicles/api/?page=1 HTTP/1.1" 200 65
+[INFO] 2026-06-13 07:59:02,681 log 21599 138112973219520 "GET /vehicles/api/?page=1 HTTP/1.1" 200 65
+[WARNING] 2026-06-13 07:59:03,824 timing 21599 138112981612224 request_timing method=GET path=/reports/api/pl/ status=200 duration_ms=3104.2
+[INFO] 2026-06-13 07:59:03,833 log 21599 138112981612224 "GET /reports/api/pl/?period=ytd&granularity=quarterly HTTP/1.1" 200 300
+[INFO] 2026-06-13 07:59:03,833 log 21599 138112981612224 "GET /reports/api/pl/?period=ytd&granularity=quarterly HTTP/1.1" 200 300
+[WARNING] 2026-06-13 07:59:04,531 timing 21599 138112993851072 request_timing method=GET path=/users/api/profile/ status=200 duration_ms=3861.6
+[INFO] 2026-06-13 07:59:04,543 log 21599 138112993851072 "GET /users/api/profile/ HTTP/1.1" 200 360
+[INFO] 2026-06-13 07:59:04,543 log 21599 138112993851072 "GET /users/api/profile/ HTTP/1.1" 200 360
+[INFO] 2026-06-13 07:59:05,360 timing 21599 138112993851072 request_timing method=GET path=/billing/api/status/ status=200 duration_ms=746.6
+[INFO] 2026-06-13 07:59:05,361 log 21599 138112993851072 "GET /billing/api/status/ HTTP/1.1" 200 204
+[INFO] 2026-06-13 07:59:05,361 log 21599 138112993851072 "GET /billing/api/status/ HTTP/1.1" 200 204
+[WARNING] 2026-06-13 07:59:07,509 timing 21599 138112993851072 request_timing method=GET path=/reports/api/income/ status=200 duration_ms=1561.0
+[INFO] 2026-06-13 07:59:07,510 log 21599 138112993851072 "GET /reports/api/income/?period=90d HTTP/1.1" 200 193
+[INFO] 2026-06-13 07:59:07,510 log 21599 138112993851072 "GET /reports/api/income/?period=90d HTTP/1.1" 200 193
+[INFO] 2026-06-13 08:06:12,932 autoreload 21599 138113727427072 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/serializers.py changed, reloading.
+[INFO] 2026-06-13 08:06:12,932 autoreload 21599 138113727427072 /home/jowamupro/software/fleetflow/fleetflow-backend/trips/serializers.py changed, reloading.
+[INFO] 2026-06-13 08:06:29,219 apps 23465 137743430312448 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 08:06:29,219 apps 23465 137743430312448 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 08:06:29,223 autoreload 23465 137743430312448 Watching for file changes with StatReloader
+[INFO] 2026-06-13 08:06:29,223 autoreload 23465 137743430312448 Watching for file changes with StatReloader
+[WARNING] 2026-06-13 08:12:11,859 timing 23465 137742688188096 request_timing method=GET path=/reports/api/overview/ status=200 duration_ms=2739.6
+[INFO] 2026-06-13 08:12:11,874 log 23465 137742688188096 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 441
+[INFO] 2026-06-13 08:12:11,874 log 23465 137742688188096 "GET /reports/api/overview/?period=30d HTTP/1.1" 200 441
+[INFO] 2026-06-13 08:14:32,966 autoreload 23465 137743430312448 /home/jowamupro/software/fleetflow/fleetflow-backend/billing/conf.py changed, reloading.
+[INFO] 2026-06-13 08:14:32,966 autoreload 23465 137743430312448 /home/jowamupro/software/fleetflow/fleetflow-backend/billing/conf.py changed, reloading.
+[INFO] 2026-06-13 08:14:35,157 apps 24220 133049654972928 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 08:14:35,157 apps 24220 133049654972928 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 08:14:35,162 autoreload 24220 133049654972928 Watching for file changes with StatReloader
+[INFO] 2026-06-13 08:14:35,162 autoreload 24220 133049654972928 Watching for file changes with StatReloader
+[INFO] 2026-06-13 08:14:37,917 autoreload 24220 133049654972928 /home/jowamupro/software/fleetflow/fleetflow-backend/billing/views.py changed, reloading.
+[INFO] 2026-06-13 08:14:37,917 autoreload 24220 133049654972928 /home/jowamupro/software/fleetflow/fleetflow-backend/billing/views.py changed, reloading.
+[INFO] 2026-06-13 08:14:39,523 apps 24418 139263593218560 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 08:14:39,523 apps 24418 139263593218560 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 08:14:39,527 autoreload 24418 139263593218560 Watching for file changes with StatReloader
+[INFO] 2026-06-13 08:14:39,527 autoreload 24418 139263593218560 Watching for file changes with StatReloader
+[INFO] 2026-06-13 08:15:32,406 timing 24418 139263257581248 request_timing method=GET path=/users/api/profile/ status=200 duration_ms=738.1
+[INFO] 2026-06-13 08:15:32,407 log 24418 139263257581248 "GET /users/api/profile/ HTTP/1.1" 200 348
+[INFO] 2026-06-13 08:15:32,407 log 24418 139263257581248 "GET /users/api/profile/ HTTP/1.1" 200 348
+[INFO] 2026-06-13 12:13:05,255 autoreload 24418 139263593218560 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/models.py changed, reloading.
+[INFO] 2026-06-13 12:13:05,255 autoreload 24418 139263593218560 /home/jowamupro/software/fleetflow/fleetflow-backend/oauth/models.py changed, reloading.
+[INFO] 2026-06-13 12:13:08,761 apps 34770 129384464257536 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 12:13:08,761 apps 34770 129384464257536 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
+[INFO] 2026-06-13 12:13:08,769 autoreload 34770 129384464257536 Watching for file changes with StatReloader
+[INFO] 2026-06-13 12:13:08,769 autoreload 34770 129384464257536 Watching for file changes with StatReloader

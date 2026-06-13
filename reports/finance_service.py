@@ -14,6 +14,13 @@ from django.utils import timezone
 
 from trips.models import Trip
 
+PAYMENT_MODE_LABELS = {
+    Trip.DriverPaymentMode.MONTHLY_FIXED: 'Paid Monthly',
+    Trip.DriverPaymentMode.WEEKLY_TRIPS: 'Weekly Payment',
+    Trip.DriverPaymentMode.FIXED_DAILY: 'Fixed Pay Daily',
+    Trip.DriverPaymentMode.PER_TRIP: 'Per Trip',
+}
+
 
 def _decimal(value) -> Decimal:
     if value is None:
@@ -70,7 +77,7 @@ def base_trips(filters: FinanceFilters):
     qs = (
         Trip.objects.filter(fleet_owner_id=filters.fleet_owner_id)
         .exclude(status=Trip.TripStatus.CANCELLED)
-        .select_related('vehicle', 'driver', 'driver__user')
+        .select_related('vehicle', 'driver', 'driver__user', 'customer')
     )
     qs = qs.filter(
         planned_departure_time__date__gte=filters.start,
@@ -84,9 +91,11 @@ def base_trips(filters: FinanceFilters):
 
 
 def trip_income_status(trip: Trip) -> str:
-    if trip.status == Trip.TripStatus.COMPLETED:
+    if trip.income_status == Trip.IncomeStatus.PAID:
         return 'Paid'
-    if trip.status == Trip.TripStatus.FLAGGED:
+    if trip.income_status == Trip.IncomeStatus.PARTIAL:
+        return 'Partial'
+    if trip.income_status == Trip.IncomeStatus.OVERDUE:
         return 'Overdue'
     return 'Pending'
 
@@ -143,6 +152,38 @@ def pct_change(current: Decimal, previous: Decimal) -> float | None:
     return float(((current - previous) / previous) * 100)
 
 
+def build_driver_payout_modes(trips) -> list[dict[str, Any]]:
+    buckets: dict[str, dict[str, Any]] = {}
+    for trip in trips:
+        mode = trip.driver_payment_mode or Trip.DriverPaymentMode.PER_TRIP
+        if mode not in buckets:
+            buckets[mode] = {
+                'mode': mode,
+                'label': PAYMENT_MODE_LABELS.get(mode, mode.replace('_', ' ').title()),
+                'total': Decimal('0'),
+                'trip_count': 0,
+            }
+        buckets[mode]['total'] += _decimal(trip.driver_payment)
+        buckets[mode]['trip_count'] += 1
+
+    ordered_modes = [
+        Trip.DriverPaymentMode.MONTHLY_FIXED,
+        Trip.DriverPaymentMode.WEEKLY_TRIPS,
+        Trip.DriverPaymentMode.FIXED_DAILY,
+        Trip.DriverPaymentMode.PER_TRIP,
+    ]
+    return [
+        {
+            'mode': mode,
+            'label': buckets[mode]['label'],
+            'total': _money_float(buckets[mode]['total']),
+            'trip_count': buckets[mode]['trip_count'],
+        }
+        for mode in ordered_modes
+        if mode in buckets
+    ]
+
+
 def build_summary(filters: FinanceFilters, prev_filters: FinanceFilters) -> dict:
     current_trips = list(base_trips(filters))
     prev_trips = list(base_trips(prev_filters))
@@ -193,7 +234,11 @@ def build_income_payload(filters: FinanceFilters, granularity: str = 'monthly') 
     records = []
     for trip in trips:
         amount = _decimal(trip.revenue_amount)
-        client = (trip.customer_name or '').strip() or 'Unassigned client'
+        client = (
+            (trip.customer.name if trip.customer_id and trip.customer else '')
+            or (trip.customer_name or '').strip()
+            or 'Unassigned client'
+        )
         client_buckets[client] += amount
         dt = trip.planned_departure_time
         if dt:
@@ -304,6 +349,7 @@ def build_expenses_payload(filters: FinanceFilters, granularity: str = 'monthly'
         'summary': summary,
         'trend': trend,
         'by_category': by_category,
+        'driver_payouts_by_mode': build_driver_payout_modes(trips),
         'records': records,
     }
 
@@ -375,6 +421,7 @@ def build_pl_payload(filters: FinanceFilters, granularity: str = 'monthly') -> d
         'summary': summary,
         'trend': trend,
         'statement': statement,
+        'driver_payouts_by_mode': build_driver_payout_modes(trips),
     }
 
 
@@ -523,6 +570,7 @@ def build_overview_payload(filters: FinanceFilters) -> dict:
         'active_trip_count': active_trip_count,
         'ongoing_trips': ongoing_trips,
         'expense_breakdown': expense_breakdown,
+        'driver_payouts_by_mode': build_driver_payout_modes(current_trips),
         'expense_total': _money_float(expense_total),
         'top_drivers': top_drivers,
         'top_vehicles': top_vehicles,

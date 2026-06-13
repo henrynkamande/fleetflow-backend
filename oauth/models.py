@@ -128,7 +128,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             models.Index(fields=['email', 'role']),
             models.Index(fields=['phone_number']),
             models.Index(fields=['fleet_owner', 'role']),
-            models.Index(fields=['billing_status']),
         ]
     
     def __str__(self):
@@ -194,6 +193,12 @@ class DriverProfile(models.Model):
         FULL_TIME = 'FULL_TIME', 'Full Time'
         PART_TIME = 'PART_TIME', 'Part Time'
         CONTRACT = 'CONTRACT', 'Contract'
+
+    class PaymentType(models.TextChoices):
+        MONTHLY_FIXED = 'MONTHLY_FIXED', 'Paid Monthly'
+        WEEKLY_TRIPS = 'WEEKLY_TRIPS', 'Weekly Payment'
+        FIXED_DAILY = 'FIXED_DAILY', 'Fixed Pay Daily'
+        PER_TRIP = 'PER_TRIP', 'Per Trip'
     
     user = models.OneToOneField(
         User,
@@ -240,13 +245,8 @@ class DriverProfile(models.Model):
     payment_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     payment_type = models.CharField(
         max_length=20,
-        choices=[
-            ('PER_TRIP', 'Per Trip'),
-            ('PER_KM', 'Per Kilometer'),
-            ('PER_HOUR', 'Per Hour'),
-            ('FIXED', 'Fixed Salary'),
-        ],
-        default='PER_TRIP'
+        choices=PaymentType.choices,
+        default=PaymentType.PER_TRIP
     )
     bank_account_number = models.CharField(max_length=50, null=True, blank=True)
     bank_name = models.CharField(max_length=100, null=True, blank=True)
@@ -409,6 +409,7 @@ class PendingFleetOwnerSignup(models.Model):
     phone_number = models.CharField(max_length=20)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    preferred_currency = models.CharField(max_length=3, default='USD')
     password = models.CharField(max_length=128)
     code_hash = models.CharField(max_length=128, blank=True)
     code_expires_at = models.DateTimeField(null=True, blank=True)

@@ -31,7 +31,7 @@ def _public_pricing_payload() -> dict:
         'unit_amount_display': f'${amount_usd:.2f}',
         'per_vehicle_label': f'${amount_usd:.0f} USD per vehicle / month',
         'trial_days': conf.BILLING_TRIAL_DAYS,
-        'note': 'Converted from KES 500 per vehicle at approximately 4 USD.',
+        'note': 'USD pricing per vehicle after the free trial.',
     }
 
 

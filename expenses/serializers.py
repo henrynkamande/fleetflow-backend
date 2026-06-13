@@ -21,6 +21,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
             'category',
             'status',
             'amount',
+            'driver_payment_mode',
             'description',
             'vendor',
             'expense_date',

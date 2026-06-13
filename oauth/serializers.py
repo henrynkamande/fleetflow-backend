@@ -113,12 +113,13 @@ class FleetOwnerRegistrationSerializer(serializers.ModelSerializer):
         required=True,
         style={'input_type': 'password'},
     )
+    preferred_currency = serializers.CharField(max_length=3, default='USD')
 
     class Meta:
         model = PendingFleetOwnerSignup
         fields = [
             'email', 'phone_number', 'first_name', 'last_name',
-            'password', 'confirm_password',
+            'preferred_currency', 'password', 'confirm_password',
         ]
 
     def validate_email(self, value):
@@ -131,6 +132,12 @@ class FleetOwnerRegistrationSerializer(serializers.ModelSerializer):
         if User.objects.filter(phone_number=value, is_verified=True).exists():
             raise serializers.ValidationError('A user with this phone number already exists.')
         return value
+
+    def validate_preferred_currency(self, value):
+        currency = value.strip().upper()
+        if len(currency) != 3 or not currency.isalpha():
+            raise serializers.ValidationError('Currency must be a valid 3-letter ISO currency code.')
+        return currency
 
     def validate(self, data):
         if data['password'] != data['confirm_password']:
@@ -156,6 +163,7 @@ class FleetOwnerRegistrationSerializer(serializers.ModelSerializer):
                 'phone_number': validated_data['phone_number'],
                 'first_name': validated_data['first_name'],
                 'last_name': validated_data['last_name'],
+                'preferred_currency': validated_data.get('preferred_currency', 'USD'),
                 'password': make_password(plain_password),
             },
         )
@@ -231,12 +239,7 @@ class DriverOnboardingSerializer(serializers.ModelSerializer, PasswordGeneration
         required=False
     )
     payment_type = serializers.ChoiceField(
-        choices=[
-            ('PER_TRIP', 'Per Trip'),
-            ('PER_KM', 'Per Kilometer'),
-            ('PER_HOUR', 'Per Hour'),
-            ('FIXED', 'Fixed Salary'),
-        ],
+        choices=DriverProfile.PaymentType.choices,
         required=False
     )
     
@@ -364,6 +367,8 @@ class DriverCreateSerializer(serializers.Serializer):
         choices=DriverProfile.EmploymentStatus.choices,
         required=False,
     )
+    payment_rate = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    payment_type = serializers.ChoiceField(choices=DriverProfile.PaymentType.choices, required=False)
 
     def validate_phone_number(self, value):
         request = self.context.get('request')
@@ -471,6 +476,10 @@ class DriverCreateSerializer(serializers.Serializer):
         employment_status = validated_data.get('employment_status')
         if employment_status:
             profile.employment_status = employment_status
+        if 'payment_rate' in validated_data:
+            profile.payment_rate = validated_data['payment_rate']
+        if 'payment_type' in validated_data:
+            profile.payment_type = validated_data['payment_type']
         profile.date_hired = timezone.now().date()
         profile.save()
         DriverProfile.objects.get_or_create(user=user)
@@ -837,10 +846,13 @@ def serialize_user_for_api(user: User, request=None) -> dict:
     """Build a JSON-safe user dict."""
     fleet_owner_id = user.id if user.is_fleet_owner else user.fleet_owner_id
     business_name = None
+    preferred_currency = 'USD'
     owner = user if user.is_fleet_owner else getattr(user, 'fleet_owner', None)
     if owner:
         try:
-            business_name = owner.fleet_owner_profile.company_name
+            profile = owner.fleet_owner_profile
+            business_name = profile.company_name
+            preferred_currency = profile.preferred_currency
         except (ObjectDoesNotExist, AttributeError, FleetOwnerProfile.DoesNotExist):
             business_name = owner.get_full_name()
 
@@ -876,6 +888,7 @@ def serialize_user_for_api(user: User, request=None) -> dict:
         'fleet_owner_id': str(fleet_owner_id) if fleet_owner_id else None,
         'company_id': str(fleet_owner_id) if fleet_owner_id else None,
         'company_name': business_name,
+        'preferred_currency': preferred_currency,
         'has_company': bool(fleet_owner_id),
         'driver_profile_id': driver_profile_id,
     }
@@ -889,6 +902,7 @@ class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.ReadOnlyField()
     company_id = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
+    preferred_currency = serializers.SerializerMethodField()
     has_company = serializers.SerializerMethodField()
     driver_profile_id = serializers.SerializerMethodField()
     
@@ -898,11 +912,12 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'email', 'phone_number', 'first_name', 'last_name',
             'full_name', 'role', 'avatar', 'avatar_url', 'is_verified',
             'is_active', 'date_joined', 'last_login',
-            'company_id', 'company_name', 'has_company', 'driver_profile_id',
+            'company_id', 'company_name', 'preferred_currency', 'has_company', 'driver_profile_id',
         ]
         read_only_fields = [
             'id', 'email', 'role', 'is_verified', 'is_active',
-            'date_joined', 'last_login', 'company_id', 'company_name'
+            'date_joined', 'last_login', 'company_id', 'company_name',
+            'preferred_currency',
         ]
 
     def to_representation(self, instance):
@@ -932,6 +947,15 @@ class UserSerializer(serializers.ModelSerializer):
         except (ObjectDoesNotExist, AttributeError, FleetOwnerProfile.DoesNotExist):
             return owner.get_full_name()
 
+    def get_preferred_currency(self, obj):
+        owner = obj if obj.is_fleet_owner else getattr(obj, 'fleet_owner', None)
+        if not owner:
+            return 'USD'
+        try:
+            return owner.fleet_owner_profile.preferred_currency
+        except (ObjectDoesNotExist, AttributeError, FleetOwnerProfile.DoesNotExist):
+            return 'USD'
+
     def get_has_company(self, obj):
         return bool(obj.is_fleet_owner or obj.fleet_owner_id)
 
@@ -950,9 +974,12 @@ class UserListSerializer(serializers.Serializer):
     def to_representation(self, user):
         owner = user if user.is_fleet_owner else getattr(user, 'fleet_owner', None)
         company_name = None
+        preferred_currency = 'USD'
         if owner:
             try:
-                company_name = owner.fleet_owner_profile.company_name or owner.get_full_name()
+                profile = owner.fleet_owner_profile
+                company_name = profile.company_name or owner.get_full_name()
+                preferred_currency = profile.preferred_currency
             except (ObjectDoesNotExist, AttributeError, FleetOwnerProfile.DoesNotExist):
                 company_name = owner.get_full_name()
         driver_profile_id = None
@@ -978,6 +1005,7 @@ class UserListSerializer(serializers.Serializer):
             'last_login': user.last_login.isoformat() if user.last_login else None,
             'company_id': str(owner.id) if owner else None,
             'company_name': company_name,
+            'preferred_currency': preferred_currency,
             'has_company': bool(owner),
             'driver_profile_id': driver_profile_id,
         }
@@ -985,10 +1013,12 @@ class UserListSerializer(serializers.Serializer):
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating user profile"""
+
+    preferred_currency = serializers.CharField(required=False, max_length=3)
     
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'phone_number', 'avatar']
+        fields = ['first_name', 'last_name', 'phone_number', 'avatar', 'preferred_currency']
     
     def validate_avatar(self, value):
         if value:
@@ -1003,6 +1033,28 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         if User.objects.filter(phone_number=value).exclude(id=self.instance.id).exists():
             raise serializers.ValidationError("This phone number is already in use.")
         return value
+
+    def validate_preferred_currency(self, value):
+        currency = value.strip().upper()
+        if len(currency) != 3 or not currency.isalpha():
+            raise serializers.ValidationError("Currency must be a valid 3-letter ISO currency code.")
+        return currency
+
+    def update(self, instance, validated_data):
+        preferred_currency = validated_data.pop('preferred_currency', None)
+        user = super().update(instance, validated_data)
+
+        if preferred_currency is not None:
+            if not user.is_fleet_owner:
+                raise serializers.ValidationError({
+                    'preferred_currency': 'Only fleet owners can update account currency.',
+                })
+            FleetOwnerProfile.objects.update_or_create(
+                user=user,
+                defaults={'preferred_currency': preferred_currency},
+            )
+
+        return user
 
 
 class DriverProfileSerializer(serializers.ModelSerializer):
@@ -1049,6 +1101,7 @@ class DriverProfileUpdateSerializer(serializers.ModelSerializer):
             'first_name', 'last_name', 'phone_number', 'avatar',
             'date_of_birth', 'address',
             'emergency_contact_name', 'emergency_contact_phone',
+            'payment_rate', 'payment_type',
             'bank_account_number', 'bank_name'
         ]
     
@@ -1200,6 +1253,10 @@ class SignupVerifyOTPSerializer(serializers.Serializer):
             )
             user.password = pending.password
             user.save()
+            FleetOwnerProfile.objects.update_or_create(
+                user=user,
+                defaults={'preferred_currency': pending.preferred_currency},
+            )
             pending.delete()
             return user
 

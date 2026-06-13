@@ -19,8 +19,8 @@ STRIPE_PRICE_ID = os.environ.get('STRIPE_PRICE_ID', '')
 
 BILLING_TRIAL_DAYS = int(os.environ.get('BILLING_TRIAL_DAYS', '7'))
 BILLING_CURRENCY = os.environ.get('BILLING_CURRENCY', 'usd').lower()
-# Display / fallback unit amount in cents when STRIPE_PRICE_ID is not set (500 KES ≈ $4 USD).
-BILLING_UNIT_AMOUNT_CENTS = int(os.environ.get('BILLING_UNIT_AMOUNT_CENTS', '400'))
+# Display / fallback unit amount in cents when STRIPE_PRICE_ID is not set.
+BILLING_UNIT_AMOUNT_CENTS = int(os.environ.get('BILLING_UNIT_AMOUNT_CENTS', '1000'))
 
 BILLING_ENFORCE = _env_bool('BILLING_ENFORCE', default=True)
 

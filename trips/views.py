@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from django.db import models
+from django.db.models import Count, ProtectedError
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.utils import timezone
@@ -12,11 +14,12 @@ import uuid as uuid_lib
 from fleetflow.pagination import paginate_queryset
 
 from .list_stats import build_trip_list_stats
-from .models import Trip
+from .models import Customer, Trip
 from .services import build_trip_list_queryset
 from .serializers import (
-    TripSerializer, TripListSerializer,
-    TripStartSerializer, TripCompleteSerializer, TripApproveSerializer
+    CustomerSerializer, TripSerializer, TripListSerializer,
+    TripStartSerializer, TripCompleteSerializer, TripApproveSerializer,
+    TripIncomeStatusSerializer
 )
 
 logger = logging.getLogger(__name__)
@@ -44,6 +47,86 @@ def _resolve_trip(user, trip_ref: str) -> Trip:
 # ============================================================================
 # TRIP ENDPOINTS
 # ============================================================================
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_customers(request):
+    user = request.user
+    fleet_owner = _fleet_owner_for_user(user)
+    if not fleet_owner:
+        return Response({'count': 0, 'customers': []}, status=status.HTTP_200_OK)
+
+    Customer.get_default_for_owner(fleet_owner)
+    customers = Customer.objects.filter(fleet_owner=fleet_owner).annotate(
+        trip_count=Count('trips')
+    )
+    q = request.query_params.get('q', '').strip()
+    if q:
+        customers = customers.filter(
+            models.Q(name__icontains=q)
+            | models.Q(phone__icontains=q)
+            | models.Q(email__icontains=q)
+        )
+    serializer = CustomerSerializer(customers, many=True)
+    return Response(
+        {'count': customers.count(), 'customers': serializer.data},
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_customer(request):
+    user = request.user
+    if not user.is_fleet_owner:
+        return Response({'error': 'Only fleet owners can create customers.'}, status=status.HTTP_403_FORBIDDEN)
+
+    serializer = CustomerSerializer(data=request.data)
+    if serializer.is_valid():
+        customer = serializer.save(fleet_owner=user, created_by=user)
+        return Response(
+            {'message': 'Customer created successfully.', 'customer': CustomerSerializer(customer).data},
+            status=status.HTTP_201_CREATED,
+        )
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT', 'PATCH'])
+@permission_classes([IsAuthenticated])
+def update_customer(request, customer_id):
+    user = request.user
+    if not user.is_fleet_owner:
+        return Response({'error': 'Only fleet owners can update customers.'}, status=status.HTTP_403_FORBIDDEN)
+
+    customer = get_object_or_404(Customer, id=customer_id, fleet_owner=user)
+    serializer = CustomerSerializer(customer, data=request.data, partial=request.method == 'PATCH')
+    if serializer.is_valid():
+        customer = serializer.save()
+        return Response(
+            {'message': 'Customer updated successfully.', 'customer': CustomerSerializer(customer).data},
+            status=status.HTTP_200_OK,
+        )
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_customer(request, customer_id):
+    user = request.user
+    if not user.is_fleet_owner:
+        return Response({'error': 'Only fleet owners can delete customers.'}, status=status.HTTP_403_FORBIDDEN)
+
+    customer = get_object_or_404(Customer, id=customer_id, fleet_owner=user)
+    if customer.is_default:
+        return Response({'error': 'The default cash customer cannot be deleted.'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        customer.delete()
+    except ProtectedError:
+        return Response(
+            {'error': 'This customer is assigned to trips and cannot be deleted.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    return Response({'message': 'Customer deleted successfully.'}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -80,7 +163,7 @@ def create_trip(request):
     if not user.is_fleet_owner:
         return Response({'error': 'Only fleet owners can create trips.'}, status=status.HTTP_403_FORBIDDEN)
     
-    serializer = TripSerializer(data=request.data, context={'request': request})
+    serializer = TripSerializer(data=request.data, context={'request': request, 'fleet_owner': user})
     
     if serializer.is_valid():
         # Validate vehicle belongs to fleet owner.
@@ -91,6 +174,10 @@ def create_trip(request):
         driver = serializer.validated_data.get('driver')
         if driver is not None and driver.fleet_owner_id != user.id:
             return Response({'error': 'Driver does not belong to your fleet.'}, status=status.HTTP_403_FORBIDDEN)
+
+        customer = serializer.validated_data.get('customer')
+        if customer is not None and customer.fleet_owner_id != user.id:
+            return Response({'error': 'Customer does not belong to your fleet.'}, status=status.HTTP_403_FORBIDDEN)
 
         trip = serializer.save(fleet_owner=user, created_by=user)
         
@@ -150,6 +237,9 @@ def update_trip(request, trip_ref):
         driver = serializer.validated_data.get('driver')
         if driver is not None and fleet_owner and driver.fleet_owner_id != fleet_owner.id:
             return Response({'error': 'Driver does not belong to your fleet.'}, status=status.HTTP_403_FORBIDDEN)
+        customer = serializer.validated_data.get('customer')
+        if customer is not None and fleet_owner and customer.fleet_owner_id != fleet_owner.id:
+            return Response({'error': 'Customer does not belong to your fleet.'}, status=status.HTTP_403_FORBIDDEN)
 
         serializer.save()
         logger.info(f"Trip updated by {user.email}: {trip.trip_number}")
@@ -158,6 +248,26 @@ def update_trip(request, trip_ref):
             'trip': TripSerializer(trip, context={'request': request}).data
         }, status=status.HTTP_200_OK)
 
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_trip_income_status(request, trip_ref):
+    """Manually update income/payment status without changing trip lifecycle."""
+    user = request.user
+    if not user.is_fleet_owner:
+        return Response({'error': 'Only fleet owners can update income status.'}, status=status.HTTP_403_FORBIDDEN)
+
+    trip = _resolve_trip(user, trip_ref)
+    serializer = TripIncomeStatusSerializer(data=request.data)
+    if serializer.is_valid():
+        trip.income_status = serializer.validated_data['income_status']
+        trip.save(update_fields=['income_status', 'updated_at'])
+        return Response({
+            'message': 'Income status updated successfully.',
+            'trip': TripSerializer(trip, context={'request': request}).data,
+        }, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -221,7 +331,7 @@ def complete_trip(request, trip_id):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_trip(request, trip_ref):
-    """Permanently remove a trip (fleet owner). Ongoing trips must be completed or cancelled first."""
+    """Remove a trip record only while it is still editable."""
     user = request.user
 
     if not user.is_fleet_owner:
@@ -229,19 +339,19 @@ def delete_trip(request, trip_ref):
 
     trip = _resolve_trip(user, trip_ref)
 
-    if trip.status == Trip.TripStatus.ONGOING:
+    if trip.status not in (Trip.TripStatus.PLANNED, Trip.TripStatus.DELAYED):
         return Response(
-            {'error': 'Complete or cancel this trip before deleting it.'},
+            {'error': 'Only planned or delayed trips can be removed from records. Use edit or cancel for other trip states.'},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
     trip_number = trip.trip_number
     trip.delete()
 
-    logger.info(f"Trip deleted by {user.email}: {trip_number}")
+    logger.info(f"Trip record removed by {user.email}: {trip_number}")
 
     return Response(
-        {'message': f'Trip {trip_number} has been deleted.'},
+        {'message': f'Trip {trip_number} was removed from editable records.'},
         status=status.HTTP_200_OK,
     )
 

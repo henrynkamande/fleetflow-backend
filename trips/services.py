@@ -41,5 +41,6 @@ def build_trip_list_queryset(user, params):
         'vehicle',
         'driver',
         'driver__user',
+        'customer',
         'fleet_owner',
     ).order_by('-planned_departure_time')
