@@ -38,6 +38,12 @@ class Expense(models.Model):
         PENDING = 'PENDING', 'Pending'
         OVERDUE = 'OVERDUE', 'Overdue'
 
+    class DriverPaymentMode(models.TextChoices):
+        MONTHLY_FIXED = 'MONTHLY_FIXED', 'Paid Monthly'
+        WEEKLY_TRIPS = 'WEEKLY_TRIPS', 'Weekly Payment'
+        FIXED_DAILY = 'FIXED_DAILY', 'Fixed Pay Daily'
+        PER_TRIP = 'PER_TRIP', 'Per Trip'
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     fleet_owner = models.ForeignKey(
         'oauth.User',
@@ -65,6 +71,13 @@ class Expense(models.Model):
     category = models.CharField(max_length=32, choices=Category.choices, db_index=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PAID, db_index=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
+    driver_payment_mode = models.CharField(
+        max_length=20,
+        choices=DriverPaymentMode.choices,
+        null=True,
+        blank=True,
+        help_text='Optional payment mode for driver wage expenses.',
+    )
     description = models.CharField(max_length=500)
     vendor = models.CharField(max_length=200, blank=True)
     expense_date = models.DateField(default=timezone.localdate, db_index=True)

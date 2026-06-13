@@ -2,7 +2,7 @@
 
 ## Product model
 
-- **$4 USD per vehicle / month** (configurable via `BILLING_UNIT_AMOUNT_CENTS`, default `400` — approx. KES 500 converted to USD).
+- **$10 USD per vehicle / month** (configurable via `BILLING_UNIT_AMOUNT_CENTS`, default `1000`).
 - **7-day free trial** with **payment method required** at signup (Stripe Checkout `mode: subscription` + `trial_period_days`).
 - Quantity on the subscription tracks **vehicles in the company** (synced when vehicles are added or removed).
 
@@ -17,7 +17,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 # Optional: use a Dashboard Price instead of auto-creating one
 STRIPE_PRICE_ID=price_...
 BILLING_TRIAL_DAYS=7
-BILLING_UNIT_AMOUNT_CENTS=400
+BILLING_UNIT_AMOUNT_CENTS=1000
 BILLING_CURRENCY=usd
 BILLING_ENFORCE=true
 FRONTEND_URL=http://localhost:5173

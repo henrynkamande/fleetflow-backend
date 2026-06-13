@@ -1,4 +1,6 @@
 # trips/models.py
+import calendar
+
 from django.db import models
 from django.utils import timezone
 from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
@@ -12,6 +14,63 @@ def trip_image_upload_path(instance, filename):
     ext = filename.split('.')[-1]
     filename = f"{uuid.uuid4()}.{ext}"
     return f"trips/{instance.trip.id}/images/{filename}"
+
+
+class Customer(models.Model):
+    """Fleet-owned customer/client record used for trip assignment and income tracking."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    fleet_owner = models.ForeignKey(
+        'oauth.User',
+        on_delete=models.CASCADE,
+        related_name='customers',
+        help_text="Fleet owner that owns this customer"
+    )
+    name = models.CharField(max_length=200)
+    phone = models.CharField(max_length=100, blank=True, default='')
+    email = models.EmailField(blank=True, default='')
+    address = models.TextField(blank=True, default='')
+    notes = models.TextField(blank=True, default='')
+    is_default = models.BooleanField(default=False)
+    created_by = models.ForeignKey(
+        'oauth.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_customers'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'customers'
+        ordering = ['-is_default', 'name']
+        indexes = [
+            models.Index(fields=['fleet_owner', 'name']),
+            models.Index(fields=['fleet_owner', 'is_default']),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['fleet_owner'],
+                condition=models.Q(is_default=True),
+                name='one_default_customer_per_fleet',
+            ),
+        ]
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get_default_for_owner(cls, fleet_owner):
+        customer, _ = cls.objects.get_or_create(
+            fleet_owner=fleet_owner,
+            is_default=True,
+            defaults={
+                'name': 'Cash Payment',
+                'created_by': fleet_owner,
+            },
+        )
+        return customer
 
 
 class Trip(models.Model):
@@ -31,6 +90,18 @@ class Trip(models.Model):
         PER_DELIVERY = 'PER_DELIVERY', 'Per Delivery'
         CONTRACT = 'CONTRACT', 'Contract Based'
         HOURLY = 'HOURLY', 'Hourly Rate'
+
+    class DriverPaymentMode(models.TextChoices):
+        MONTHLY_FIXED = 'MONTHLY_FIXED', 'Paid Monthly'
+        WEEKLY_TRIPS = 'WEEKLY_TRIPS', 'Weekly Payment'
+        FIXED_DAILY = 'FIXED_DAILY', 'Fixed Pay Daily'
+        PER_TRIP = 'PER_TRIP', 'Per Trip'
+
+    class IncomeStatus(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        PARTIAL = 'PARTIAL', 'Partial'
+        PAID = 'PAID', 'Paid'
+        OVERDUE = 'OVERDUE', 'Overdue'
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
@@ -58,6 +129,15 @@ class Trip(models.Model):
         blank=True,
         related_name='trips',
         help_text="Driver assigned to this trip"
+    )
+
+    customer = models.ForeignKey(
+        'trips.Customer',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='trips',
+        help_text="Customer/client assigned to this trip"
     )
     
     # Trip Identification
@@ -213,11 +293,37 @@ class Trip(models.Model):
         help_text="Driver payment for this trip"
     )
 
+    driver_payment_mode = models.CharField(
+        max_length=20,
+        choices=DriverPaymentMode.choices,
+        default=DriverPaymentMode.PER_TRIP,
+        help_text="Driver payment mode snapshot used for this trip"
+    )
+
+    driver_payment_rate = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text="Driver pay rate snapshot used to calculate this trip payout"
+    )
+
+    driver_payment_auto_calculated = models.BooleanField(
+        default=True,
+        help_text="When true, calculate driver payment from mode and rate"
+    )
+
     other_expenses = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         default=Decimal('0.00'),
         help_text="Other miscellaneous expenses"
+    )
+
+    income_status = models.CharField(
+        max_length=20,
+        choices=IncomeStatus.choices,
+        default=IncomeStatus.PENDING,
+        help_text="Payment status controlled manually by fleet admin"
     )
     
     # Trip Status & Tracking
@@ -313,6 +419,8 @@ class Trip(models.Model):
             models.Index(fields=['fleet_owner', 'planned_departure_time']),
             models.Index(fields=['fleet_owner', 'vehicle']),
             models.Index(fields=['fleet_owner', 'driver']),
+            models.Index(fields=['fleet_owner', 'customer']),
+            models.Index(fields=['fleet_owner', 'income_status']),
             models.Index(fields=['status']),
             models.Index(fields=['vehicle', 'status']),
             models.Index(fields=['driver', 'status']),
@@ -329,6 +437,17 @@ class Trip(models.Model):
         """Auto-generate trip number and perform validations"""
         if not self.trip_number:
             self.trip_number = self._generate_trip_number()
+
+        if not self.customer_id and self.fleet_owner_id:
+            self.customer = Customer.get_default_for_owner(self.fleet_owner)
+        if self.customer_id:
+            self.customer_name = self.customer.name
+            if not self.customer_contact:
+                self.customer_contact = self.customer.phone
+
+        self._sync_driver_payment_snapshot()
+        if self.driver_payment_auto_calculated:
+            self.driver_payment = self.calculate_driver_payment()
         
         # Validate odometer readings
         if self.start_odometer and self.end_odometer:
@@ -481,3 +600,40 @@ class Trip(models.Model):
         self.is_flagged = False
         self.status = self.TripStatus.COMPLETED
         self.save()
+
+    def _sync_driver_payment_snapshot(self):
+        """Default payout settings from the assigned driver profile."""
+        if not self.driver_id or not self.driver:
+            return
+        if not self.driver_payment_mode:
+            self.driver_payment_mode = getattr(self.driver, 'payment_type', self.DriverPaymentMode.PER_TRIP)
+        if not self.driver_payment_rate:
+            self.driver_payment_rate = getattr(self.driver, 'payment_rate', Decimal('0.00')) or Decimal('0.00')
+
+    def calculate_driver_payment(self):
+        """Calculate the payout amount represented by this trip."""
+        rate = self.driver_payment_rate or Decimal('0.00')
+        if not self.driver_id or rate <= 0:
+            return Decimal('0.00')
+
+        if self.driver_payment_mode == self.DriverPaymentMode.MONTHLY_FIXED:
+            trip_date = (self.actual_arrival_time or self.planned_departure_time).date()
+            if self._driver_has_prior_trip_on_date(trip_date):
+                return Decimal('0.00')
+            days_in_month = Decimal(calendar.monthrange(trip_date.year, trip_date.month)[1])
+            return (rate / days_in_month).quantize(Decimal('0.01'))
+
+        if self.driver_payment_mode == self.DriverPaymentMode.FIXED_DAILY:
+            trip_date = (self.actual_arrival_time or self.planned_departure_time).date()
+            if self._driver_has_prior_trip_on_date(trip_date):
+                return Decimal('0.00')
+            return rate
+
+        # Weekly and per-trip modes reward completed trip effort.
+        return rate
+
+    def _driver_has_prior_trip_on_date(self, trip_date):
+        return self.__class__.objects.filter(
+            driver_id=self.driver_id,
+            planned_departure_time__date=trip_date,
+        ).exclude(pk=self.pk).exists()

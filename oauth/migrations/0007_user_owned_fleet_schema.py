@@ -52,6 +52,5 @@ class Migration(migrations.Migration):
         ),
         migrations.DeleteModel(name='KYCDocument'),
         migrations.AddIndex(model_name='user', index=models.Index(fields=['fleet_owner', 'role'], name='users_fleet_o_4ce925_idx')),
-        migrations.AddIndex(model_name='user', index=models.Index(fields=['billing_status'], name='users_billing_83f64d_idx')),
         migrations.AddIndex(model_name='driverprofile', index=models.Index(fields=['fleet_owner', 'is_active'], name='driver_prof_fleet_o_d6ee9d_idx')),
     ]
