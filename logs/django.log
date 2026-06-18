@@ -10787,3 +10787,9 @@ TypeError: unsupported operand type(s) for +: 'decimal.Decimal' and 'NoneType'
 [INFO] 2026-06-15 07:37:07,881 apps 12036 130377892962816 Outbound email: SendGrid SMTP (from noreply@myfleetvault.com)
 [INFO] 2026-06-15 07:37:07,910 autoreload 12036 130377892962816 Watching for file changes with StatReloader
 [INFO] 2026-06-15 07:37:07,910 autoreload 12036 130377892962816 Watching for file changes with StatReloader
+[WARNING] 2026-06-15 07:43:16,192 timing 12036 130377154819776 request_timing method=GET path=/content/api/posts/ status=200 duration_ms=811.6
+[INFO] 2026-06-15 07:43:16,267 log 12036 130377154819776 "GET /content/api/posts/?status=published&limit=6&page=1 HTTP/1.1" 200 502
+[INFO] 2026-06-15 07:43:16,267 log 12036 130377154819776 "GET /content/api/posts/?status=published&limit=6&page=1 HTTP/1.1" 200 502
+[INFO] 2026-06-15 07:43:18,743 timing 12036 130377154819776 request_timing method=GET path=/content/api/posts/ status=200 duration_ms=721.8
+[INFO] 2026-06-15 07:43:18,745 log 12036 130377154819776 "GET /content/api/posts/?status=published&limit=6&page=1 HTTP/1.1" 200 472
+[INFO] 2026-06-15 07:43:18,745 log 12036 130377154819776 "GET /content/api/posts/?status=published&limit=6&page=1 HTTP/1.1" 200 472

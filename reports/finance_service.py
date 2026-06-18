@@ -10,6 +10,7 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
+from django.db.models import Q
 from django.utils import timezone
 
 from trips.models import Trip
@@ -79,9 +80,16 @@ def base_trips(filters: FinanceFilters):
         .exclude(status=Trip.TripStatus.CANCELLED)
         .select_related('vehicle', 'driver', 'driver__user', 'customer')
     )
+    # Include trips scheduled in range, or logged in range (e.g. planned departure slightly in the future).
     qs = qs.filter(
-        planned_departure_time__date__gte=filters.start,
-        planned_departure_time__date__lte=filters.end,
+        Q(
+            planned_departure_time__date__gte=filters.start,
+            planned_departure_time__date__lte=filters.end,
+        )
+        | Q(
+            created_at__date__gte=filters.start,
+            created_at__date__lte=filters.end,
+        )
     )
     if filters.vehicle_id:
         qs = qs.filter(vehicle_id=filters.vehicle_id)
